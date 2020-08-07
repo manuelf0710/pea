@@ -1,0 +1,89 @@
+<!--<app-loading *ngIf="isSearching"></app-loading>-->
+  <div class="row" *ngIf="datatables_config.paginatorPosition == 'top'">
+    <div class="col-md-6 col-lg-6 col-sm-12 col-12">
+        <div class="row">
+            <div class="col-m12 col-lg-12 col-sm-12 col-12">
+                <app-pagination [links]="arrlinks" (goPage)="goPage($event)" ></app-pagination>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row text-muted">
+    <div class="col-md-8 col-lg-8 col-sm-8 col-8">
+                <div class="input-group input-group-sm mb-1 float-right">
+                    <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-sm"><i class="fa fa-search"></i></span>
+                    </div>
+                    <input #movieSearchInput type="text" placeholder="Buscar" class="form-control form-control-sm" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                    <div class="text-left" *ngIf="isSearching">
+                        <i class="ml-1 fa fa-refresh fa-spin fa-2x"></i>
+                    </div> 
+                </div>          
+    </div>    
+    <div class="col-md-2 col-lg-2 col-sm-2 col-2" *ngIf="!isSearching">
+        <em class="fz-12">{{start + 1}}-{{pageTo}} de {{totalRows}}</em>
+    </div>
+    <div class="col-md-2 col-lg-2 col-sm-2 col-2" *ngIf="!isSearching">
+        <div class="float-right"><span class="fz-12">Mostrar</span> 
+            <select (change)="onChangePaginationSize()" name="" id="" [(ngModel)]="pageSize" class=" mb-1 ml-1" style="width:40px;">
+                <option [value]="le" *ngFor="let le of pageLength">{{le}}</option>
+            </select> 
+        </div>
+    </div>    
+</div>    
+<table class="table table-hover table-sm">
+    <thead >
+        <tr class="thead-dark">
+            <th>#</th>
+            <th></th>
+            <th *ngFor="let column of columns">{{column.title}}</th>
+        </tr>
+        <!--
+        <tr>
+            <th></th>
+            <th></th>
+            
+            <th *ngFor="let column of columns">
+               <input type="text" class="rounded float-right form-control form-control-sm mb-3" [disabled]="!column.searchable" style="height:25px">
+            </th>
+        </tr>-->
+    </thead>
+    <tbody>
+        <ng-container *ngIf="!isSearching">
+        <tr *ngFor="let item of dataSource; let i = index">
+            <td>{{i+1}}</td>
+            <td>
+                <div ngbDropdown class="d-idnline-block" *ngIf="!acciones.listado_seleccion">
+                    <span id="dropdownBasic1" ngbDropdownToggle></span>
+                    <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                        <button ngbDropdownItem  *ngIf="acciones.buttons.edit" (click)="editarRow(item)" class="btn btn-warning btn-sm"><i class="fa fa-pencil"></i> Editar</button>
+                        <button ngbDropdownItem  *ngIf="acciones.buttons.delete" (click)="eliminarRow(item)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Eliminar</button>
+                        <button ngbDropdownItem  *ngIf="acciones.buttons.copy" (click)="copiarRow(item)" class="btn btn-info btn-sm"><i class="fa fa-clone"></i> Copiar</button>
+                    </div>
+                  </div>
+                  <div *ngIf="acciones.listado_seleccion">
+                    <button  *ngIf="acciones.buttons.edit" (click)="editarRow(item)" class="btn btn-warning btn-sm"><i class="fa fa-pencil"></i></button>&nbsp;
+                    <button  *ngIf="acciones.buttons.delete" (click)="eliminarRow(item)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i></button>&nbsp;
+                    <button  *ngIf="acciones.buttons.copy" (click)="copiarRow(item)" class="btn btn-info btn-sm"><i class="fa fa-clone"></i></button>
+
+                  </div>
+            </td>
+            
+            <ng-container *ngFor="let column of datatables_config.columns">
+               <!--<td >{{getValueofItem(item, column)}}</td>-->               
+               <td *ngIf="!column.pipe && column.render != 'imagen'">{{item | tablevalue:column }}</td>
+               <td *ngIf="column.pipe == 'currency'">{{item | tablevalue:column | currency }}</td>
+               <td *ngIf="column.render == 'imagen'">
+                   <img [src]="api_url+'/'+item.imagen" alt="" [width]="column.width_img" *ngIf="item.imagen!=null && item.imagen!=''">
+                   <img [src]="api_url+'/uploads/productos/default/defaultproduct.png'" alt="" [width]="column.width_img" *ngIf="item.imagen == '' || item.imagen== null">
+                </td>
+            </ng-container>
+        </tr>
+        </ng-container>
+    </tbody>    
+</table>
+<div class="row" *ngIf="datatables_config.paginatorPosition == 'bottom'">
+    <div class="col-md-6 col-lg-6 ">
+      <app-pagination [links]="arrlinks" (goPage)="goPage($event)" *ngIf="!isSearching"></app-pagination>
+    </div>
+</div>

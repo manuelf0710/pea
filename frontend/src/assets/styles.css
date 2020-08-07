@@ -1,0 +1,249 @@
+.panel{
+  border: solid 1px #f1ecec;
+  /* padding: 10px 15px; */
+  margin-bottom: 10px;
+}
+.clearboth{
+  clear: both;
+}
+.panel-default>.panel-heading {
+  color: #333;
+  background-color: #f5f5f5;
+  border-color: #ddd;
+}
+.panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-right-radius: 3px;
+  border-top-left-radius: 3px;
+}
+.panel-body {
+  padding: 15px;
+}
+
+.panel-default {
+  border-color: #ddd;
+}
+.panel:hover{
+  color: #6e6e6e;
+  /* cursor: pointer; */
+  box-shadow: 0 4px 8px #efefef, 0 0 8px #efefef;
+}
+.panel-heading {
+  padding: 10px 15px;
+  border-bottom: 1px solid transparent;
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+}
+snack-bar-container.snackbar-success {
+  background: #6cce5a !important;
+  box-shadow: 0 0 25px #d7ffe4;
+}
+
+snackbar-success .mat-simple-snackbar {
+  color:#f1efeb !important;
+}
+.snackbar-success .mat-simple-snackbar-action{
+  color:#f1efeb !important;
+}
+snack-bar-container.snackbar-error {
+  background: #ff0000 !important;
+  box-shadow: 0 0 25px #d7ffe4;
+}
+
+snackbar-error .mat-simple-snackbar {
+  color:#f1efeb !important;
+}
+.snackbar-error .mat-simple-snackbar-action{
+  color:#f1efeb !important;
+}
+.loadingspinner{
+  display:inline;
+  position:absolute !important; 
+  left:5px !important;
+}
+.btnloading{
+  position: relative;
+}
+.addtext{
+  /*color: #1e88e5;*/
+  font-size: 1.5em;
+}
+.mat-sidenav-content{
+  margin-top: 80px;
+}
+.progress-bar-container {
+  height: 2px;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 11;
+}
+mat-toolbar.mat-toolbar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 10;
+  box-shadow: 0 2px 5px 0 rgba(0,0,0,.3);
+}
+.mat-toolbar.mat-primary {
+  background: #1976d2;
+  color: #fff;
+}
+.mat-toolbar-multiple-rows {
+  min-height: 64px;
+}
+.mat-toolbar-multiple-rows {
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  width: 100%;
+}
+.mat-toolbar mat-toolbar-row.notification-container {
+  padding: 0;
+  height: auto;
+  overflow: hidden;
+}
+mat-sidenav.mat-sidenav.sidenav {
+  position: fixed;
+  top: 64px;
+  bottom: 0;
+  left: 0;
+  padding: 0;
+  min-width: 260px;
+  background-color: #fafafa;
+  box-shadow: 6px 0 6px rgba(0,0,0,.1);
+}
+.mat-sidenav::-webkit-scrollbar, body::-webkit-scrollbar, mat-sidenav.sidenav::-webkit-scrollbar, mat-dialog-container::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.mat-sidenav::-webkit-scrollbar-thumb, body::-webkit-scrollbar-thumb, mat-sidenav.sidenav::-webkit-scrollbar-thumb, mat-dialog-container ::-webkit-scrollbar-thumb{
+  background-color: #6e6e6e;
+  outline: 1px solid #333;
+}
+.sidenav {
+  width: 250px;
+  max-width: 250px;
+  background: #f4f4f5;
+  overflow-x: hidden;
+  z-index: 4;
+}
+.list-group {
+  margin-bottom: 20px;
+  padding-left: 0;
+}
+a.list-group-item, button.list-group-item {
+  color: #555;
+}
+.menubg {
+  background: #f7f6f6 !important;
+}
+.list-group-item {
+  position: relative;
+  display: block;
+  padding: 10px 15px;
+  background-color: #fff;
+}
+a {
+  cursor: pointer;
+}
+.list-group-item+.list-group-item.active {
+    background: #c2185b  !important;
+}
+a.list-group-item:hover, a.list-group-item:active {
+  color: #fff !important;
+  background-color: #c2185b !important;
+}
+a.list-group-item:hover, button.list-group-item:hover {
+  text-decoration: none;
+  color: #555;
+  background-color: #f5f5f5;
+}
+.active{
+  z-index: 2;
+  color: #fff !important;
+  background-color: #3f51b5 !important;
+  border-color: #296ca5;
+}
+.nav-item > .active{
+    border-top: solid 4px #dc3545 !important;
+    background: none !important;
+    color: #000000 !important;
+}
+.tab-content > .active{
+	background: none !important;
+	color: #000000 !important;
+}
+.mat-list-item-content:hover{
+  background:#3f51b5;
+  color:#fff !important;
+  cursor: pointer;
+}
+
+.example-container {
+    width: 100%;
+    height: 100%;
+    min-height: 500px;
+    margin: 10px;
+    border: 1px solid #555;
+  }
+  .all-wrap {
+    min-height: 100vh;
+  }
+   
+  .page-wrap {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+   
+  .content {
+    flex: 1;
+  }
+  
+.mat-drawer-container {
+    background-color: #303030;
+    color: #777 !important; 
+}  
+
+.mat-drawer {
+    background-color: #424242;
+    color: #777 !important;
+}
+   
+   
+  /*
+   * Make the Component injected by Router Outlet full height:
+   */
+  main {
+    display: flex;
+    flex-direction: column;
+    > *:not(router-outlet) {
+      flex: 1;
+      display: block;
+    }
+  }
+  .example-full-width {
+    width: 100%;
+  }
+.margenes{
+    margin-left: 1px;
+    margin-right: 1px;
+} 
+.titlered{
+    color:#E76C67;
+} 
+.sizefont{
+    font-size: 1.5em;
+}
+.font9{
+    font-size:0.9em;
+}
+
+.formcreate{
+  padding:3px;
+  background: #ffffff !important;
+}

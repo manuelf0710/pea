@@ -1,0 +1,9 @@
+.fixed{
+    left: 45%;
+    position: fixed;
+    top:.2em;
+    z-index:10;    
+}
+.alert{
+    padding: .35rem 1.25rem;
+}

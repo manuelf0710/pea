@@ -1,0 +1,42 @@
+<div class="row">
+  <div class="col">
+    <h2>Modulos</h2>
+  </div>
+</div>
+<div class="row">
+  <div class="col-md-12 col-lg-12 ">
+        <input style="width:350px;" type="text" placeholder="Busca Modulos"  [(ngModel)]="modulosearch" id="modulosearch" name="modulosearch" class="rounded float-right form-control mb-3" >
+  </div>
+</div>
+<div class="row">
+
+        <div class="col-sm-3 col-3 col-lg-2 text-center  mr-1" *ngFor="let modulo of modulos | filterfor : { nombre: modulosearch, descripcion: modulosearch }: false  ">
+          <div class="col ">
+                <button  type="button" class="btn btn-lg bg-light border border-dark" (click)="goTo(modulo)">
+                  <i class="fa fa-5x fa-server text-dark"></i>
+                 {{modulo.nombre}}
+                </button>
+				 {{modulo.descripcion}}
+          </div>
+        </div> 
+		<!--
+      <div class="col-md-4 col-lg-4 col-xs-12" *ngFor="let modulo of modulos | filterfor : { nombre: modulosearch, descripcion: modulosearch }: false  " >
+        <div class="card mb-3" style="/*max-width: 540px;*/ min-height:150px" >
+          <div class="row no-gutters">
+            <div class="col-md-2">
+                <img src="assets/img/modulo.png" width="70px" />
+            </div>
+            <div class="col-md-10 ">
+              <div class="card-body">
+                <h5 class="card-title">{{modulo.nombre}}</h5>
+                <p class="card-text" style="font-size:10px;">{{modulo.descripcion}}</p>
+              </div>
+              <div class="card-footer">
+                  <div style="font-size:10px;" class="text-right"><button  (click)="goTo(modulo)" class="btn btn-primary btn-sm btn-block">Ingresar <i class="fa fa-angle-double-right"></i></button></div>  
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>-->
+</div>
+<router-outlet></router-outlet>
