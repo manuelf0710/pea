@@ -31,7 +31,11 @@ export class AutocompleteComponent implements OnInit {
       .post<any>(this.url,{globalsearch:term}).pipe(
         map(response => {
           console.log(response.data);
-          return response.data;
+			  if(response.data){
+				return response.data;
+			  }else{
+				  return response;
+			  }
           }
           )
       );    

@@ -33,17 +33,17 @@ const routes: Routes = [
         }
         }        
     },
-     /* {
-        path: 'pos',
-        loadChildren: () => import('./pos/pos.module').then(m => m.PosModule),
+      {
+        path: 'pea',
+        loadChildren: () => import('./pea/pea.module').then(m => m.PeaModule),
         canActivate: [AuthGuard],
         data: {
           breadcrumb: { 
-            label:'pos',
-            info:{icon: 'fa fa-arrow-fa-asterisk-down', iconType: 'bootstrap', label:'pos' }
+            label:'pea',
+            info:{icon: 'fa fa-arrow-fa-asterisk-down', iconType: 'bootstrap', label:'pea' }
          }
         }
-     }*/
+     }
     ]
   },
 

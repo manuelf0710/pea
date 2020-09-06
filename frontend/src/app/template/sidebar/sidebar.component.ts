@@ -34,18 +34,18 @@ export class SidebarComponent implements OnInit {
                         { heading:false, page: 'cards', url:'pagetres', icon:'sidebar-item-icon fa fa-file-text', hijos:[]}
                       ];
 */
-public pages_menu:{} = [];
-/*
+//public pages_menu:{} = [];
+
   public pages_menu:{} = [
-                        {heading:false, page: 'tabs sidebarcomponet', url:'pageuno', hijos:[]},
-                        {heading:true, page: 'tables', url:'pagedos',hijos:[
-                                                                                                          {page: 'hijo uno', url:'hijouno'},
-                                                                                                          {page: 'hijo dos', url:'hijodos'}
+                        {heading:false, page: 'Programar ODS', url:'pea', hijos:[]},
+                        {heading:true, page: 'With SubItems', url:'subitems',hijos:[
+                                                                                                          {page: 'SubItem uno', url:'subitem1'},
+                                                                                                          {page: 'SubItem dos', url:'subitem2'}
                                                                                                          ]
                         },
-                        { heading:false, page: 'cards', url:'pagetres',  hijos:[]}
+                        { heading:false, page: 'other linl', url:'other link',  hijos:[]}
                       ];
-  public pages_menu2:{} = [
+  /*public pages_menu2:{} = [
                         {heading:false, page: 'tabs menu22222 manuelf', url:'pageuno', hijos:[]},
                         {heading:true, page: 'tables', url:'pagedos',hijos:[
                                                                                                           {page: 'hijo uno', url:'hijouno'},
@@ -79,12 +79,16 @@ public pages_menu:{} = [];
         .subscribe(event => {
             let modulo_menu = [];
             modulo_menu = JSON.parse(localStorage.getItem('modulos'));
+            console.log("antes del ");
 			if(event instanceof NavigationEnd ){
+        console.log("despues del");
               let modulo = event.url.split("/");
               let find = false;
               if(modulo_menu){
               modulo_menu.forEach(element => {
+                console.log("en el foreach");
                 if(element.url == modulo[1]){
+                  console.log("filtrado dentro del foreach");
                   this.pages_menu = element.pages_menu;
                   find = true;
                 }

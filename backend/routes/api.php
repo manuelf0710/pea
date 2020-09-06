@@ -30,3 +30,19 @@ Route::group([
 	Route::post('requerimientos_lista', 'RequerimientoController@index');
 	Route::get('requerimientos_lista', 'RequerimientoController@index');*/
 });
+
+Route::group(['middleware' => ['jwt.auth']], function () {
+	Route::group([
+    'prefix' => 'comun',
+	], function () {
+		Route::post('buscarproducto', 'pea\ProductoController@buscarProducto')->name('buscar_producto');
+		
+	});
+	
+	Route::group([
+    'prefix' => 'pea',
+	], function () {
+		//Route::post('productoslist', 'pos\ProductoController@listado')->name('productos_listado');
+		//Route::post('buscarproducto', 'pea\ProductoController@buscarProducto')->name('buscar_productoget');
+	});
+});

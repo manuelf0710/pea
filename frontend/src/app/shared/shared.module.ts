@@ -32,6 +32,7 @@ import {
   NgbDatepickerI18n,
 } from '@ng-bootstrap/ng-bootstrap';
 import { AutocompleteComponent } from './components/autocomplete/autocomplete.component';
+import { BuscarProductoComponent } from './components/buscar-producto/buscar-producto.component';
 
 
 @NgModule({
@@ -43,7 +44,7 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
     FileUploadComponent, 
     DatatablescustomComponent, 
     TablevaluePipe, 
-    PaginationComponent, SelectionlistComponent, BgtableComponent, ToastsContainerComponent, AutocompleteComponent,
+    PaginationComponent, SelectionlistComponent, BgtableComponent, ToastsContainerComponent, AutocompleteComponent, BuscarProductoComponent,
   ],
   imports: [
     CommonModule,
@@ -63,6 +64,7 @@ import { AutocompleteComponent } from './components/autocomplete/autocomplete.co
     BgtableComponent,
     ToastsContainerComponent,
     AutocompleteComponent,
+    BuscarProductoComponent,
 
   ],
   providers:[
