@@ -1,0 +1,9 @@
+<div class="input-group input-group-sm mb-3">
+    <input type="text" class="form-control form-control-sm" aria-label="Small" placeholder="digite para buscar"  [(ngModel)]="modeloBusqueda" [ngbTypeahead]="search" [resultFormatter]="resultFormatBandListValue" [inputFormatter]="inputFormatBandListValue" (selectItem)="selected($event)" [editable]="false">
+    <div class="input-group-append">
+      <span class="input-group-text" id="inputGroup-sizing-sm"><i class="fa fa-search"></i></span>
+      <small *ngIf="searching" class="form-text text-muted"><i class="fa fa-refresh fa-spin"></i></small>
+    </div>                
+  </div>
+<!--<hr>
+<pre>Model: {{ modeloBusqueda | json }}</pre>-->

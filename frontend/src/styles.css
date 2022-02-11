@@ -1,0 +1,70 @@
+/* You can add global styles to this file, and also import other style files */
+/*
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+*/
+
+/* You can add global styles to this file, and also import other style files
+deeppurple-amber.css
+indigo-pink.css
+pink-bluegrey.css
+purple-green.css
+ */
+@import '@angular/material/prebuilt-themes/pink-bluegrey.css';
+/*html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }*/
+*::-webkit-scrollbar {
+  width: 0.5em;
+}
+
+*::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: darkgrey;
+  outline: 1px solid slategrey;
+}
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.admin-block div{
+  padding: 3px;;
+}
+.dropdown-toggle{
+  cursor: pointer;
+}
+.mat-drawer-container {
+  background-color: #fff !important; 
+  color: #fff;
+}
+app-datatablescustom .form-group{
+	margin-bottom:0 !important;
+}
+.fz-11{ font-size:11px;}
+.fz-12{ font-size:12px;}
+.fz-13{ font-size:13px;}
+
+.modal-header{
+	background:#dc3545!important;
+	color:#f8f9fa!important
+}
+.modal-header .close{
+	color:#f8f9fa!important
+}
+.border-top-success{border-top:solid 5px #8bc34a;}
+.border-top-warning{ border-top:solid 5px #FF9800;}
+.border-top-primary{ border-top:solid 5px #2196f3;}
+.border-top-danger{ border-top:solid 5px #f98787;}
+.border-top-info{ border-top:solid 5px #a0f1f1;}
+
+.fullsize-modal > .modal-dialog{
+	min-width:98% !important;
+}
+.icon-action:hover{
+	color:#ff0000;
+	cursor:pointer;
+}
+.border-dashed{
+	border: dashed 1px #ccc;
+}

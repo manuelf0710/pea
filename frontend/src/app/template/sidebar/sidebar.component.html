@@ -1,0 +1,27 @@
+<!-- START SIDEBAR-->            
+<div class="admin-block d-flex">
+	<div>
+		<img src="assets/img/admin-avatar.png" width="45px" />
+	</div>
+	<div class="admin-info">
+	<div class="font-strong">{{currentUser.name}}</div><small>{{currentUser.perfil.nombre}}</small></div>
+</div>
+
+<div class="pd-1">
+	<div class="list-group list-group-root well">
+		<a class="list-group-item menubg" routerLink="'/'" [routerLinkActive]="['active']">Inicio <i class="iconfa fa-2x fa fa-home pull-right"></i></a>	
+		<ng-container *ngFor="let menu of pages_menu">
+			<a class="list-group-item menubg" routerLink="{{menu.url}}" [routerLinkActive]="['active']" *ngIf="menu.hijos.length == 0">
+				{{menu.page}}
+			</a>
+			<a class="list-group-item menubg" *ngIf="menu.hijos.length > 0" (click)="openSubmenu(menu.id)">
+				{{menu.page}} 
+				<i class="fa pull-right" [ngClass]="{'fa-folder-open': menu.id == openMenu, 'fa-folder': menu.id != openMenu }" ></i>
+			</a>
+			<div class="list-group  collapse" *ngIf="menu.hijos.length > 0" [ngClass]="{'show': menu.id == openMenu, '': menu.id != openMenu }">
+				<a *ngFor="let submenu of menu.hijos" class="list-group-item menubg" routerLink="{{submenu.url}}" [routerLinkActive]="['active']">{{submenu.page}} 
+				</a>
+			</div>
+		</ng-container>
+	</div>
+</div>

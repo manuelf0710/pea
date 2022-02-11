@@ -1,0 +1,66 @@
+<mat-sidenav-container class="all-wrap" >
+  <div class="progress-bar-container">
+    <!--  <mat-progress-bar  aria-valuemin="0" color="warn" mode="indeterminate" role="progressbar" aria-valuenow="0"></mat-progress-bar>-->
+  </div>
+<mat-sidenav #sidenav class="sidenav" mode="side">
+  <!--<div class="list-group" >
+    <a class="list-group-item menubg" [routerLink]="['/create_proposal']" [routerLinkActive]="['active']" (click)="sidenav.close()">Create Proposal <i class="fa fa-chevron-right pull-right"></i></a>
+    <a class="list-group-item menubg" [routerLink]="['/list_proposal']" [routerLinkActive]="['active']" (click)="sidenav.close()">List Proposal <i class="fa fa-chevron-right pull-right"></i></a>
+    <a class="list-group-item menubg" [routerLink]="['/list_clients']" [routerLinkActive]="['active']" (click)="sidenav.close()"> List Clients<i class="fa fa-chevron-right pull-right"></i></a>
+    <a class="list-group-item menubg" [routerLink]="['/crear_trabajo']" [routerLinkActive]="['active']" (click)="sidenav.close()">Create Job <i class="fa fa-chevron-right pull-right"></i></a>
+    <a class="list-group-item menubg"[routerLink]="['/define_texts']" [routerLinkActive]="['active']" (click)="sidenav.close()">Define Texts <i class="fa fa-chevron-right pull-right"></i></a>
+    <a class="list-group-item menubg" [routerLink]="['/define_textmail']" [routerLinkActive]="['active']" (click)="sidenav.close()">Define Texts Mail <i class="fa fa-chevron-right pull-right"></i></a>
+    <a class="list-group-item menubg" [routerLink]="['/create_mail']" [routerLinkActive]="['active']" (click)="sidenav.close()">Create Mail <i class="fa fa-chevron-right pull-right"></i></a>
+    <a class="list-group-item menubg" [routerLink]="['/balance_list']" [routerLinkActive]="['active']" (click)="sidenav.close()">Balances List <i class="fa fa-chevron-right pull-right"></i></a>
+</div>-->
+<app-sidebar *ngIf="currentUser"></app-sidebar>
+</mat-sidenav>
+
+<div class="page-wrap">
+  <header role="banner">
+    <mat-toolbar color="primary" *ngIf="currentUser">
+      <button
+        type="button"
+        mat-icon-button
+        (click)="sidenav.toggle()"
+        title="Open sidenav">
+        <!--<mat-icon>menu</mat-icon>-->
+        <i class="fa fa-bars"></i>
+      </button>
+      &nbsp;Pea
+      <app-header [inputSideNav]="sidenav"></app-header>
+    </mat-toolbar>
+  </header>
+  <div class="container-fluid"> 
+      <main >
+        <div class="breadcrumb" *ngIf="currentUser">
+          <xng-breadcrumb [separator]="iconTemplate" >
+            <ng-container *xngBreadcrumbItem="let breadcrumb">
+              <ng-container>{{ breadcrumb | titlecase }}</ng-container>
+            </ng-container>
+          </xng-breadcrumb>
+        </div>
+        <div class="container-fluid">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
+      <!--
+      <footer style="position:absolute; bottom: 0;">
+        Footer of Compras -pos
+      </footer>-->
+    <!-- Footer -->
+    <footer class="footer" >
+      <div class="container">
+        <span>© {{currentYear}} Copyright:
+         Manuelf0710.</span>
+      </div>
+    </footer>
+    <!-- Footer -->  
+  </div>
+</div>
+</mat-sidenav-container>
+<ng-template #iconTemplate>
+  <i class="fa fa-angle-double-right"></i>
+</ng-template>
+<app-toasts-container aria-live="polite" aria-atomic="true"></app-toasts-container>
+

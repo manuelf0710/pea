@@ -1,0 +1,8 @@
+.my-drop-zone {border:dotted 2px #576369;  width: 100%; padding:20px; }
+.nv-file-over { border: dotted 3px red; } /* Default class applied to drop zones on over */
+.another-file-over-class { border: dotted 3px #ff0000; }
+.bg-gray{background:#ffffff; width: 100%; padding:20px; }
+.progress{height: 10px; background:#f9f9f9; border:solid 1px #dedede}
+.hasBaseDropZoneOver{ border: dotted 3px #ff0000; }
+.btn-sm{font-size: 8px;}
+html, body { height: 100%; }

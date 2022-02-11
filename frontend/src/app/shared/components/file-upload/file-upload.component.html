@@ -1,0 +1,136 @@
+<div class="container">
+    <div class="row">
+        <input 
+    style="display: none" 
+    type="file"
+    ng2FileSelect
+    [uploader]="uploader"
+    (onFileSelected)="onFileSelected($event)"
+    class=""
+    [multiple]="multiple"
+    #FileInput>
+    <div style="display: none;">
+ <button (click)="getFiles()">getFiles</button>
+ <button (click)="echoFiles()">echofiles</button>
+ <button (click)="validarRepetido()">validarREpetido</button>
+ <button (click)="obtenerArchivos()">obtenerarchivos emitir</button>
+</div>
+        <div class="col-md-12" (click)="FileInput.click()">
+            <div ng2FileDrop
+                 [ngClass]="{'nv-file-over': hasBaseDropZoneOver}"
+                 (fileOver)="fileOverBase($event)"
+                 [uploader]="uploader"
+                 class="bg-gray my-drop-zone">
+                 <div class="row">
+                 <div class="col-md-6" style="color:#000000; font-size:10px;" *ngIf="accept_files_extension.length">archivos permitidos {{accept_files_extension.toString()}}</div>
+                 <div class="col-md-6" style="color:#000000; font-size:10px;" *ngIf="max_size > 0">peso máximo {{max_size+'MB'}}</div>                
+                </div>
+                 <span style="color:#E91E63"><strong>{{title}}</strong></span>
+                <table class="" style="font-size:11px;" align="center">
+                    <thead>
+                    </thead>
+                    <tbody>
+                    <tr *ngFor="let item of uploader.queue">
+                        <td>{{ item?.file?.name }}</td>
+                        <td *ngIf="uploader.options.isHTML5" nowrap>{{ item?.file?.size/1024/1024 | number:'.2' }} MB</td>
+                        <td *ngIf="uploader.options.isHTML5" width="50">
+                            <div class="progress" style="margin-bottom: 0;">
+                                <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': item.progress + '%' }"></div>
+                            </div>
+                        </td>
+                        <td class="text-center">
+                            <span *ngIf="item.isSuccess"><i class="glyphicon glyphicon-ok"></i></span>
+                            <span *ngIf="item.isCancel"><i class="glyphicon glyphicon-ban-circle"></i></span>
+                            <span *ngIf="item.isError"><i class="glyphicon glyphicon-remove"></i></span>
+                        </td>
+                        <td nowrap>
+                            <!--<button type="button" class="btn btn-success btn-sm"
+                                    (click)="item.upload()" [disabled]="item.isReady || item.isUploading || item.isSuccess">
+                                <span class="glyphicon glyphicon-upload"></span> Subir
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm"
+                                    (click)="item.cancel()" [disabled]="!item.isUploading">
+                                <span class="glyphicon glyphicon-ban-circle"></span> Cancelar
+                            </button>
+                            -->
+                            <button title="quitar este archivo" *ngIf="uploader.getNotUploadedItems().length && !item.isUploaded" type="button" class="btn btn-danger btn-sm"
+                                    (click)="item.remove(); $event.stopPropagation()">
+                                <span class="glyphicon glyphicon-trash"></span> x
+                            </button>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <!--
+                <div>
+                    <table *ngIf="elementos_borrados.length" style="font-size:8px">
+                        <tr>
+                            <td>Elementos borrados</td>
+                        </tr>
+                        <tr *ngFor="let archivo of elementos_borrados">
+                            <td>{{archivo}}</td>
+                        </tr>
+                    </table>
+                </div> -->
+                
+                <div *ngIf="uploader.queue.length > 0" >
+                    <div>
+                        <div class="progress mb-1" style="height:3px; display:none;">
+                            <div class="progress-bar" role="progressbar" [ngStyle]="{ 'width': uploader.progress + '%' }"></div>
+                        </div>
+                    </div>
+                    <div *ngIf="!autoupload">
+                    <button *ngIf="uploader.getNotUploadedItems().length" type="button" class="btn btn-success btn-sm"
+                            (click)="SubirArchivos(); $event.stopPropagation()" [disabled]="!uploader.getNotUploadedItems().length">
+                        <span class="glyphicon glyphicon-upload"></span> Subir
+                    </button>
+                    <!--<button type="button" class="btn btn-warning btn-sm"
+                            (click)="uploader.cancelAll()" [disabled]="!uploader.isUploading">
+                        <span class="glyphicon glyphicon-ban-circle"></span> Cancelar
+                    </button>-->
+                    <button *ngIf="uploader.getNotUploadedItems().length" type="button" class="btn btn-danger btn-sm"
+                            (click)="uploader.clearQueue(); $event.stopPropagation()" [disabled]="!uploader.queue.length">
+                        <span class="glyphicon glyphicon-trash"></span> Remover
+                    </button>
+                </div>
+                </div>                
+            </div>
+ <!--
+            <div ng2FileDrop
+                 [ngClass]="{'another-file-over-class': hasAnotherDropZoneOver}"
+                 (fileOver)="fileOverAnother($event)"
+                 [uploader]="uploader"
+                 class="bg-gray my-drop-zone"
+                 style="display:block"
+                 >
+                Another drop zone
+            </div>-->
+ <!--
+            Multiple
+            <input type="file" ng2FileSelect [uploader]="uploader" multiple  /><br/>
+ 
+            Single
+            <input type="file" ng2FileSelect [uploader]="uploader" />-->
+        </div>
+        <div class="col-md-12" style="margin-bottom: 40px">
+            <!--<p>cantidad de archivos: {{ uploader?.queue?.length }}</p>-->
+            <div>
+              
+            </div>
+ 
+        </div>         
+
+ 
+    </div>
+ 
+    <div class="row" style="display: none;">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">Response</div>
+                <div class="panel-body">
+                  {{ response }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

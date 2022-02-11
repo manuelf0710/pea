@@ -1,0 +1,8 @@
+<nav aria-label="Page navigation page_results" *ngIf="links.length > 1">
+    <ul class="pagination pagination-xs">
+        <li *ngFor="let pagina of links" class="page-item" >
+                <a  *ngIf="pagina.selec == 0" class="page-link" href="#" (click)="goToPage(pagina);$event.preventDefault();$event.stopPropagation()">{{pagina.label}}</a>
+                <span *ngIf="pagina.selec == 1" class="page-link active" >{{pagina.label}}</span>
+        </li>
+    </ul>
+</nav>

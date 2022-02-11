@@ -1,0 +1,30 @@
+        <!-- START HEADER-->
+            <div class="flexbox flex-1 menuuseractions ">
+                <!-- START TOP-LEFT TOOLBAR-->
+                <!-- END TOP-LEFT TOOLBAR-->
+                <!-- START TOP-RIGHT TOOLBAR-->
+                    <div class="col">
+                        <div ngbDropdown class="d-idnline-block">
+                            <span id="dropdownBasic1" ngbDropdownToggle>{{ currentUser.name }}</span>
+                            <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                              <a ngbDropdownItem ><i class="fa fa-user"></i> Perfil</a>
+                              <a ngbDropdownItem ><i class="fa fa-support"></i> Soporte</a>
+                              <a ngbDropdownItem (click)="logout()"><i class="fa fa-power-off"></i> Logout</a>
+                            </div>
+                          </div> 
+                    </div>
+
+                       
+                        <!--<a class="nav-link dropdown-toggle link text-light" data-toggle="dropdown">
+                            <img src="assets/img/admin-avatar.png" />
+                            <span></span>{{ currentUser.name }}<i class="fa fa-angle-down m-l-5"></i></a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <a class="dropdown-item" href="profile.html"><i class="fa fa-user"></i>Profile</a>
+                            <a class="dropdown-item" href="profile.html"><i class="fa fa-cog"></i>Settings</a>
+                            <a class="dropdown-item" href="javascript:;"><i class="fa fa-support"></i>Support</a>
+                            <li class="dropdown-divider"></li>
+                            <a class="dropdown-item" (click)="logout()"><i class="fa fa-power-off"></i>Logout</a>
+                        </ul> -->
+                <!-- END TOP-RIGHT TOOLBAR-->
+            </div>
+        <!-- END HEADER-->

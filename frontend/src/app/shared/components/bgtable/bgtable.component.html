@@ -1,0 +1,230 @@
+<app-loading *ngIf="isSearching"></app-loading>
+<div class="row" *ngIf="tableConfig.buttons.acciones['new']">
+    <div class="col-12 col-lg-12 col text-right mb-2">
+        <button class="btn btn-primary btn-sm"  (click)="nuevoRegistro('new')"><i class="fa fa-plus-circle" ></i> Nuevo Registro</button>
+    </div>
+</div>
+<ngb-pagination *ngIf="tableConfig.paginatorPosition=='top' || tableConfig.paginatorPosition=='both'"
+  [(page)]="currentPage"
+  [pageSize]="pageSize"
+  [collectionSize]="totalRecords"
+  [boundaryLinks] = "true"
+  [directionLinks] = "true"
+  [ellipses] = "true"
+  [maxSize] = "6"
+  [rotate] = "true"
+  (pageChange) ="pageChange($event)"
+  size="sm"></ngb-pagination>
+<div class="row" style="position:relative">
+<div class="col-10 col-lg-10" >
+    <em *ngIf="totalRecords > 0" class="fz-12">{{from}}-{{to}} - {{totalRecords}}</em>
+    <em *ngIf="totalRecords == 0" class="fz-12">Sin Resultados</em>
+</div>
+<div class="col-2 col-lg-2" >
+    <div class="float-right"><span class="fz-12">Mostrar</span> 
+        <select (change)="onChangePaginationSize()" name="" id="" [(ngModel)]="pageSize" class=" mb-1 ml-1" style="width:40px;">
+            <option [value]="le" *ngFor="let le of pageLength">{{le}}</option>
+        </select> 
+    </div>
+</div>
+<div class="col-md-12 col-lg-12 col-sm-12 col-12">
+
+    <div ngbDropdown class="d-idnline-block" display="static" #DropAdvancedSearch="ngbDropdown" >
+        <span id="advancedsearch"  class="row">
+            <div class="col-md-6 col-lg-6 col-12">
+                <div class="input-group input-group-sm mb-1 float-right">
+                    <!--<div class="input-group-prepend" >
+                    <span class="input-group-text" id="inputGroup-sizing-sm" ngbDropdownToggle><i class="fa fa-search"></i></span>
+                    </div>-->
+                    <input [ngStyle]="tableConfig.globalSearch ? {'display':'block'} : {'display': 'none'}" #globalsearch type="text" placeholder="Buscar" class="form-control form-control-sm" aria-label="Small" aria-describedby="inputGroup-sizing-sm">
+                    <!--<div class="input-group-append" ngbDropdownToggle *ngIf="!tableConfig.listado_seleccion">-->
+                    <div class="input-group-append" ngbDropdownToggle >
+                        <span class="input-group-text" id="inputGroup-sizing-sm" *ngIf="tableConfig.advancedSearch">Filtrar&nbsp;&nbsp;  <i class="fa fa-filter"></i></span>
+                        <span class="input-group-text" id="inputGroup-sizing-sm" *ngIf="!tableConfig.advancedSearch && tableConfig.globalSearch"><i class="fa fa-search"></i></span>
+                    </div>
+                    <!--<div class="input-group-append" *ngIf="tableConfig.advancedSearch">
+                        <span class="input-group-text" placement="top" ngbTooltip="Eliminar Filtros de Busqueda" (click)="cleanAdvancedSearch();">
+                            <i class="fa fa-close text-danger"></i>
+                        </span>
+                    </div>-->
+                </div>
+            </div> 
+        </span>
+       
+        <div ngbDropdownMenu aria-labelledby="dropdownBasic1" class="col-md-12 col-lg-12" *ngIf="tableConfig.advancedSearch && formSearch" >
+            <div class="form_search">
+                <div class="row">
+                    <ng-container *ngFor="let column of formSearch">
+                        <div class="col-md-3 col-lg-3 col-sm-6 col-6" *ngIf="column.type!='date' && column.type != 'select'">
+                            <div class="form-group" >
+                                <label for="exampleInputEmail1" class="text-muted">{{column.title}}</label>
+                                <input  [type]="column.type" [(ngModel)]="paramSearchToObject[column.key]" (blur)="SearchForRowFilter($event, column)" class="fz-11 rounded float-right form-control form-control-sm mb-1"   placeholder="{{column.title}}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-lg-3 col-sm-6 col-6" *ngIf="column.type == 'select'">
+                            <div class="form-group">
+                                <label for="exampleInputselect1" class="text-muted">{{column.title}} </label>
+                                <select [(ngModel)]="paramSearchToObject[column.key]" class="form-control" class="fz-11 rounded float-right form-control form-control-sm mb-1" (blur)="SearchForRowFilter($event, column)">
+                                    <option value="">Seleccione ...</option> 
+                                    <option [value]="item.value" *ngFor="let item of column.options">{{item.label}}</option>
+                                </select>
+                            </div>
+                        </div>                        
+                          
+                        <div class="col-md-3 col-lg-3 col-6" *ngIf="column.type=='date'">
+                          <div class="form-group" >
+                            <label for="exampleInputEmaidl1" class="text-muted">{{column.title}}</label>
+                                <div class="input-group ">
+                                    <input  (dateSelect)="dateSeleccionado($event)" placeholder="dd/mm/yyyy"
+                                    name="dp" [(ngModel)]="paramSearchToObject[column.key]" ngbDatepicker #d="ngbDatepicker"  class="fz-11 rounded float-right form-control form-control-sm mb-3" style="height:20px"  readonly>
+                                    <div class="input-group-append">
+                                        <i   class="fa fa-calendar" (click)="d.toggle()" ></i>
+                                    </div>
+                                </div>
+                          </div>
+                        </div>
+                    </ng-container><!--
+                        <ng-container *ngFor="let column of customFilters">
+                        <div class="col-md-3 col-lg-3 col-sm-6 col-6" *ngIf="column.type!='date' && column.type != 'select'">
+                            <div class="form-group" >
+                                <label for="exampleInputEmail1" class="text-muted">{{column.title}} </label>
+                                <input  [type]="column.type" [(ngModel)]="paramSearchToObject[column.key]" class="fz-11 rounded float-right form-control form-control-sm mb-1"   placeholder="{{column.title}}">
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-lg-3 col-sm-6 col-6" *ngIf="column.type == 'select'">
+                            <div class="form-group">
+                                <label for="exampleInputselect1" class="text-muted">{{column.title}} </label>
+                                <select class="form-control" class="fz-11 rounded float-right form-control form-control-sm mb-1" [(ngModel)]="paramSearchToObject[column.key]">
+                                    <option value="">Seleccione ...</option> 
+                                    <option [value]="item.value" *ngFor="let item of column.options">{{item.label}}</option>
+                                </select>
+                            </div>
+                        </div>                        
+                          
+                        <div class="col-md-3 col-lg-3 col-6" *ngIf="column.type=='date'">
+                          <div class="form-group" >
+                            <label for="exampleInputEmaidl1" class="text-muted">{{column.title}}</label>
+                                <div class="input-group ">
+                                    <input  (dateSelect)="dateSeleccionado($event)" placeholder="dd/mm/yyyy"
+                                    name="dp" [(ngModel)]="paramSearchToObject[column.key]" ngbDatepicker #d="ngbDatepicker"  class="fz-11 rounded float-right form-control form-control-sm mb-3" style="height:20px"  readonly>
+                                    <div class="input-group-append">
+                                        <i   class="fa fa-calendar" (click)="d.toggle()" ></i>
+                                    </div>
+                                </div>
+                          </div>
+                        </div>
+                    </ng-container>-->                    
+                    <div class="col-md-12 col-lg-12 col-12">
+                        <div class="col text-right">
+                        <button class="btn btn-secondary btn-sm mr-2" (click)="cleanAdvancedSearch(); DropAdvancedSearch.close();">Limpiar <i class="fa fa-close" ></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" (click)="advancedSearch(); DropAdvancedSearch.close();">Buscar <i class="fa fa-search" ></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>    
+</div>
+
+
+</div>
+<div class="row">
+<div class="col-md-12 col-lg-12 col-sm-12 col-12" *ngIf="!tableConfig.listado_seleccion && tableConfig.buttons.exports.length">
+    <div class="float-right">
+        <div class="btn-group">
+            <button type="button" class="btn btn-light btn-sm">Exportar</button>
+            <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown">
+                <button class="btn btn-sm btn-light dropdown-toggle-split" ngbDropdownToggle><i class="fa fa-caret-down"></i></button>
+                <div class="dropdown-menu" ngbDropdownMenu>
+                    <button ngbDropdownItem  *ngFor="let item of tableConfig.buttons.exports" (click)="exportar(item)"><i class="fa fa-file-code-o"></i> {{item}}</button>
+                </div>
+            </div>
+        </div>  
+    </div>    
+</div>
+</div>
+
+<div class="table-responsive-sm ">
+<table class="table table-sm table-hover table-bordered table-striped" *ngIf="!template">
+    <thead class="thead-light">
+        <tr class="" align="center">
+            <th>#</th>
+            <th></th>
+            <th *ngFor="let column of tableConfig.columns">{{column.title}}</th>
+        </tr>
+        
+        <tr align="center" *ngIf="tableConfig.rowSearch">
+            <th colspan="2">
+                <button class="btn btn-sm btn-success btn-to-top" (click)="searchForRow()"> <i class="fa fa-search"></i></button>
+            </th>            
+            <th *ngFor="let column of tableConfig.columns">
+               <input *ngIf="column.type!='date' && column.searchable" [type]="column.type" (blur)="SearchForRowFilter($event, column)" class="fz-11 rounded float-right form-control form-control-sm mb-3" [disabled]="!column.searchable" style="height:20px">
+                <div class="input-group " *ngIf="column.type=='date' && column.searchable">
+                    <input  (dateSelect)="dateSeleccionado($event)" placeholder="dd/mm/yyyy"
+                    name="dp" [(ngModel)]="paramSearchToObject[column.data]" ngbDatepicker #d="ngbDatepicker"  class="fz-11 rounded float-right form-control form-control-sm mb-3" style="height:20px" [disabled]="!column.searchable" readonly>
+                    <div class="input-group-append">
+                        <i  *ngIf="column.searchable"  class="fa fa-calendar" (click)="d.toggle()"></i>
+                    </div>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <ng-container *ngIf="!isSearching">
+            <tr *ngFor="let item of dataSource; let i = index">
+                <td width="50">{{i+1}}</td>
+                <td width="100">
+                    <div ngbDropdown class="d-idnline-block" *ngIf="!tableConfig.listado_seleccion" placement="right">
+                        <span id="dropdowntable" class="dropdowntable" ngbDropdownToggle><i class="fa fa-caret-down"></i></span>
+                        <div ngbDropdownMenu aria-labelledby="dropdownBasic1">
+                            <button ngbDropdownItem  *ngIf="tableConfig.buttons.acciones['edit']" (click)="editarRow(item)" class="btn btn-warning btn-sm"><i class="fa fa-pencil"></i> Editar</button>
+                            <button ngbDropdownItem  *ngIf="tableConfig.buttons.acciones['delete']" (click)="eliminarRow(item)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i> Eliminar</button>
+                            <button ngbDropdownItem  *ngIf="tableConfig.buttons.acciones['copy']" (click)="copiarRow(item)" class="btn btn-info btn-sm"><i class="fa fa-clone"></i> Copiar</button>
+                        </div>
+                      </div>
+                      <div *ngIf="tableConfig.listado_seleccion">
+                        <div class="btn-group" role="group" aria-label="Basic example">
+                            <button type="button"placement="top" ngbTooltip="Editar" *ngIf="tableConfig.buttons.acciones['edit']" (click)="editarRow(item)" class="btn btn-warning btn-sm"><i class="fa fa-pencil"></i></button>
+                            <button type="button"  placement="top" ngbTooltip="Eliminar" *ngIf="tableConfig.buttons.acciones['delete']" (click)="eliminarRow(item)" class="btn btn-danger btn-sm"><i class="fa fa-times"></i></button>
+                            <button type="button" placement="top" ngbTooltip="Agregar" *ngIf="tableConfig.buttons.acciones['copy']" (click)="copiarRow(item)" class="btn btn-info btn-sm"><i class="fa fa-clone"></i></button>
+                          </div>                        
+    
+                      </div>
+                </td>
+                
+                <ng-container *ngFor="let column of tableConfig.columns">
+                    <td *ngIf="column.type=='text' && column.pipe == 'currency'">{{item | tablevalue:column | currency }} </td>
+                    <td *ngIf="column.type=='text' && !column.pipe">{{item | tablevalue:column }} </td>
+                    <td *ngIf="column.type=='number' && !column.pipe">{{item | tablevalue:column  }}</td>
+                    <td *ngIf="column.type=='date'">{{item | tablevalue:column | date: 'dd/MM/yyyy h:m:s a' }}</td>
+                    <td *ngIf="column.type == 'imagen'">
+                        <img [src]="api_url+'/'+item.imagen" alt="" [width]="column.width_img" *ngIf="item.imagen!=null && item.imagen!=''">
+                        <img [src]="api_url+'/uploads/productos/default/defaultproduct.png'" alt="" [width]="column.width_img" *ngIf="item.imagen == '' || item.imagen== null">
+                     </td>                    
+                </ng-container>
+            </tr>
+            </ng-container>
+    </tbody>
+</table>
+</div>
+<div *ngIf="template" class="mb-3">
+    <div class="card-deck">
+        <ng-template [ngTemplateOutlet]="template" >
+        </ng-template>
+    </div>
+</div>
+
+<ngb-pagination *ngIf="tableConfig.paginatorPosition=='bottom' || tableConfig.paginatorPosition=='both'"
+  [(page)]="currentPage"
+  [pageSize]="pageSize"
+  [collectionSize]="totalRecords"
+  [boundaryLinks] = "true"
+  [directionLinks] = "true"
+  [ellipses] = "true"
+  [maxSize] = "6"
+  [rotate] = "true"
+  (pageChange) ="pageChange($event)"
+  size="sm"></ngb-pagination>
