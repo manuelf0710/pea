@@ -1,0 +1,34 @@
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4 col-lg-4 col-xs-12 border border-default">
+      <div class="row">
+        <h3>Tipo Productos</h3>
+        <ul class="list-group">
+          <li
+            class="list-group-item"
+            *ngFor="let item of tipoproductos_list"
+            (click)="getProfesionalsAssoc(item.id)"
+          >
+            <span class="badge badge-success">{{ item.tiempo }}</span
+            >{{ item.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-md-8 col-lg-8 col-xs-12 border border-default">
+      <div class="row">
+        <h3 class="text-center">agendar</h3>
+
+        <ul class="list-group">
+          <li
+            class="list-group-item"
+            *ngFor="let item of tipoproductouser_list"
+            (click)="agendaProfesional(item.id)"
+          >
+            {{ item.name }}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -47,5 +47,11 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 	], function () {
 		//Route::post('productoslist', 'pos\ProductoController@listado')->name('productos_listado');
 		//Route::post('buscarproducto', 'pea\ProductoController@buscarProducto')->name('buscar_productoget');
+		Route::post('tipoproductouserlist', 'pea\TipoProductoUserController@listado')->name('tipoproductouser_listado');
+		Route::get('tipoproductouserlist', 'pea\TipoProductoUserController@listado')->name('tipoproductouser_listadoget');
+		Route::get('tipoproductousers/{tipoproducto_id}', 'pea\TipoProductoUserController@tipoProductoByUser')->name('tipoproductobyuser');
+		
+		Route::get('tipoproductoslist', 'pea\TipoProductoController@buscarTipoProducto')->name('buscar_tipoproducto');
+		
 	});
 });

@@ -4,8 +4,18 @@
 
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:8000/api',
-  server_root: 'http://localhost:8000',  
+  apiUrl: "http://localhost:8000/api/",
+  server_root: "http://localhost:8000",
+  auth: {
+    PostLogin: "auth/login",
+  },
+  tipoproductos: {
+    getAll: "pea/tipoproductoslist",
+  },
+  tipoproductos_user: {
+    getAll: "pea/tipoproductouserlist",
+    getById: "pea/tipoproductousers/",
+  },
 };
 
 /*

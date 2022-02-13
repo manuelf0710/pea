@@ -4,6 +4,7 @@ import { AuthGuard } from './../auth/guards/auth.guard';
 import { IndexComponent } from './components/index/index.component';
 import { CrearOdsComponent } from './components/crear-ods/crear-ods.component';
 import { SolicitudComponent } from './components/solicitud/solicitud.component';
+import { ProgramarAgendaComponent } from './components/programaragenda/programaragenda.component';
 
 
 
@@ -53,7 +54,19 @@ const routes: Routes = [
           }  
         }      
   
-       },             
+       }, 
+       {
+        path: 'programar',
+        component: ProgramarAgendaComponent,
+        canActivate: [AuthGuard],
+        data :{
+          breadcrumb: {
+            label:'Programar Agenda',
+            info:{icon: 'fa fa-caret-square-o-up', iconType: 'bootstrap', label:'Crear ODS' }
+          }  
+        }      
+  
+       },                    
     ]    
   }//,
   //{ path: '**', redirectTo: '' }   
