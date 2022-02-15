@@ -30,20 +30,14 @@ class ProductoRepsoController extends Controller
         $pageSize = $request->get('pageSize');
 		$pageSize == '' ? $pageSize = 20 : $pageSize;
 		
-        $codigo = $request->get('codigo');
-        $descripcion = $request->get('descripcion');
-        $categoria = $request->get('categoria');
         $globalSearch = $request->get('globalsearch');
 		
 		if($globalSearch != ''){
-			$response = ProductoRepso::withoutTrashed()->orderBy('productos.id', 'desc')
+			$response = ProductoRepso::withoutTrashed()->orderBy('productos_repso.id', 'desc')
 			->globalSearch($globalSearch)
 			->paginate($pageSize);		
 		}else{
-			$response = ProductoRepso::withoutTrashed()->orderBy('productos.id', 'desc')
-			->codigo($codigo)
-			->descripcion($descripcion)
-			->categoria($categoria)
+			$response = ProductoRepso::with('regional','contrato', 'tipoProducto')->withoutTrashed()->orderBy('productos_repso.id', 'desc')
 			->paginate($pageSize);
 		}
 						

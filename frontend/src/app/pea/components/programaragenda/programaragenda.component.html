@@ -1,33 +1,106 @@
-<div class="container-fluid">
+<div class="container-fluid fz-11">
+  <app-loading *ngIf="loading"></app-loading>
   <div class="row">
-    <div class="col-md-4 col-lg-4 col-xs-12 border border-default">
+    <div class="col-md-2 col-lg-2 col-xs-12 border border-default">
       <div class="row">
-        <h3>Tipo Productos</h3>
         <ul class="list-group">
           <li
             class="list-group-item"
-            *ngFor="let item of tipoproductos_list"
-            (click)="getProfesionalsAssoc(item.id)"
+            *ngFor="let item of tipoproductosList"
+            (click)="getProfesionalsAssoc(item)"
           >
-            <span class="badge badge-success">{{ item.tiempo }}</span
-            >{{ item.name }}
+            <span class="badge badge-secondary">{{ item.tiempo }}</span>
+            {{ item.name }}
           </li>
         </ul>
       </div>
     </div>
-    <div class="col-md-8 col-lg-8 col-xs-12 border border-default">
+    <div class="col-md-10 col-lg-10 col-xs-12 border border-default">
       <div class="row">
-        <h3 class="text-center">agendar</h3>
-
         <ul class="list-group">
           <li
             class="list-group-item"
-            *ngFor="let item of tipoproductouser_list"
-            (click)="agendaProfesional(item.id)"
+            *ngFor="let item of tipoproductoUserList"
+            (click)="agendaProfesional(item)"
           >
             {{ item.name }}
           </li>
         </ul>
+      </div>
+      <div
+        class="row"
+        *ngIf="habilitarSeccionSeleccionado && tipoproductoUserList.length > 0"
+      >
+        <div class="col-md-12">
+          <h3>agenda de {{ profesionalSeleccionado.name }}</h3>
+          <div class="row">
+            <div class="col-md-4">
+              tiempo programado para el servicio en minutos
+              {{ tipoproductoSeleccionado.tiempo }}
+            </div>
+            <div class="col-md-4">
+              Enviar Email <input type="checkbox" checked />
+            </div>
+            <div class="col-md-4">
+              Tipo Cita
+              <select name="modalidad" id="modalidad" class="form-control">
+                <option value="">Seleccione...</option>
+                <option value="1">Presencial</option>
+                <option value="2">Virtual</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="exampleInputEmail1">fecha Inicio</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  placeholder="Enter email"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="exampleInputEmail1">Hora Inicio</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  placeholder="Enter email"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="exampleInputEmail1">Fecha Fin</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  placeholder="Enter email"
+                />
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="exampleInputEmail1">Hora Fin</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  placeholder="Enter email"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

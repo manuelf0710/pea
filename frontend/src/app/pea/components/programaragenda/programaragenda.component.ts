@@ -1,6 +1,8 @@
 import { Component, OnInit } from "@angular/core";
 import { TipoproductosService } from "../../../services/tipoproductos.service";
 import { TipoproductosuserService } from "src/app/services/tipoproductosuser.service";
+import { profesionalSeleccionado } from "../../models/profesionaseleccionado";
+import { tipoProductoSeleccionado } from "../../models/tipoproductoseleccionado";
 
 @Component({
   selector: "app-programaragenda",
@@ -8,9 +10,12 @@ import { TipoproductosuserService } from "src/app/services/tipoproductosuser.ser
   styleUrls: ["./programaragenda.component.css"],
 })
 export class ProgramarAgendaComponent implements OnInit {
-  public tipoproductos_list = [];
-  public tipoproductouser_list = [];
-  public;
+  public tipoproductosList = [];
+  public tipoproductoUserList = [];
+  public tipoproductoSeleccionado: tipoProductoSeleccionado;
+  public profesionalSeleccionado: profesionalSeleccionado;
+  public habilitarSeccionSeleccionado: boolean = false;
+  public loading: boolean = true;
 
   constructor(
     private _TipoproductosService: TipoproductosService,
@@ -22,30 +27,43 @@ export class ProgramarAgendaComponent implements OnInit {
   }
 
   loadTipoProductos() {
+    this.loading = true;
+    this.habilitarSeccionSeleccionado = false;
     this._TipoproductosService.getLista().subscribe(
       (res: any) => {
-        this.tipoproductos_list = res;
+        this.tipoproductosList = res;
+        this.loading = false;
       },
       (error: any) => {
         console.log("ha ocurrido un error en bgtable component ");
         console.log("error ", error);
+        this.loading = false;
       },
       () => {}
     );
   }
 
-  getProfesionalsAssoc(idTipoProducto) {
+  getProfesionalsAssoc(tipoProducto) {
+    this.loading = true;
     this._TipoproductosuserService
-      .getTipoProductoByUser(idTipoProducto)
+      .getTipoProductoByUser(tipoProducto.id)
       .subscribe(
         (res: any) => {
-          this.tipoproductouser_list = res;
+          this.tipoproductoUserList = res;
+          this.tipoproductoSeleccionado = tipoProducto;
+          this.loading = false;
         },
         (error: any) => {
           console.log("ha ocurrido un error en bgtable component ");
           console.log("error ", error);
+          this.loading = false;
         },
         () => {}
       );
+  }
+
+  agendaProfesional(profesional) {
+    this.profesionalSeleccionado = profesional;
+    this.habilitarSeccionSeleccionado = true;
   }
 }

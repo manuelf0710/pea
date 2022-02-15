@@ -96,9 +96,10 @@ class ContratoController extends Controller
 	
 	public function buscarContrato(Request $request){
 		$productos = Contrato::withoutTrashed()
-							->select('id','descripcion as nombre')
-							->where("descripcion","like","%".$request->post('globalsearch')."%")
-							->where("estado","=","1")
+							->select('id','nombre')
+							->where("nombre","like","%".$request->post('globalsearch')."%")
+							//->where("estado","=","1")
+                            ->take(20)
 							->get();
 		return response()->json($productos); 
 	}

@@ -36,9 +36,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
     'prefix' => 'comun',
 	], function () {
 		Route::post('buscarproducto', 'pea\ProductoController@buscarProducto')->name('buscar_producto');
-		Route::post('regionaleslist', 'comun\RegionalController@listado')->name('regionales_listado');
+		Route::get('regionaleslist', 'comun\RegionalController@listado')->name('regionales_listado');
 		Route::post('sitioslist', 'comun\SitioController@listado')->name('sitios_listado');
 		Route::post('contratoslist', 'comun\ContratoController@listado')->name('contratos_listado');
+		Route::post('buscarcontrato', 'comun\ContratoController@buscarContrato')->name('buscarcontrato');
 		
 	});
 	
@@ -52,6 +53,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::get('tipoproductousers/{tipoproducto_id}', 'pea\TipoProductoUserController@tipoProductoByUser')->name('tipoproductobyuser');
 		
 		Route::get('tipoproductoslist', 'pea\TipoProductoController@buscarTipoProducto')->name('buscar_tipoproducto');
+		Route::post('solicitudes', 'pea\ProductoRepsoController@listado')->name('productosrepso');
 		
 	});
 });

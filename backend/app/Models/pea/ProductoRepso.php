@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 class ProductoRepso extends Model
 {
 	use Notifiable;
+	protected $table = 'productos_repso';
     public $timestamps = true;
     use SoftDeletes;
 	
@@ -40,6 +41,21 @@ class ProductoRepso extends Model
     	];		
         return $rules;
     }	
+
+	public function tipoProducto()
+	{
+	  return $this->hasOne('App\Models\pea\TipoProducto',  'id', 'tipoproducto_id');
+	} 
+	public function regional()
+	{
+	  return $this->hasOne('App\Models\Regional',  'id', 'regional_id');
+	} 
+
+	public function contrato()
+	{
+	  return $this->hasOne('App\Models\Contrato',  'id', 'contrato_id');
+	} 	
+
 	public function scopeDescripcion($query, $des){
 		if($des)
 			return $query->where('descripcion', 'like', "%$des$%");
