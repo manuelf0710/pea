@@ -7,9 +7,21 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\pea\ProductoRepso;
 use App\Http\Controllers\Controller;
+use Auth;
 
 class ProductoRepsoController extends Controller
 {
+
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //$this->middleware('auth');
+		$this->middleware(['auth','verified']);
+    }    
     /**
      * Display a listing of the resource.
      *
@@ -56,6 +68,37 @@ class ProductoRepsoController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make( $request->all() , ProductoRepso::rules($request));
+		if(!($validator -> fails())){
+			$modelo = new ProductoRepso();
+			$modelo->tipoproducto_id = $request->post('tipoproducto_id');
+			$modelo->regional_id    = $request->post('regional_id');
+			$modelo->contrato_id    = $request->post('contrato_id');
+			$modelo->anio  = $request->post('anio');
+			$modelo->cantidad  = $request->post('cantidad');
+			$modelo->descripcion  = $request->post('descripcion');
+            $modelo->user_id = auth()->user()->id;
+			$modelo->save();
+
+            for($i = 0; $i < $modelo->cantidad; $i++){
+                
+            }
+			
+            $response = array(
+                'status' => 'ok',
+                'code' => 200,
+                'data'   => $modelo,
+                'msg'    => 'Guardado'
+              );
+		}else{
+            $response = array(
+                'status' => 'error',
+               'msg' => $validator->errors(),
+               'validator'=> $validator 
+            );
+		}  
+        return response()->json($response);      	
+
     }
 
     /**
