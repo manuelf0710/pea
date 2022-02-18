@@ -10,37 +10,59 @@ use Illuminate\Http\Request;
 class Producto extends Model
 {
 	use Notifiable;
-    public $timestamps = true;
-    use SoftDeletes;
-	
-    protected $fillable = [
-        'descripcion', 'unidad', 'precio_unitario','estado'
-    ];	
+	public $timestamps = true;
+	use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
-    protected $hidden = ['updated_at','deleted_at'];
-    public static $directionOrder = ['ASC','ASC'];
-	
+	protected $fillable = [
+		'producto_repso_id',
+		'user_id',
+		'estado_id',
+		'producto_id',
+		'sitio_id',
+		'descripcion',
+		'cantidad',
+		'estado_repso',
+		'cedula',
+		'dependencia_id',
+		'fecha_programacion',
+		'modalidad',
+		'ciudad_id',
+		'direccion',
+		'observaciones'
+	];
+
+	protected $dates = ['deleted_at'];
+	protected $hidden = ['updated_at', 'deleted_at'];
+	public static $directionOrder = ['ASC', 'ASC'];
+
 	public static $customMessages = [
-    	'required' => 'Cuidado!! el campo :attribute no puede ser vacío',
-    	'unique' => 'Error! el valor de :attribute ya se encuentra registrado',
-    	'max' => 'Error! el valor de :attribute supero el tope permitido',
+		'required' => 'Cuidado!! el campo :attribute no puede ser vacío',
+		'unique' => 'Error! el valor de :attribute ya se encuentra registrado',
+		'max' => 'Error! el valor de :attribute supero el tope permitido',
 		'integer' => 'Error! el valor de :attribute debe ser un número sin comas ni puntos'
-	];	
-	
-	public static function rules(Request $request, $id = null)
-    {
-		
-     	$rules = [
-        	'descripcion' => 'required|string',
-        	'unidad' => 'required',
-			'precio_unitario' =>'required'
-    	];		
-        return $rules;
-    }	
-	public function scopeDescripcion($query, $des){
-		if($des)
-			return $query->where('descripcion', 'like', "%$des$%");
-	}	
+	];
 
+	public static function rules(Request $request, $id = null)
+	{
+
+		$rules = [
+
+			'sitio_id' => 'required|integer',
+			'descripcion' => 'required|string',
+			'cantidad' => 'required|integer',
+			'estado_repso' => 'required|integer',
+			'estado_id' => 'required|integer',
+			'cedula' => 'required|integer',
+			'dependencia_id' => 'required|integer',
+			'modalidad' => 'required|integer',
+			'ciudad_id' => 'required|integer',
+			'observaciones' => 'required|string'
+		];
+		return $rules;
+	}
+	public function scopeDescripcion($query, $des)
+	{
+		if ($des)
+			return $query->where('descripcion', 'like', "%$des$%");
+	}
 }
