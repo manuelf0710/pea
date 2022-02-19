@@ -71,7 +71,7 @@ export class SolicitudListarComponent implements OnInit {
     listado_seleccion: true,
     columns: this.columns,
     url: environment.apiUrl + environment.solicitud.getAll,
-    globalSearch: true,
+    globalSearch: false,
     rowSearch: false,
     advancedSearch: true,
     paginatorPosition: "bottom",

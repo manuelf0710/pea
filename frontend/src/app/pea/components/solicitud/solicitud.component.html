@@ -1,11 +1,13 @@
-<div class="container-fluid">
-  <form>
+<app-loading *ngIf="loading"></app-loading>
+<div class="container-fluid" *ngIf="!loading">
+  <form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
     <div class="card w-100">
       <h5 class="card-header">Solicitud</h5>
       <div class="card-body">
         <div class="row">
           <div class="col-md-6 col-lg-6 col-xs-12">
             <div class="form-group">
+              <label for="tipoproducto">Tipo producto</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text"><i class="fa fa-th"></i></span>
@@ -14,17 +16,33 @@
                   name="tipoproducto_id"
                   id="tipoproducto_id"
                   class="form-control form-control-sm"
+                  formControlName="tipoproducto_id"
                 >
-                  <option value="">Seleccione ...</option>
-                  <option value="" *ngFor="let item of tipoProductos">
+                  <option [ngValue]="null" disabled>
+                    Seleccione tipo de producto
+                  </option>
+                  <option [value]="item.id" *ngFor="let item of tipoProductos">
                     {{ item.name }}
                   </option>
                 </select>
+              </div>
+              <div
+                *ngIf="
+                  formulario.get('tipoproducto_id').errors &&
+                  formulario.get('tipoproducto_id').touched
+                "
+              >
+                <small
+                  *ngIf="formulario.get('tipoproducto_id').hasError('required')"
+                  class="form-text text-danger"
+                  >el campo tipo producto no debe estar vacío.</small
+                >
               </div>
             </div>
           </div>
           <div class="col-md-6 col-lg-6 col-xs-12">
             <div class="form-group">
+              <label for="regional">Regional</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text"
@@ -35,12 +53,27 @@
                   name="regional_id"
                   id="regional_id"
                   class="form-control form-control-sm"
+                  formControlName="regional_id"
                 >
-                  <option value="">Seleccione ...</option>
-                  <option value="" *ngFor="let item of regionales">
+                  <option [ngValue]="null" disabled>
+                    Seleccione la regional
+                  </option>
+                  <option [value]="item.id" *ngFor="let item of regionales">
                     {{ item.nombre }}
                   </option>
                 </select>
+              </div>
+              <div
+                *ngIf="
+                  formulario.get('regional_id').errors &&
+                  formulario.get('regional_id').touched
+                "
+              >
+                <small
+                  *ngIf="formulario.get('regional_id').hasError('required')"
+                  class="form-text text-danger"
+                  >el campo regional no debe estar vacío.</small
+                >
               </div>
             </div>
           </div>
@@ -49,17 +82,29 @@
         <div class="row">
           <div class="col-md-6 col-lg-6 col-xs-12">
             <div class="form-group">
-              <!--<p>crear-ods works!</p>-->
-              <!--<app-buscar-producto></app-buscar-producto>-->
+              <label for="contrato">Contrato</label>
               <app-autocomplete
                 [url]="url"
                 (seleccionado)="seleccionado($event)"
-                [labelValue]="'Contrato'"
+                [labelValue]="'contrato'"
               ></app-autocomplete>
+            </div>
+            <div
+              *ngIf="
+                formulario.get('contrato_id').errors &&
+                formulario.get('contrato_id').touched
+              "
+            >
+              <small
+                *ngIf="formulario.get('contrato_id').hasError('required')"
+                class="form-text text-danger"
+                >el campo contrato no debe estar vacío.</small
+              >
             </div>
           </div>
           <div class="col-md-6 col-lg-6 col-xs-12">
             <div class="form-group">
+              <label for="anio">Año</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text"
@@ -67,10 +112,28 @@
                   ></span>
                 </div>
                 <input
-                  type="text"
+                  type="number"
                   class="form-control form-control-sm"
                   placeholder="Año"
+                  formControlName="anio"
                 />
+              </div>
+              <div
+                *ngIf="
+                  formulario.get('anio').errors &&
+                  formulario.get('anio').touched
+                "
+              >
+                <small
+                  *ngIf="formulario.get('anio').hasError('required')"
+                  class="form-text text-danger"
+                  >el campo año no debe estar vacío.</small
+                >
+                <small
+                  *ngIf="formulario.get('anio').hasError('min')"
+                  class="form-text text-danger"
+                  >el campo año minímo debe ser 2022.</small
+                >
               </div>
             </div>
           </div>
@@ -79,6 +142,7 @@
         <div class="row">
           <div class="col-md-6 col-lg-6 col-xs-12">
             <div class="form-group">
+              <label for="cantidad">Cantidad</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text"
@@ -86,15 +150,34 @@
                   ></span>
                 </div>
                 <input
-                  type="text"
+                  type="number"
                   class="form-control form-control-sm"
                   placeholder="Cantidad"
+                  formControlName="cantidad"
                 />
+              </div>
+              <div
+                *ngIf="
+                  formulario.get('cantidad').errors &&
+                  formulario.get('cantidad').touched
+                "
+              >
+                <small
+                  *ngIf="formulario.get('cantidad').hasError('required')"
+                  class="form-text text-danger"
+                  >el campo cantidad no debe estar vacío.</small
+                >
+                <small
+                  *ngIf="formulario.get('cantidad').hasError('min')"
+                  class="form-text text-danger"
+                  >el campo cantidad minímo debe ser 1.</small
+                >
               </div>
             </div>
           </div>
           <div class="col-md-6 col-lg-6 col-xs-12">
             <div class="form-group">
+              <label for="descripcion">Descripción</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text"
@@ -105,14 +188,27 @@
                   type="text"
                   class="form-control form-control-sm"
                   placeholder="Descripción"
+                  formControlName="descripcion"
                 />
+              </div>
+              <div
+                *ngIf="
+                  formulario.get('descripcion').errors &&
+                  formulario.get('descripcion').touched
+                "
+              >
+                <small
+                  *ngIf="formulario.get('descripcion').hasError('required')"
+                  class="form-text text-danger"
+                  >el campo descripción no debe estar vacío.</small
+                >
               </div>
             </div>
           </div>
         </div>
         <div class="row">
           <div class="col-md-6 offset-md-3 text-center">
-            <button type="button" class="btn btn-secondary btn-lg">
+            <button type="submit" class="btn btn-secondary btn-lg">
               <i class="fa fa-save mr-1"></i>Guardar
             </button>
           </div>
