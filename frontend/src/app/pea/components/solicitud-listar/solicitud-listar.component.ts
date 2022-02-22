@@ -5,6 +5,7 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ViewEncapsulation,
 } from "@angular/core";
+import { Router, ActivatedRoute } from "@angular/router";
 import { BgtableComponent } from "src/app/shared/components/bgtable/bgtable.component";
 import { environment } from "src/environments/environment";
 
@@ -22,8 +23,12 @@ export class SolicitudListarComponent implements OnInit {
     acciones: {
       edit: true,
       delete: true,
-      copy: false,
-      new: true,
+      copy: {
+        label: "programar",
+        icon: "fa fa-tasks",
+        class: "btn btn-success btn-sm",
+      },
+      new: false,
     },
     exports: [],
   };
@@ -64,6 +69,13 @@ export class SolicitudListarComponent implements OnInit {
       searchable: false,
       type: "text",
     },
+    {
+      title: "Descripción",
+      data: "descripcion",
+      orderable: false,
+      searchable: false,
+      type: "text",
+    },
   ];
 
   tableConfig = {
@@ -78,11 +90,16 @@ export class SolicitudListarComponent implements OnInit {
     customFilters: [],
   };
 
-  constructor() {}
+  constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {}
 
   agregarSolicitud(ev) {}
   editarSolicitud(ev) {}
   eliminar(ev) {}
+  programar(ev) {
+    this.router.navigate(["/pea/solicitudproductos"], {
+      queryParams: { id: ev.id },
+    });
+  }
 }

@@ -54,8 +54,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::get('tipoproductoslist', 'pea\TipoProductoController@buscarTipoProducto')->name('buscar_tipoproducto');
 		Route::post('solicitudes', 'pea\ProductoRepsoController@listado')->name('productosrepso');
 		Route::post('solicitud', 'pea\ProductoRepsoController@store')->name('productosolicitud');
+		Route::get('solicitud/{id}', 'pea\ProductoRepsoController@show')->name('productosolicitudshow');
 
 		// Rutas de Productos
 		Route::put('updateproducto/{id}', 'pea\ProductoController@update')->name('productoupdate');
+		Route::post('productobyrepsoid/{id}', 'pea\ProductoController@productsByProductRepso')->name('productosbyidrepso');
 	});
 });

@@ -165,4 +165,33 @@ class ProductoController extends Controller
         }
         return response()->json($response);
     }
+
+       /**
+     * get the data relation with productrepsoid parent.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function productsByProductRepso($id, Request $request){
+        $pageSize = $request->get('pageSize');
+        $pageSize == '' ? $pageSize = 20 : $pageSize;
+
+        $codigo = $request->get('codigo');
+        $descripcion = $request->get('descripcion');
+        $categoria = $request->get('categoria');
+        $globalSearch = $request->get('globalsearch');
+
+        if ($globalSearch != '') {
+            $response = Producto::withoutTrashed()->orderBy('productos.id', 'desc')
+                ->where('producto_repso_id','=', $id)
+                ->globalSearch($globalSearch)
+                ->paginate($pageSize);
+        } else {
+            $response = Producto::withoutTrashed()->orderBy('productos.id', 'desc')
+                ->where('producto_repso_id','=', $id)
+                ->paginate($pageSize);
+        }
+
+        return response()->json($response);
+    }
 }

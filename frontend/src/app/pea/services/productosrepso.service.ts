@@ -1,8 +1,10 @@
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { Observable } from "rxjs";
+//import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
 import { environment } from "src/environments/environment";
+
+import { productoRepso } from "./../models/productoRepso";
 
 @Injectable({
   providedIn: "root",
@@ -22,5 +24,18 @@ export class ProductosrepsoService {
         data
       );
     }
+  }
+
+  public getSolicitudById(id) {
+    return this._http
+      .get<productoRepso>(
+        environment.apiUrl + environment.solicitud.getById + id
+      )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
   }
 }

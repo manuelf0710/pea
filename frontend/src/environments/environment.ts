@@ -10,6 +10,10 @@ export const environment = {
     postLogin: "auth/login",
     refreshToken: "auth/refresh",
   },
+  productos: {
+    getByIdProductoRepso: "pea/productobyrepsoid/",
+    posByIdProductoRepso: "pea/productobyrepsoid/",
+  },
   tipoproductos: {
     getAll: "pea/tipoproductoslist",
   },

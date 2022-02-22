@@ -7,6 +7,7 @@ import { SolicitudComponent } from "./components/solicitud/solicitud.component";
 import { ProgramarAgendaComponent } from "./components/programaragenda/programaragenda.component";
 import { SolicitudListarComponent } from "./components/solicitud-listar/solicitud-listar.component";
 import { GenerarAgendaComponent } from "./components/generar-agenda/generar-agenda.component";
+import { ProductorepsodetallesprodComponent } from "./components/productorepsodetallesprod/productorepsodetallesprod.component";
 
 const routes: Routes = [
   {
@@ -110,6 +111,22 @@ const routes: Routes = [
               icon: "fa fa-caret-square-o-up",
               iconType: "bootstrap",
               label: "Crear ODS",
+            },
+          },
+        },
+      },
+
+      {
+        path: "solicitudproductos",
+        component: ProductorepsodetallesprodComponent,
+        canActivate: [AuthGuard],
+        data: {
+          breadcrumb: {
+            label: "Solicitud-productos",
+            info: {
+              icon: "fa fa-caret-square-o-up",
+              iconType: "bootstrap",
+              label: "solicitud-Productos",
             },
           },
         },
