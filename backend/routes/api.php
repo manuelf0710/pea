@@ -40,6 +40,8 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::post('sitioslist', 'comun\SitioController@listado')->name('sitios_listado');
 		Route::post('contratoslist', 'comun\ContratoController@listado')->name('contratos_listado');
 		Route::post('buscarcontrato', 'comun\ContratoController@buscarContrato')->name('buscarcontrato');
+
+		Route::get('getcliente/{id}', 'comun\ClienteController@show')->name('clienteshow');
 	});
 
 	Route::group([

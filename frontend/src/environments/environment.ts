@@ -29,6 +29,7 @@ export const environment = {
   comun: {
     getRegionales: "comun/regionaleslist",
     buscarContrato: "comun/buscarcontrato",
+    getClienteByCedula: "comun/getcliente/",
   },
 };
 

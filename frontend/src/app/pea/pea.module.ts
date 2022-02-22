@@ -23,6 +23,7 @@ import { SolicitudListarComponent } from "./components/solicitud-listar/solicitu
 import { GenerarAgendaComponent } from "./components/generar-agenda/generar-agenda.component";
 import { ProductorepsodetallesprodComponent } from "./components/productorepsodetallesprod/productorepsodetallesprod.component";
 import { ProductoService } from "./services/producto.service";
+import { ClienteService } from "../services/cliente.service";
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { ProductoService } from "./services/producto.service";
     ComunService,
     ProductoService,
     ProductosrepsoService,
+    ClienteService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthTokenInterceptor, multi: true },

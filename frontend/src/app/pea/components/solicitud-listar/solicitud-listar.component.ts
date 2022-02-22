@@ -43,7 +43,7 @@ export class SolicitudListarComponent implements OnInit {
     },
     {
       title: "Tipo Producto",
-      data: "tipo_producto.name",
+      data: "tipoproducto.name",
       orderable: false,
       searchable: false,
       type: "text",
