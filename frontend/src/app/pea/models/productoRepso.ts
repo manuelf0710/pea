@@ -10,4 +10,5 @@ export interface productoRepso {
   regional_id: number;
   tipo_producto: tipoProducto;
   tipoproducto_id: number;
+  cantidad:number;
 }

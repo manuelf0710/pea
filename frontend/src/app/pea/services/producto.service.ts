@@ -31,4 +31,21 @@ export class ProductoService {
       data
     );
   }
+
+  /*
+   * procesar el cargue del excel de clientes funcionarios
+   */
+  public procesarExcelBySolicitud(id, data) {
+    return this._http
+      .post<any>(
+        environment.apiUrl + environment.productos.getProcesarCargue + id,
+        data
+      )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
 }

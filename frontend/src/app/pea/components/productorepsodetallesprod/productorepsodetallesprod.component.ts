@@ -7,6 +7,7 @@ import { productoRepso } from "../../models/productoRepso";
 import { ProductosrepsoService } from "../../services/productosrepso.service";
 import { ProductoService } from "../../services/producto.service";
 import { ClienteService } from "src/app/services/cliente.service";
+import { ToastService } from "src/app/shared/services/toast.service";
 
 @Component({
   selector: "app-productorepsodetallesprod",
@@ -18,10 +19,15 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   odsDetalles: productoRepso;
   productosLista: [];
   loading: boolean = true;
-  mostrarRegistro: boolean = true;
+  mostrarRegistro: boolean = false;
+  mostrarCargaExcel: boolean = false;
   formulario: FormGroup;
+  formularioArchivo: FormGroup;
+  public archivoscargados: any[] = [];
+  urlSubidaArchivo!: String;
 
   constructor(
+    private _ToastService: ToastService,
     private FormBuilder: FormBuilder,
     private _ProductosrepsoService: ProductosrepsoService,
     private _ProductoService: ProductoService,
@@ -34,6 +40,10 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.route.queryParams.subscribe((params: Params) => {
       this.id = params["id"];
       this.initLoadData();
+      this.urlSubidaArchivo =
+        environment.apiUrl +
+        environment.imports.importExcelToProductRepso +
+        this.id;
     });
   }
 
@@ -61,6 +71,11 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       comentarios: [""],
       pyp_ergonomia: [""],
     });
+
+    this.formularioArchivo = this.FormBuilder.group({
+      id: [this.id],
+      archivo: ["", [Validators.required]],
+    });
   }
 
   initLoadData() {
@@ -78,6 +93,44 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   agregarRegistro() {
     //this.mostrarRegistro = true
     this.mostrarRegistro = !this.mostrarRegistro;
+  }
+
+  openCargaExcel() {
+    this.mostrarCargaExcel = !this.mostrarCargaExcel;
+  }
+
+  importExcel() {}
+
+  getArchivos(archivos_upload) {
+    /*archivos subidos, desde fileuploadcomponent */
+    this.archivoscargados = archivos_upload;
+    console.log("algo paso", this.archivoscargados);
+    this.formularioArchivo
+      .get("archivo")
+      .setValue(this.archivoscargados[0]["path"]);
+
+    if (this.archivoscargados.length > 0) {
+      this._ToastService.info("archivo cargado y procesando datos...");
+      this.procesarDatosExcel();
+    }
+  }
+
+  procesarDatosExcel() {
+    console.log("el valor del archivo ",this.formularioArchivo.get("archivo").value);
+    this._ProductoService
+      .procesarExcelBySolicitud(this.id, {
+        nombrearchivo: this.formularioArchivo.value.archivo,
+        ...this.odsDetalles,
+      })
+      .subscribe((res: any) => {
+        if(res.status == 'error'){
+            this._ToastService.danger(res.msg);
+        }
+        if(res.code==200){
+          this._ToastService.success(res.msg);
+          this.mostrarCargaExcel = false;
+        }
+      });
   }
 
   buscarCedula(event: Event) {

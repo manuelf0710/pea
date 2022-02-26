@@ -1,12 +1,14 @@
 <?php
 
-//namespace App\Http\Controllers;
 namespace App\Http\Controllers\comun;
+
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Cliente;
 use App\Http\Controllers\Controller;
+use App\Imports\ClientesImport;
 
 class ClienteController extends Controller
 {
@@ -81,6 +83,16 @@ class ClienteController extends Controller
     public function edit($id)
     {
         //
+    }
+
+    /*
+    * importa el excel de clientes
+     */
+    public function importExcel($id){
+        $importClientes = new ClientesImport;
+
+        Excel::import($importClientes, public_path().'/uploads/clientes/'.'test.csv'); 
+        return response()->json($importClientes->clientesImportar);
     }
 
     /**

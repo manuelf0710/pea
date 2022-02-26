@@ -28,14 +28,14 @@ export class RefreshTokenInterceptor implements HttpInterceptor {
         console.log("status en refreshtoken interceptor " + err.status);
         if (err.status === 500) {
           if (err.error.message == "The token has been blacklisted") {
-            this.authenticationService.logout();
-            location.reload(true);
+            /*this.authenticationService.logout();
+            location.reload(true);*/
           }
         }
         if (err.status === 401) {
           if (err.error.message == "Token Signature could not be verified.") {
-            this.authenticationService.logout();
-            location.reload(true);
+            /*this.authenticationService.logout();
+            location.reload(true);*/
           }
           if (err.error.message == "Token has expired") {
             let params = {

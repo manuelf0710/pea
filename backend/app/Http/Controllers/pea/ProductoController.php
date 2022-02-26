@@ -3,12 +3,17 @@
 //namespace App\Http\Controllers;
 namespace App\Http\Controllers\pea;
 
+use App\Http\Controllers\Controller;
+use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\pea\Producto;
-use App\Http\Controllers\Controller;
+use App\Models\pea\ProductoRepso;
+use App\Models\Cliente;
+use App\Imports\ClientesImport;
 use Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ProductoController extends Controller
 {
@@ -166,13 +171,14 @@ class ProductoController extends Controller
         return response()->json($response);
     }
 
-       /**
+    /**
      * get the data relation with productrepsoid parent.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function productsByProductRepso($id, Request $request){
+    public function productsByProductRepso($id, Request $request)
+    {
         $pageSize = $request->get('pageSize');
         $pageSize == '' ? $pageSize = 20 : $pageSize;
 
@@ -183,13 +189,108 @@ class ProductoController extends Controller
 
         if ($globalSearch != '') {
             $response = Producto::withoutTrashed()->orderBy('productos.id', 'desc')
-                ->where('producto_repso_id','=', $id)
+                ->where('producto_repso_id', '=', $id)
                 ->globalSearch($globalSearch)
                 ->paginate($pageSize);
         } else {
             $response = Producto::withoutTrashed()->orderBy('productos.id', 'desc')
-                ->where('producto_repso_id','=', $id)
+                ->where('producto_repso_id', '=', $id)
                 ->paginate($pageSize);
+        }
+
+        return response()->json($response);
+    }
+
+    public function validarErrores()
+    {
+    }
+
+
+    /*
+    * importa el excel de clientes
+     */
+    public function ImportClientesByProductoRepso($id, Request $request)
+    {
+
+        //$requestData = $request->get('descripcion');
+        $requestData = $request->all();
+
+        /*$productoRepso = DB::table('productos_repso')
+            ->where("id", "=", $id)
+            ->select('productos_repso.*')
+            ->addSelect(DB::raw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos"))
+            ->first();*/
+
+
+
+        $find = ProductoRepso::select('id', 'tipoproducto_id', 'regional_id', 'contrato_id', 'anio', 'descripcion', 'cantidad', 'user_id', 'archivo')
+            ->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
+            ->find($id);
+        $error = 0;
+
+        if (!empty($find)) {
+            if (file_exists(public_path() . '/' . $request->get('nombrearchivo'))) {
+
+                $importClientes = new ClientesImport;
+
+                Excel::import($importClientes, public_path() . '/' . $request->get('nombrearchivo'));
+
+                $totalImport = count($importClientes->clientesImportar);
+                if ($totalImport > $find->cantidad) {
+                    $response = array(
+                        'status' => 'error',
+                        'msg' => "El archivo de Funcionarios tiene mas registros que la cantidad de la solicitud",
+                        'validator' => "Las cantidades no corresponden"
+                    );
+                    $error = 1;
+                }
+
+                if (($totalImport + $find->total_productos) > $find->cantidad) {
+                    $response = array(
+                        'status' => 'error',
+                        'msg' => "El archivo de Funcionarios + los  registros que ya existen es mayor a la cantidad de la solicitud",
+                        'validator' => "Las cantidades no corresponden, registros existentes"
+                    );
+                    $error = 1;
+                }
+
+                $find->archivo = $request->get('nombrearchivo');
+                $find->save();
+                if ($error == 0) {
+                    foreach ($importClientes->clientesImportar as $producto) {
+                        $producto = new Producto();
+                        $producto->producto_repso_id = $id;
+                        $producto->estado_id = 9;
+                        $producto->cedula = $producto->cedula;
+                        $producto->dependencia_id = $producto->dependencia_id;
+                        $producto->user_id = auth()->user()->id;
+                        $producto->save();
+                    }
+                } else {
+                    return response()->json($response);
+                }
+
+                $response = array(
+                    'status' => 'success',
+                    'code' => 200,
+                    'data' => $find,
+                    'msg'  => 'Registro Procesado correctamente'
+                );
+
+                return response()->json($response);
+            } else {
+                $response = array(
+                    'status' => 'error',
+                    'msg' => "No se ha encontrado el archivo",
+                    'validator' => "Archivo no encontrado"
+                );
+            }
+        } else {
+            $response = array(
+                'status' => 'error',
+                'msg' => "no existe el id de solicitud " . $id,
+                'validator' => "Id no encontrado"
+            );
         }
 
         return response()->json($response);

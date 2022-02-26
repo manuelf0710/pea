@@ -13,6 +13,7 @@ export const environment = {
   productos: {
     getByIdProductoRepso: "pea/productobyrepsoid/",
     posByIdProductoRepso: "pea/productobyrepsoid/",
+    getProcesarCargue: "pea/productosprocesarcargue/",
   },
   tipoproductos: {
     getAll: "pea/tipoproductoslist",
@@ -30,6 +31,10 @@ export const environment = {
     getRegionales: "comun/regionaleslist",
     buscarContrato: "comun/buscarcontrato",
     getClienteByCedula: "comun/getcliente/",
+  },
+  imports: {
+    uploadExcelToProductRepso: "files/uploads/",
+    importExcelToProductRepso: "imports/importclientesproducto/",
   },
 };
 

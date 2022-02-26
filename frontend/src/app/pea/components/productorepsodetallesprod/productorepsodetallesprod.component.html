@@ -12,6 +12,9 @@
         <div class="col-md-3">regional: {{ odsDetalles.regional.nombre }}</div>
         <div class="col-md-3">
           <span class="badge badge-primary"> {{ odsDetalles.anio }}</span>
+          <span class="badge badge-success ml-1">
+            {{ odsDetalles.cantidad }}</span
+          >
         </div>
       </div>
     </div>
@@ -22,9 +25,17 @@
     </div>
   </div>
   <div class="row mb-2">
-    <div class="col-md-12">
-      <button class="btn btn-secondary btn-sm" (click)="agregarRegistro()">
+    <div class="col-md-6">
+      <button
+        class="btn btn-outline-secondary btn-sm mb-2"
+        (click)="agregarRegistro()"
+      >
         Agregar Registro
+      </button>
+    </div>
+    <div class="col-md-6">
+      <button class="btn btn-outline-success btn-sm" (click)="openCargaExcel()">
+        <i class="fa fa-file-excel-o"></i> Cargar Excel
       </button>
     </div>
   </div>
@@ -56,6 +67,26 @@
       </tbody>
     </table>
   </div>-->
+  <div class="row" *ngIf="mostrarCargaExcel">
+    <div class="col-md-4 offset-md-4">
+      <div class="card bg-light mb-3 w-100">
+        <div class="card-header">Carga un archivo de excel</div>
+        <div class="card-body">
+          <h5 class="card-title">Selecciona tu archivo</h5>
+          <p class="card-text">
+            <file-upload
+              [fk_key]="formularioArchivo.get('id').value"
+              [autoupload]="true"
+              (ArchivosCargados)="getArchivos($event)"
+              [title]="'Agregar Excel con personas a producto'"
+              [document_type]="'clientes'"
+              [accept_files_extension]="['xlsx', 'csv']"
+            ></file-upload>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
   <form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
     <div class="row" *ngIf="mostrarRegistro">
       <ngb-accordion #acc="ngbAccordion" class="w-100" closeOthers="true">
