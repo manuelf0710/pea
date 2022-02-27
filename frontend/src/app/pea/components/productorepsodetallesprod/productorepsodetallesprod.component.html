@@ -1,45 +1,192 @@
 <app-loading *ngIf="loading"></app-loading>
 
 <div class="container-fluid" *ngIf="!loading">
-  <div class="card bg-light mb-3">
-    <div class="card-header">
-      <div class="row">
-        <div class="col-md-3">Contrato: {{ odsDetalles.contrato.nombre }}</div>
-        <div class="col-md-3">
-          producto:
-          {{ odsDetalles.tipo_producto.name }}
+  <nav class="navbar navbar-expand-md navbar-light bg-light">
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <div
+        class="btn-group pull-right ml-auto"
+        role="group"
+        aria-label="Basic example"
+      >
+        <button
+          class="btn btn-sm btn-outline-secondary"
+          (click)="agregarRegistro()"
+        >
+          <i class="fa fa-plus-circle"></i>
+          Agregar Registro
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-info btn-sm"
+          (click)="filtrar()"
+        >
+          <i class="fa fa-filter"></i> Filtrar
+        </button>
+        <button
+          class="btn btn-outline-success btn-sm pull-right"
+          (click)="openCargaExcel()"
+        >
+          <i class="fa fa-file-excel-o"></i> Cargar Excel
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card bg-light mb-3">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-md-12">
+              Contrato: {{ odsDetalles.contrato.nombre }}
+            </div>
+            <div class="col-md-12">
+              producto:
+              {{ odsDetalles.tipo_producto.name }}
+            </div>
+            <div class="col-md-12">
+              regional: {{ odsDetalles.regional.nombre }}
+            </div>
+            <div class="col-md-12">
+              <span class="badge badge-secondary p-1">
+                {{ odsDetalles.anio }}</span
+              >
+              <span class="badge badge-success p-1 ml-1">
+                {{ odsDetalles.cantidad }}</span
+              >
+            </div>
+          </div>
         </div>
-        <div class="col-md-3">regional: {{ odsDetalles.regional.nombre }}</div>
-        <div class="col-md-3">
-          <span class="badge badge-primary"> {{ odsDetalles.anio }}</span>
-          <span class="badge badge-success ml-1">
-            {{ odsDetalles.cantidad }}</span
-          >
+        <div class="card-body">
+          <p class="card-text">
+            {{ odsDetalles.descripcion }}
+          </p>
         </div>
       </div>
     </div>
-    <div class="card-body">
-      <p class="card-text">
-        {{ odsDetalles.descripcion }}
-      </p>
+
+    <div class="col-md-8">
+      <div class="row" *ngIf="mostrarCargaExcel">
+        <div class="col-md-10 offset-md-1">
+          <div class="card bg-light mb-1 w-100">
+            <div class="card-header">Carga un archivo de excel</div>
+            <div class="card-body">
+              <file-upload
+                [fk_key]="formularioArchivo.get('id').value"
+                [autoupload]="true"
+                (ArchivosCargados)="getArchivos($event)"
+                [title]="'Agregar Excel con personas a producto'"
+                [document_type]="'clientes'"
+                [accept_files_extension]="['xlsx', 'csv']"
+              ></file-upload>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="mostrarFiltros">
+        <div class="col-md-3 col-lg-3 col-xs-12">
+          <div class="form-group">
+            <label for="regional">Dependencia</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-map"></i></span>
+              </div>
+              <input
+                type="number"
+                name="fdependencia_id"
+                id="fdependencia_id"
+                class="form-control form-control-sm"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-lg-3 col-xs-12">
+          <div class="form-group">
+            <label for="regional">Cédula</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-map"></i></span>
+              </div>
+              <input
+                type="number"
+                name="fcedula"
+                id="fcedula"
+                class="form-control form-control-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-lg-3 col-xs-12">
+          <div class="form-group">
+            <label for="regional">Nombre</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-map"></i></span>
+              </div>
+              <input
+                type="number"
+                name="fnombre"
+                id="fnombre"
+                class="form-control form-control-sm"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-lg-3 col-xs-12">
+          <div class="form-group">
+            <label for="regional">Estado</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-map"></i></span>
+              </div>
+              <input
+                type="number"
+                name="festado"
+                id="festado"
+                class="form-control form-control-sm"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3 col-lg-3 col-xs-12">
+          <div class="form-group">
+            <label for="regional">Modalidad</label>
+            <div class="input-group">
+              <div class="input-group-prepend">
+                <span class="input-group-text"><i class="fa fa-map"></i></span>
+              </div>
+              <select
+                type="number"
+                name="fmodalidad"
+                id="fmodalidad"
+                class="form-control form-control-sm"
+              >
+                <option value="1">Presencial</option>
+                <option value="2">Virtual</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="row">
+            <div class="col-md-12 mb-3">
+              <button
+                type="button"
+                class="btn btn-outline-secondary btn-sm pull-right"
+              >
+                <i class="fa fa-search"></i> Buscar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-  <div class="row mb-2">
-    <div class="col-md-6">
-      <button
-        class="btn btn-outline-secondary btn-sm mb-2"
-        (click)="agregarRegistro()"
-      >
-        Agregar Registro
-      </button>
-    </div>
-    <div class="col-md-6">
-      <button class="btn btn-outline-success btn-sm" (click)="openCargaExcel()">
-        <i class="fa fa-file-excel-o"></i> Cargar Excel
-      </button>
-    </div>
-  </div>
-  <!--<div class="row">
+
+  <div class="row">
     <table class="table table-sm table-hover table-bordered table-striped">
       <thead>
         <tr>
@@ -54,39 +201,25 @@
         <ng-container *ngFor="let item of productosLista">
           <tr *ngIf="item.cedula !== ''">
             <td>
-              <button class="btn btn-sm btn-primary">
-                <i class="fa fa-info"></i>
-              </button>
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-warning btn-sm">
+                  <i class="fa fa-pencil"></i>
+                </button>
+                <button type="button" class="btn btn-success btn-sm">
+                  <i class="fa fa-tasks"></i>
+                </button>
+              </div>
             </td>
-            <td>&nbsp;{{ item.cedula }}</td>
             <td></td>
-            <td></td>
-            <td></td>
+            <td>{{ item.cedula }}</td>
+            <td>{{ item.nombre }}</td>
+            <td>{{ item.estado }}</td>
           </tr>
         </ng-container>
       </tbody>
     </table>
-  </div>-->
-  <div class="row" *ngIf="mostrarCargaExcel">
-    <div class="col-md-4 offset-md-4">
-      <div class="card bg-light mb-3 w-100">
-        <div class="card-header">Carga un archivo de excel</div>
-        <div class="card-body">
-          <h5 class="card-title">Selecciona tu archivo</h5>
-          <p class="card-text">
-            <file-upload
-              [fk_key]="formularioArchivo.get('id').value"
-              [autoupload]="true"
-              (ArchivosCargados)="getArchivos($event)"
-              [title]="'Agregar Excel con personas a producto'"
-              [document_type]="'clientes'"
-              [accept_files_extension]="['xlsx', 'csv']"
-            ></file-upload>
-          </p>
-        </div>
-      </div>
-    </div>
   </div>
+
   <form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
     <div class="row" *ngIf="mostrarRegistro">
       <ngb-accordion #acc="ngbAccordion" class="w-100" closeOthers="true">

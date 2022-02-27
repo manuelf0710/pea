@@ -21,6 +21,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   loading: boolean = true;
   mostrarRegistro: boolean = false;
   mostrarCargaExcel: boolean = false;
+  mostrarFiltros: boolean = true;
   formulario: FormGroup;
   formularioArchivo: FormGroup;
   public archivoscargados: any[] = [];
@@ -86,6 +87,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     ]).subscribe(([odsDetalles, productosLista]) => {
       this.odsDetalles = odsDetalles;
       this.productosLista = productosLista.data;
+      console.log("holmanuelf", this.productosLista);
 
       this.loading = false;
     });
@@ -97,6 +99,11 @@ export class ProductorepsodetallesprodComponent implements OnInit {
 
   openCargaExcel() {
     this.mostrarCargaExcel = !this.mostrarCargaExcel;
+    this.mostrarCargaExcel == true ? (this.mostrarFiltros = false) : true;
+  }
+  filtrar() {
+    this.mostrarFiltros = !this.mostrarFiltros;
+    this.mostrarFiltros == true ? (this.mostrarCargaExcel = false) : true;
   }
 
   importExcel() {}
@@ -116,17 +123,20 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   }
 
   procesarDatosExcel() {
-    console.log("el valor del archivo ",this.formularioArchivo.get("archivo").value);
+    console.log(
+      "el valor del archivo ",
+      this.formularioArchivo.get("archivo").value
+    );
     this._ProductoService
       .procesarExcelBySolicitud(this.id, {
         nombrearchivo: this.formularioArchivo.value.archivo,
         ...this.odsDetalles,
       })
       .subscribe((res: any) => {
-        if(res.status == 'error'){
-            this._ToastService.danger(res.msg);
+        if (res.status == "error") {
+          this._ToastService.danger(res.msg);
         }
-        if(res.code==200){
+        if (res.code == 200) {
           this._ToastService.success(res.msg);
           this.mostrarCargaExcel = false;
         }

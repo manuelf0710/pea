@@ -69,6 +69,7 @@ export class AuthenticationService {
       .post<any>(environment.apiUrl + environment.auth.refreshToken, { params })
       .pipe(
         map((user) => {
+          console.log("el token dentro del servicio authenticate ",user);
           localStorage.setItem("token", user.token);
           return user.token;
         })

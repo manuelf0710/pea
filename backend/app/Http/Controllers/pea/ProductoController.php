@@ -188,12 +188,17 @@ class ProductoController extends Controller
         $globalSearch = $request->get('globalsearch');
 
         if ($globalSearch != '') {
-            $response = Producto::withoutTrashed()->orderBy('productos.id', 'desc')
-                ->where('producto_repso_id', '=', $id)
+            $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+                ->select('productos.id', 'clientes.cedula', 'clientes.nombre',)
+                ->withoutTrashed()->orderBy('productos.id', 'desc')
                 ->globalSearch($globalSearch)
                 ->paginate($pageSize);
         } else {
-            $response = Producto::withoutTrashed()->orderBy('productos.id', 'desc')
+            $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+                ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
+                ->select('productos.id', 'clientes.cedula', 'clientes.nombre', 'productos.estado_id', 'estadoprogramaciones.nombre as estado')
+                //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
+                ->withoutTrashed()->orderBy('productos.id', 'desc')
                 ->where('producto_repso_id', '=', $id)
                 ->paginate($pageSize);
         }
@@ -226,7 +231,7 @@ class ProductoController extends Controller
         $find = ProductoRepso::select('id', 'tipoproducto_id', 'regional_id', 'contrato_id', 'anio', 'descripcion', 'cantidad', 'user_id', 'archivo')
             ->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
             ->find($id);
-        $error = 0;
+        $validacion = 0;
 
         if (!empty($find)) {
             if (file_exists(public_path() . '/' . $request->get('nombrearchivo'))) {
@@ -242,7 +247,7 @@ class ProductoController extends Controller
                         'msg' => "El archivo de Funcionarios tiene mas registros que la cantidad de la solicitud",
                         'validator' => "Las cantidades no corresponden"
                     );
-                    $error = 1;
+                    $validacion = 1;
                 }
 
                 if (($totalImport + $find->total_productos) > $find->cantidad) {
@@ -251,23 +256,23 @@ class ProductoController extends Controller
                         'msg' => "El archivo de Funcionarios + los  registros que ya existen es mayor a la cantidad de la solicitud",
                         'validator' => "Las cantidades no corresponden, registros existentes"
                     );
-                    $error = 1;
+                    $validacion = 1;
                 }
 
                 $find->archivo = $request->get('nombrearchivo');
                 $find->save();
-                if ($error == 0) {
-                    foreach ($importClientes->clientesImportar as $producto) {
+                if ($validacion == 0) {
+                    foreach ($importClientes->clientesImportar as $item) {
                         $producto = new Producto();
                         $producto->producto_repso_id = $id;
                         $producto->estado_id = 9;
-                        $producto->cedula = $producto->cedula;
-                        $producto->dependencia_id = $producto->dependencia_id;
+                        $producto->cedula = $item['cedula'];
+                        $producto->dependencia_id = $item['dependencia_id'];
                         $producto->user_id = auth()->user()->id;
                         $producto->save();
                     }
                 } else {
-                    return response()->json($response);
+                    return response()->json($$importClientes->clientesImportar);
                 }
 
                 $response = array(
