@@ -1,7 +1,7 @@
 <app-loading *ngIf="loading"></app-loading>
 
 <div class="container-fluid" *ngIf="!loading">
-  <nav class="navbar navbar-expand-md navbar-light bg-light">
+  <nav class="navbar navbar-expand-md navbar-light bg-light mb-1">
     <div class="collapse navbar-collapse" id="navbarNav">
       <div
         class="btn-group pull-right ml-auto"
@@ -68,6 +68,9 @@
     <div class="col-md-8">
       <div class="row" *ngIf="mostrarCargaExcel">
         <div class="col-md-10 offset-md-1">
+          <div class="alert alert-danger">
+            <p>se ha preserandofgd gdfgdfg dfgdfgdf</p>
+          </div>
           <div class="card bg-light mb-1 w-100">
             <div class="card-header">Carga un archivo de excel</div>
             <div class="card-body">
@@ -84,7 +87,7 @@
         </div>
       </div>
       <div class="row" *ngIf="mostrarFiltros">
-        <div class="col-md-3 col-lg-3 col-xs-12">
+        <div class="col-md-6 col-lg-4 col-xs-12">
           <div class="form-group">
             <label for="regional">Dependencia</label>
             <div class="input-group">
@@ -100,7 +103,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-3 col-lg-3 col-xs-12">
+        <div class="col-md-6 col-lg-4 col-xs-12">
           <div class="form-group">
             <label for="regional">Cédula</label>
             <div class="input-group">
@@ -117,7 +120,7 @@
           </div>
         </div>
 
-        <div class="col-md-3 col-lg-3 col-xs-12">
+        <div class="col-md-6 col-lg-4 col-xs-12">
           <div class="form-group">
             <label for="regional">Nombre</label>
             <div class="input-group">
@@ -134,7 +137,7 @@
           </div>
         </div>
 
-        <div class="col-md-3 col-lg-3 col-xs-12">
+        <div class="col-md-6 col-lg-4 col-xs-12">
           <div class="form-group">
             <label for="regional">Estado</label>
             <div class="input-group">
@@ -150,7 +153,7 @@
             </div>
           </div>
         </div>
-        <div class="col-md-3 col-lg-3 col-xs-12">
+        <div class="col-md-6 col-lg-4 col-xs-12">
           <div class="form-group">
             <label for="regional">Modalidad</label>
             <div class="input-group">

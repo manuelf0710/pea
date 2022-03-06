@@ -70,6 +70,13 @@ export class SolicitudListarComponent implements OnInit {
       type: "text",
     },
     {
+      title: "Profesional",
+      data: "profesional.name",
+      orderable: false,
+      searchable: false,
+      type: "text",
+    },    
+    {
       title: "Descripción",
       data: "descripcion",
       orderable: false,

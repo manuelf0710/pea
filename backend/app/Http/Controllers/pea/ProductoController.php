@@ -272,7 +272,8 @@ class ProductoController extends Controller
                         $producto->save();
                     }
                 } else {
-                    return response()->json($$importClientes->clientesImportar);
+                    //return response()->json($importClientes->clientesImportar);
+                    return response()->json($response);
                 }
 
                 $response = array(

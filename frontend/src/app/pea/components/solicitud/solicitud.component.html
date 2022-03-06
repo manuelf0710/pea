@@ -205,6 +205,28 @@
               </div>
             </div>
           </div>
+          <div class="col-md-6 col-lg-6 col-xs-12">
+            <div class="form-group">
+              <label for="profesional">Profesional</label>
+              <app-autocomplete
+                [url]="urlProfesionales"
+                (seleccionado)="seleccionadoProfesional($event)"
+                [labelValue]="'profesional'"
+              ></app-autocomplete>
+            </div>
+            <div
+              *ngIf="
+                formulario.get('profesional_id').errors &&
+                formulario.get('profesional_id').touched
+              "
+            >
+              <small
+                *ngIf="formulario.get('profesional_id').hasError('required')"
+                class="form-text text-danger"
+                >el campo profesional no debe estar vacío.</small
+              >
+            </div>
+          </div>          
         </div>
         <div class="row">
           <div class="col-md-6 offset-md-3 text-center">

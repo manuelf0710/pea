@@ -139,6 +139,11 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         if (res.code == 200) {
           this._ToastService.success(res.msg);
           this.mostrarCargaExcel = false;
+          this._ProductoService
+            .getProductosBySolicitud(this.id, {})
+            .subscribe((data) => {
+              this.productosLista = data.data;
+            });
         }
       });
   }

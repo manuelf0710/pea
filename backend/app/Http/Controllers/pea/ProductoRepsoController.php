@@ -51,7 +51,7 @@ class ProductoRepsoController extends Controller
                 ->globalSearch($globalSearch)
                 ->paginate($pageSize);
         } else {
-            $response = ProductoRepso::with('regional', 'contrato', 'tipoproducto')->withoutTrashed()->orderBy('productos_repso.id', 'desc')
+            $response = ProductoRepso::with('regional', 'contrato', 'tipoproducto','profesional')->withoutTrashed()->orderBy('productos_repso.id', 'desc')
                 ->paginate($pageSize);
         }
 
@@ -76,6 +76,7 @@ class ProductoRepsoController extends Controller
             $modelo->tipoproducto_id = $request->post('tipoproducto_id');
             $modelo->regional_id    = $request->post('regional_id');
             $modelo->contrato_id    = $request->post('contrato_id');
+            $modelo->profesional_id    = $request->post('profesional_id');
             $modelo->anio  = $request->post('anio');
             $modelo->cantidad  = $request->post('cantidad');
             $modelo->descripcion  = $request->post('descripcion');

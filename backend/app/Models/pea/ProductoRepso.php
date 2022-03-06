@@ -37,7 +37,8 @@ class ProductoRepso extends Model
 			'regional_id' => 'required|integer',
 			'contrato_id' => 'required|integer',
 			'anio' => 'required|integer',
-			'cantidad' => 'required|integer'
+			'cantidad' => 'required|integer',
+			'profesional_id' => 'required|integer',
 		];
 		return $rules;
 	}
@@ -55,6 +56,11 @@ class ProductoRepso extends Model
 	{
 		return $this->hasOne('App\Models\Contrato',  'id', 'contrato_id');
 	}
+
+	public function profesional()
+	{
+		return $this->hasOne('App\User',  'id', 'profesional_id');
+	}	
 
 	public function scopeDescripcion($query, $des)
 	{

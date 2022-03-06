@@ -5,10 +5,15 @@ namespace App;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
+
+    public $timestamps = true;
+
+    use SoftDeletes;    
 
     /**
      * The attributes that are mass assignable.
@@ -62,5 +67,10 @@ class User extends Authenticatable implements JWTSubject
    public function perfil()
    {
     return $this->belongsTo('App\Perfil', 'perfil_id', 'id');
-   } 	
+   } 
+   
+   public function profesional()
+   {
+    return $this->belongsTo('App\Perfil', 'perfil_id', 'id');
+   }    
 }
