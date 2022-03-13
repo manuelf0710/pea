@@ -8,13 +8,13 @@
         role="group"
         aria-label="Basic example"
       >
-        <button
+        <!--<button
           class="btn btn-sm btn-outline-secondary"
           (click)="agregarRegistro()"
         >
           <i class="fa fa-plus-circle"></i>
           Agregar Registro
-        </button>
+        </button>-->
         <button
           type="button"
           class="btn btn-outline-info btn-sm"
@@ -202,13 +202,13 @@
       </thead>
       <tbody>
         <ng-container *ngFor="let item of productosLista">
-          <tr *ngIf="item.cedula !== ''">
+          <tr *ngIf="item.cedula !== ''" [ngClass]="{'bg-info text-white': (personaGestion && item.cedula == personaGestion.cedula) }">
             <td>
               <div class="btn-group" role="group" aria-label="Basic example">
                 <button type="button" class="btn btn-warning btn-sm">
                   <i class="fa fa-pencil"></i>
                 </button>
-                <button type="button" class="btn btn-success btn-sm">
+                <button type="button" class="btn btn-success btn-sm" (click)="gestionProgramacion(item)">
                   <i class="fa fa-tasks"></i>
                 </button>
               </div>
@@ -217,7 +217,7 @@
             <td>{{ item.cedula }}</td>
             <td>{{ item.nombre }}</td>
             <td>{{ item.estado }}</td>
-          </tr>
+          </tr>         
         </ng-container>
       </tbody>
     </table>
@@ -225,262 +225,8 @@
 
   <form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
     <div class="row" *ngIf="mostrarRegistro">
-      <ngb-accordion #acc="ngbAccordion" class="w-100" closeOthers="true">
-        <ngb-panel id="toggle-1" title="Registrar Funcionario">
-          <ng-template ngbPanelContent>
-            <div class="row">
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Cédula</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="number"
-                      name="cedula"
-                      id="cedula"
-                      class="form-control form-control-sm"
-                      formControlName="cedula"
-                      (keydown)="buscarCedula($event)"
-                    />
-                  </div>
-                </div>
-              </div>
+      <ngb-accordion #acc="ngbAccordion" class="w-100" closeOthers="true" activeIds="toggle-2">
 
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Nombre</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="text"
-                      name="nombre"
-                      id="nombre"
-                      class="form-control form-control-sm"
-                      formControlName="nombre"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Dependencia</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="number"
-                      name="dependencia_id"
-                      id="dependencia_id"
-                      class="form-control form-control-sm"
-                      formControlName="dependencia_id"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Correo</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="text"
-                      name="email"
-                      id="email"
-                      class="form-control form-control-sm"
-                      formControlName="email"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">division</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="text"
-                      name="division"
-                      id="division"
-                      class="form-control form-control-sm"
-                      formControlName="division"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">subdivision</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="text"
-                      name="subdivision"
-                      id="subdivision"
-                      class="form-control form-control-sm"
-                      formControlName="subdivision"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Cargo</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="text"
-                      name="cargo"
-                      id="cargo"
-                      class="form-control form-control-sm"
-                      formControlName="cargo"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Ciudad Ejecución</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="number"
-                      name="ciudad_id"
-                      id="ciudad_id"
-                      class="form-control form-control-sm"
-                      formControlName="ciudad_id"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Dirección</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="number"
-                      name="direccion"
-                      id="direccion"
-                      class="form-control form-control-sm"
-                      formControlName="direccion"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Barrio</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="number"
-                      name="barrio"
-                      id="barrio"
-                      class="form-control form-control-sm"
-                      formControlName="barrio"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Otrosi</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="number"
-                      name="otrosi"
-                      id="otrosi"
-                      class="form-control form-control-sm"
-                      formControlName="otrosi"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div class="col-md-4 col-lg-4 col-xs-12">
-                <div class="form-group">
-                  <label for="regional">Fecha de ingreso</label>
-                  <div class="input-group">
-                    <div class="input-group-prepend">
-                      <span class="input-group-text"
-                        ><i class="fa fa-map"></i
-                      ></span>
-                    </div>
-                    <input
-                      type="number"
-                      name="fecha_ingreso"
-                      id="fecha_ingreso"
-                      class="form-control form-control-sm"
-                      formControlName="fecha_ingreso"
-                      readonly
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          </ng-template>
-        </ngb-panel>
         <ngb-panel id="toggle-2" title="Gestionar Programación">
           <ng-template ngbPanelContent>
             <div class="row">
@@ -493,14 +239,16 @@
                         ><i class="fa fa-map"></i
                       ></span>
                     </div>
-                    <input
-                      type="number"
-                      name="modadlidad"
+
+                    <select
+                      name="modalidad"
                       id="modalidad"
-                      class="form-control form-control-sm"
+                      class="form form-control-sm"
                       formControlName="modalidad"
-                      readonly
-                    />
+                    >
+                      <option value="1">Presencial</option>
+                      <option value="2">Virtual</option>
+                    </select>                    
                   </div>
                 </div>
               </div>
@@ -520,7 +268,6 @@
                       id="descripcion"
                       class="form-control form-control-sm"
                       formControlName="descripcion"
-                      readonly
                     />
                   </div>
                 </div>
@@ -554,14 +301,24 @@
                         ><i class="fa fa-map"></i
                       ></span>
                     </div>
+                   
                     <input
-                      type="number"
+                      type="tet"
+                      (dateSelect)="dateSeleccionado($event)"
+                      ngbDatepicker
+                      #d="ngbDatepicker"
                       name="fecha_seguimiento"
                       id="fecha_seguimiento"
                       class="form-control form-control-sm"
                       formControlName="fecha_seguimiento"
                       readonly
                     />
+                    <div class="input-group-append">
+                      <i
+                        class="fa fa-calendar"
+                        (click)="d.toggle()"
+                      ></i>
+                    </div> 
                   </div>
                 </div>
               </div>

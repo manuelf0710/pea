@@ -25,6 +25,9 @@ import { ProductorepsodetallesprodComponent } from "./components/productorepsode
 import { ProductoService } from "./services/producto.service";
 import { ClienteService } from "../services/cliente.service";
 
+import { FullCalendarModule } from "@fullcalendar/angular";
+import { NuevaAgendaProfesionalComponent } from "./components/generar-agenda/crear/nueva-agenda-profesional/nueva-agenda-profesional.component";
+
 @NgModule({
   declarations: [
     IndexComponent,
@@ -34,6 +37,7 @@ import { ClienteService } from "../services/cliente.service";
     SolicitudListarComponent,
     GenerarAgendaComponent,
     ProductorepsodetallesprodComponent,
+    NuevaAgendaProfesionalComponent,
   ],
   imports: [
     CommonModule,
@@ -42,6 +46,7 @@ import { ClienteService } from "../services/cliente.service";
     NgbModule,
     FormsModule,
     ReactiveFormsModule,
+    FullCalendarModule,
   ],
   providers: [
     TipoproductosService,

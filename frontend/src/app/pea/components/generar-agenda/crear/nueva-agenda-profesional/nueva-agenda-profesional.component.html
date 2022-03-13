@@ -1,0 +1,101 @@
+<div *ngIf="loading">
+  <!--<button type="button" class=" close" aria-label="Close" (click)="closeModal()">
+      <i class="fa fa-close text-darks"></i>
+    </button>-->
+  <app-loading></app-loading>
+</div>
+
+<form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">
+      <span *ngIf="!formulario.get('id').value"> Nuevo Agenda </span>
+      <span *ngIf="formulario.get('id').value"> Editar Agenda </span>
+    </h3>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <i class="fa fa-close"></i>
+    </button>
+  </div>
+
+  <div class="modal-body" style="min-height: 380px"></div>
+
+  <div class="modal-footer">
+    <div class="row">
+      <div class="col-12 col-lg-12 col-md-12 text-right">
+        <button type="button" class="btn btn-dark" (click)="closeModal()">
+          Salir</button
+        >&nbsp;
+        <button
+          type="submit"
+          class="btn btn-primary"
+          [disabled]="formulario.invalid || loading"
+        >
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</form>
+
+<div class="form-group">
+  <label for="regional">Tipo de producto</label>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fa fa-map"></i></span>
+    </div>
+    <input
+      type="number"
+      name="descripcion"
+      id="descripcion"
+      class="form-control form-control-sm"
+    />
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="regional">Fecha Hora inicio</label>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fa fa-map"></i></span>
+    </div>
+    <input
+      type="number"
+      name="descripcion"
+      id="descripcion"
+      class="form-control form-control-sm"
+    />
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="regional">Fecha Hora Fin</label>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fa fa-map"></i></span>
+    </div>
+    <input
+      type="number"
+      name="descripcion"
+      id="descripcion"
+      class="form-control form-control-sm"
+    />
+  </div>
+</div>
+
+<div class="form-group">
+  <label for="regional">Hora inicio</label>
+  <div class="input-group">
+    <div class="input-group-prepend">
+      <span class="input-group-text"><i class="fa fa-map"></i></span>
+    </div>
+
+    <select name="modalidad" id="modalidad" class="form form-control-sm">
+      <option value="1">Presencial</option>
+      <option value="2">Virtual</option>
+    </select>
+  </div>
+</div>

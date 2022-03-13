@@ -1,1 +1,12 @@
 <p>generar-agenda works!</p>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-8">
+      <full-calendar
+        *ngIf="calendarVisible"
+        [options]="calendarOptions"
+      ></full-calendar>
+    </div>
+    <div class="col-md-4"></div>
+  </div>
+</div>

@@ -32,7 +32,7 @@
             <h2 class="login-title">Iniciar sesión</h2>
             <div class="form-group">
                     <label for="email">Email</label>
-                    <input type="text" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" />
+                    <input type="text" formControlName="email" class="form-control" [ngClass]="{ 'is-invalid': submitted && f.email.errors }" autocomplete="on" />
                     <div *ngIf="submitted && f.email.errors" class="invalid-feedback">
                         <div *ngIf="f.email.errors.required">Email is required</div>
                     </div>

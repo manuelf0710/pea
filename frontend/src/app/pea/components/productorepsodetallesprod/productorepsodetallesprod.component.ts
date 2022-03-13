@@ -9,11 +9,20 @@ import { ProductoService } from "../../services/producto.service";
 import { ClienteService } from "src/app/services/cliente.service";
 import { ToastService } from "src/app/shared/services/toast.service";
 
+export interface gestionPersona {
+  id:number;
+  cedula: number;
+  estado: String;
+  estado_id: number;
+  nombre: String;
+}
+
 @Component({
   selector: "app-productorepsodetallesprod",
   templateUrl: "./productorepsodetallesprod.component.html",
   styleUrls: ["./productorepsodetallesprod.component.css"],
 })
+
 export class ProductorepsodetallesprodComponent implements OnInit {
   id!: number;
   odsDetalles: productoRepso;
@@ -26,6 +35,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   formularioArchivo: FormGroup;
   public archivoscargados: any[] = [];
   urlSubidaArchivo!: String;
+  active: number = 1;
+  personaGestion !: gestionPersona;
 
   constructor(
     private _ToastService: ToastService,
@@ -97,6 +108,19 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.mostrarRegistro = !this.mostrarRegistro;
   }
 
+  gestionProgramacion(item){
+    this.mostrarRegistro = !this.mostrarRegistro;
+    if(this.personaGestion === undefined){
+      this.personaGestion = item
+    }
+    if(this.personaGestion.cedula != item.cedula){
+      this.personaGestion = item
+      this.mostrarRegistro = true;
+    }
+    
+    console.log("registropersona ",this.personaGestion);
+  }
+
   openCargaExcel() {
     this.mostrarCargaExcel = !this.mostrarCargaExcel;
     this.mostrarCargaExcel == true ? (this.mostrarFiltros = false) : true;
@@ -164,6 +188,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       }
     }
   }
+
+  dateSeleccionado(evento){}
 
   guardar(ev) {}
 }
