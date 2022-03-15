@@ -31,11 +31,14 @@ export const environment = {
     getRegionales: "comun/regionaleslist",
     buscarContrato: "comun/buscarcontrato",
     getClienteByCedula: "comun/getcliente/",
-    buscarUsers:"comun/buscarusers"
+    buscarUsers: "comun/buscarusers",
   },
   imports: {
     uploadExcelToProductRepso: "files/uploads/",
     importExcelToProductRepso: "imports/importclientesproducto/",
+  },
+  agenda: {
+    agendaProfesional: "pea/agenda/profesional/",
   },
 };
 

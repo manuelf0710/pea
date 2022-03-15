@@ -1,6 +1,7 @@
 import { Component, OnInit, Input } from "@angular/core";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { NgbActiveModal, NgbTimeStruct } from "@ng-bootstrap/ng-bootstrap";
+
 import { ToastService } from "../../../../../shared/services/toast.service";
 import { UtilService } from "src/app/shared/services/util.service";
 
@@ -10,7 +11,7 @@ export interface Agenda {
   profesional?: String;
   start: String;
   end: String;
-  tipo_agenda?: number;
+  tipo?: number;
   created_at?: String;
   updated_at?: String;
   deleted_at?: String;
@@ -23,12 +24,29 @@ export interface Agenda {
 })
 export class NuevaAgendaProfesionalComponent implements OnInit {
   formulario: FormGroup;
-  @Input() data: Agenda;
+  @Input() data: any;
   public loading: boolean = false;
+
+  public start_time!: NgbTimeStruct;
+  public end_time!: NgbTimeStruct;
   public respuesta = {
     status: "close",
     data: [],
   };
+  tiposLista = [
+    {
+      id: 1,
+      nombre: "Disponible",
+    },
+    {
+      id: 2,
+      nombre: "Bloqueo",
+    },
+    {
+      id: 3,
+      nombre: "Informe",
+    },
+  ];
 
   constructor(
     private FormBuilder: FormBuilder,
@@ -39,7 +57,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
 
   ngOnInit(): void {
     this.buildForm();
-    this.loading = true;
+    this.loading = false;
   }
 
   private buildForm() {
@@ -47,25 +65,55 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
     let profesional_id = null;
     let profesional = null;
     let start = null;
+    let start_time = null;
     let end = null;
-    let tipo_agenda = null;
+    let tipo = null;
 
     if (this.data) {
       id = this.data.id;
       profesional_id = this.data.profesional_id;
       profesional = this.data.profesional;
-      start = this.data.start;
-      end = this.data.end;
-      tipo_agenda = this.data.tipo_agenda;
+      start = `${parseInt(this.data.start.split("/")[2])}-${parseInt(
+        this.data.start.split("/")[1]
+      )}-${parseInt(this.data.start.split("/")[0])}`;
+      end = `${parseInt(this.data.end.split("/")[2])}-${parseInt(
+        this.data.end.split("/")[1]
+      )}-${parseInt(this.data.end.split("/")[0])}`;
+      tipo = this.data.tipo;
+      start_time = {
+        hour: this.data.start_time.split(":")[0],
+        minute: this.data.start_time.split(":")[1],
+      };
     }
+
+    let start_timeVar = {
+      hour: parseInt(this.data.start_time.split(":")[0]),
+      minute: parseInt(this.data.start_time.split(":")[1]),
+      second: 0,
+    };
+
+    this.start_time = { ...start_timeVar };
+
+    let end_timeVar = {
+      hour: parseInt(this.data.end_time.split(":")[0]),
+      minute: parseInt(this.data.end_time.split(":")[1]),
+      second: 0,
+    };
+
+    this.end_time = { ...end_timeVar };
+
+    console.log("la data en el contrller modal ", this.data);
+    console.log("la data en el contrller modal ", start);
 
     this.formulario = this.FormBuilder.group({
       id: [id],
       profesional_id: [profesional_id, [Validators.required]],
       profesional: [profesional, [Validators.required]],
       start: [start],
+      start_time: [start_time],
       end: [end, [Validators.required]],
-      tipo_agenda: [tipo_agenda, [Validators.required]],
+      end_time: [],
+      tipo: [tipo, [Validators.required]],
     });
   }
 

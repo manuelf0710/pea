@@ -18,7 +18,8 @@ import { tipoProducto } from "./../../models/tipoproducto";
 })
 export class SolicitudComponent implements OnInit {
   public url = environment.apiUrl + environment.comun.buscarContrato;
-  public urlProfesionales = environment.apiUrl + environment.comun.buscarUsers + '?profile=2';
+  public urlProfesionales =
+    environment.apiUrl + environment.comun.buscarUsers + "?profile=2";
   public loading: boolean = false;
   public regionales: regional[];
   public tipoProductos: tipoProducto[];
@@ -66,7 +67,7 @@ export class SolicitudComponent implements OnInit {
       tipoproducto_id: [tipoproducto_id, [Validators.required]],
       regional_id: [regional_id, [Validators.required]],
       contrato_id: [contrato_id, [Validators.required]],
-      profesional_id: ['', [Validators.required]],
+      profesional_id: ["", [Validators.required]],
       anio: [
         anio,
         [

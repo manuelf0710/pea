@@ -24,6 +24,7 @@ import { GenerarAgendaComponent } from "./components/generar-agenda/generar-agen
 import { ProductorepsodetallesprodComponent } from "./components/productorepsodetallesprod/productorepsodetallesprod.component";
 import { ProductoService } from "./services/producto.service";
 import { ClienteService } from "../services/cliente.service";
+import { AgendaService } from "../services/agenda.service";
 
 import { FullCalendarModule } from "@fullcalendar/angular";
 import { NuevaAgendaProfesionalComponent } from "./components/generar-agenda/crear/nueva-agenda-profesional/nueva-agenda-profesional.component";
@@ -55,6 +56,7 @@ import { NuevaAgendaProfesionalComponent } from "./components/generar-agenda/cre
     ProductoService,
     ProductosrepsoService,
     ClienteService,
+    AgendaService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthTokenInterceptor, multi: true },

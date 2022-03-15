@@ -21,7 +21,126 @@
     </button>
   </div>
 
-  <div class="modal-body" style="min-height: 380px"></div>
+  <div class="modal-body" style="min-height: 380px">
+    <div class="row"><div class="col-md-12"></div></div>
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">inicio</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-calendar"></i
+              ></span>
+            </div>
+            <input
+              type="text"
+              name="start"
+              id="start"
+              class="form-control form-control-sm"
+              formControlName="start"
+              readonly
+              ngbDatepicker
+              #d="ngbDatepicker"
+            />
+            <button
+              class="btn btn-outline-secondary btn-sm calendar"
+              (click)="d.toggle()"
+              type="button"
+            >
+              ...
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Hora inicio</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-map"></i></span>
+            </div>
+            <ngb-timepicker
+              formControlName="start_time"
+              [(ngModel)]="start_time"
+              [spinners]="false"
+              [size]="'small'"
+            ></ngb-timepicker>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Final</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-calendar"></i
+              ></span>
+            </div>
+            <input
+              type="text"
+              name="end"
+              id="end"
+              class="form-control form-control-sm"
+              formControlName="end"
+              readonly
+              ngbDatepicker
+              #d2="ngbDatepicker"
+            />
+            <button
+              class="btn btn-outline-secondary btn-sm calendar"
+              (click)="d2.toggle()"
+              type="button"
+            >
+              ...
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Hora Fin</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-map"></i></span>
+            </div>
+            <ngb-timepicker
+              formControlName="end_time"
+              [(ngModel)]="end_time"
+              [spinners]="false"
+              [size]="'small'"
+            ></ngb-timepicker>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Tipo</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-map"></i></span>
+            </div>
+            <select
+              type="text"
+              name="tipo"
+              id="tipo"
+              class="form-control form-control-sm"
+              formControlName="tipo"
+            >
+              <option [ngValue]="null" disabled>
+                Seleccione tipo de producto
+              </option>
+              <option [value]="item.id" *ngFor="let item of tiposLista">
+                {{ item.nombre }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <div class="modal-footer">
     <div class="row">
@@ -40,62 +159,3 @@
     </div>
   </div>
 </form>
-
-<div class="form-group">
-  <label for="regional">Tipo de producto</label>
-  <div class="input-group">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fa fa-map"></i></span>
-    </div>
-    <input
-      type="number"
-      name="descripcion"
-      id="descripcion"
-      class="form-control form-control-sm"
-    />
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="regional">Fecha Hora inicio</label>
-  <div class="input-group">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fa fa-map"></i></span>
-    </div>
-    <input
-      type="number"
-      name="descripcion"
-      id="descripcion"
-      class="form-control form-control-sm"
-    />
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="regional">Fecha Hora Fin</label>
-  <div class="input-group">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fa fa-map"></i></span>
-    </div>
-    <input
-      type="number"
-      name="descripcion"
-      id="descripcion"
-      class="form-control form-control-sm"
-    />
-  </div>
-</div>
-
-<div class="form-group">
-  <label for="regional">Hora inicio</label>
-  <div class="input-group">
-    <div class="input-group-prepend">
-      <span class="input-group-text"><i class="fa fa-map"></i></span>
-    </div>
-
-    <select name="modalidad" id="modalidad" class="form form-control-sm">
-      <option value="1">Presencial</option>
-      <option value="2">Virtual</option>
-    </select>
-  </div>
-</div>

@@ -1,12 +1,26 @@
-<p>generar-agenda works!</p>
 <div class="container-fluid">
   <div class="row">
-    <div class="col-md-8">
+    <div class="col-md-8"></div>
+  </div>
+  <div class="row">
+    <div class="col-md-9">
       <full-calendar
         *ngIf="calendarVisible"
         [options]="calendarOptions"
       ></full-calendar>
     </div>
-    <div class="col-md-4"></div>
+    <div class="col-md-3">
+      <div class="form-group">
+        <label for="profesional" class="text-secondary">Profesional</label>
+        <app-autocomplete
+          [url]="urlProfesionales"
+          (seleccionado)="seleccionadoProfesional($event)"
+          [labelValue]="'profesional'"
+        ></app-autocomplete>
+        <p *ngIf="profesionalSeleccionado">
+          {{ profesionalSeleccionado.nombre }}
+        </p>
+      </div>
+    </div>
   </div>
 </div>
