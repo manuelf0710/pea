@@ -13,11 +13,20 @@ export class AgendaService {
 
   getAgendaProfesional(id: number): Observable<any> {
     return this._http
-      .get<any>(environment.apiUrl + environment.agenda.agendaProfesional + id)
+      .get<any>(
+        environment.apiUrl + environment.agenda.getAgendaProfesional + id
+      )
       .pipe(
         map((lista) => {
           return lista;
         })
       );
+  }
+
+  public postAgenda(id, data) {
+    return this._http.post<any>(
+      environment.apiUrl + environment.agenda.postAgendaProfesional + id,
+      data
+    );
   }
 }

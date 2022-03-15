@@ -38,7 +38,8 @@ export const environment = {
     importExcelToProductRepso: "imports/importclientesproducto/",
   },
   agenda: {
-    agendaProfesional: "pea/agenda/profesional/",
+    getAgendaProfesional: "pea/agenda/profesional/",
+    postAgendaProfesional: "pea/agenda/profesional/",
   },
 };
 

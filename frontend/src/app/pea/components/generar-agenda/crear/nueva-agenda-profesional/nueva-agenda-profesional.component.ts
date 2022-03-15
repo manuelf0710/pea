@@ -4,6 +4,7 @@ import { NgbActiveModal, NgbTimeStruct } from "@ng-bootstrap/ng-bootstrap";
 
 import { ToastService } from "../../../../../shared/services/toast.service";
 import { UtilService } from "src/app/shared/services/util.service";
+import { AgendaService } from "../../../../../services/agenda.service";
 
 export interface Agenda {
   id?: number;
@@ -52,7 +53,8 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
     private FormBuilder: FormBuilder,
     public _activeModal: NgbActiveModal,
     private _ToastService: ToastService,
-    private _UtilService: UtilService
+    private _UtilService: UtilService,
+    private _AgendaService: AgendaService
   ) {}
 
   ngOnInit(): void {
@@ -117,8 +119,52 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
     });
   }
 
+  formatearFechaGuardar(fecha, horas) {
+    return fecha + " " + horas.hour + ":" + horas.minute + ":" + horas.second;
+  }
+
   guardar(event: Event) {
     event.preventDefault();
+    if (this.formulario.valid) {
+      let value = {
+        ...this.formulario.value,
+      };
+
+      value.start = this.formatearFechaGuardar(value.start, value.start_time);
+      value.end = this.formatearFechaGuardar(value.end, value.end_time);
+
+      this._UtilService
+        .confirm({
+          title: "Guardar Agenda",
+          message: "Seguro que desea guardar esta agenda?",
+        })
+        .then(
+          () => {
+            this.loading = true;
+
+            this._AgendaService
+              .postAgenda(this.formulario.get("profesional_id").value, value)
+              .subscribe((res: any) => {
+                if (res.status == "ok") {
+                  this.respuesta = { status: "ok", data: res };
+                  this._ToastService.success(
+                    "agenda " + res.msg + " correctamente"
+                  );
+                }
+                if (res.status == "error") {
+                  let messageError = this._ToastService.errorMessage(res.msg);
+                  this._ToastService.danger(messageError);
+                }
+                this.loading = false;
+              });
+          },
+          () => {
+            this.loading = false;
+          }
+        );
+    } else {
+      this.formulario.markAllAsTouched();
+    }
   }
 
   closeModal() {

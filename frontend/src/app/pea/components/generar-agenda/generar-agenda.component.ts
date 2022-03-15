@@ -23,7 +23,7 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =
     environment.apiUrl + environment.comun.buscarUsers + "?profile=2";
-  public profesionalSeleccionado = { id: 2, nombre: "diana prueba" };
+  public profesionalSeleccionado: any;
   public agendaProfesional = [];
   loading: boolean = false;
   calendarVisible = true;
@@ -154,6 +154,17 @@ export class GenerarAgendaComponent implements OnInit {
       .then((result) => {
         if (result.status == "ok") {
           //this.dataTableReload.reload(result.data.data);
+          let nuevaAgenda = {
+            backgroundColor: result.data.data.backgroundColor,
+            end: result.data.data.end,
+            id: result.data.data.id,
+            profesional_id: result.data.data.profesional_id,
+            start: result.data.data.start,
+            textColor: result.data.data.textColor,
+            title: result.data.data.title,
+          };
+
+          calendarApi.addEvent(nuevaAgenda);
         }
       })
       .catch((error) => {});
@@ -211,6 +222,7 @@ export class GenerarAgendaComponent implements OnInit {
   }
 
   seleccionadoProfesional(item) {
+    this.loading = true;
     this.profesionalSeleccionado = item;
     //this.formulario.get("profesional_id").setValue(item.id);
     this.agendaProfesional = [];
@@ -218,9 +230,15 @@ export class GenerarAgendaComponent implements OnInit {
       (res: any) => {
         this.calendarVisible = true;
         this.calendarOptions.events = res;
+        this.agendaProfesional = res;
+        this.loading = false;
       },
-      (error: any) => {},
-      () => {}
+      (error: any) => {
+        this.loading = false;
+      },
+      () => {
+        this.loading = false;
+      }
     );
   }
 }

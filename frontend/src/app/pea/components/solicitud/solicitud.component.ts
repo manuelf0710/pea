@@ -107,7 +107,7 @@ export class SolicitudComponent implements OnInit {
       this._UtilService
         .confirm({
           title: "Guardar Solicitud",
-          message: "Seguro que desea guardar estasolicitud?",
+          message: "Seguro que desea guardar esta solicitud?",
         })
         .then(
           () => {
