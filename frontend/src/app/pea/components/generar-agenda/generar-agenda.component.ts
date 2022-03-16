@@ -1,4 +1,5 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, LOCALE_ID, Inject } from "@angular/core";
+import { formatDate } from "@angular/common";
 import {
   CalendarOptions,
   DateSelectArg,
@@ -79,7 +80,8 @@ export class GenerarAgendaComponent implements OnInit {
     private _AgendaService: AgendaService,
     private _UtilService: UtilService,
     private _ToastService: ToastService,
-    private modalService: NgbModal
+    private modalService: NgbModal,
+    @Inject(LOCALE_ID) public locale: string
   ) {}
 
   ngOnInit(): void {}
@@ -105,7 +107,6 @@ export class GenerarAgendaComponent implements OnInit {
       this._ToastService.info("debe seleccionar primero un profesional");
       return;
     }
-    console.log("selectinfo aquiii ", selectInfo);
     const calendarApi = selectInfo.view.calendar;
 
     let start = calendarApi.formatDate(selectInfo.startStr, {
@@ -119,7 +120,7 @@ export class GenerarAgendaComponent implements OnInit {
       minute: "2-digit",
       second: "2-digit",
     });
-    let end = calendarApi.formatDate(selectInfo.startStr, {
+    let end = calendarApi.formatDate(selectInfo.endStr, {
       month: "2-digit",
       year: "numeric",
       day: "2-digit",
@@ -162,38 +163,89 @@ export class GenerarAgendaComponent implements OnInit {
             start: result.data.data.start,
             textColor: result.data.data.textColor,
             title: result.data.data.title,
+            tipo: result.data.data.tipo,
           };
 
           calendarApi.addEvent(nuevaAgenda);
         }
       })
       .catch((error) => {});
+  }
 
-    /*const title = prompt("Please enter a new title for your event");
-    const calendarApi = selectInfo.view.calendar;
-
-    calendarApi.unselect(); // clear date selection
-
-    if (title) {
-      calendarApi.addEvent({
-        id: createEventId(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay,
-      });
-    }
-    */
+  formatearHora(fecha) {
+    let hora = fecha.split(" ");
+    return hora[1].split(":")[0] + ":" + hora[1].split(":")[1];
   }
 
   handleEventClick(clickInfo: EventClickArg) {
+    console.log("ingresaste manuelf ", clickInfo.event);
+
+    console.log("valores ", clickInfo.event.start);
+
+    const calendarApi = clickInfo.event;
+
+    let start = formatDate(
+      clickInfo.event.startStr,
+      "dd/MM/yyyy H:m:s",
+      this.locale
+    );
+
+    let end = formatDate(
+      clickInfo.event.endStr,
+      "dd/MM/yyyy H:m:s",
+      this.locale
+    );
+
+    let start_time = this.formatearHora(start);
+    let end_time = this.formatearHora(end);
+
+    const modalRef = this.modalService.open(NuevaAgendaProfesionalComponent, {
+      backdrop: "static",
+      size: "xs",
+      keyboard: false,
+    });
+
+    let info = {
+      id: clickInfo.event.id,
+      profesional_id: this.profesionalSeleccionado.id,
+      profesional: this.profesionalSeleccionado.nombre,
+      start: start.split(" ")[0],
+      start_time: start_time,
+      end: end.split(" ")[0],
+      end_time: end_time,
+      tipo: clickInfo.event.extendedProps.tipo,
+    };
+
+    console.log("esta es la infooo ", info);
+
+    modalRef.componentInstance.data = info;
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+          //this.dataTableReload.reload(result.data.data);
+          let nuevaAgenda = {
+            backgroundColor: result.data.data.backgroundColor,
+            end: result.data.data.end,
+            id: result.data.data.id,
+            profesional_id: result.data.data.profesional_id,
+            start: result.data.data.start,
+            textColor: result.data.data.textColor,
+            title: result.data.data.title,
+          };
+
+          //calendarApi.addEvent(nuevaAgenda);
+        }
+      })
+      .catch((error) => {});
+    /*
     if (
       confirm(
         `Are you sure you want to delete the event '${clickInfo.event.title}'`
       )
     ) {
       clickInfo.event.remove();
-    }
+    } */
   }
 
   handleEvents(events: EventApi[]) {

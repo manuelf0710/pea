@@ -66,7 +66,7 @@ class AgendaController extends Controller
     public function getAgendaById($id){
         $response = Agenda::withoutTrashed()
         ->join('lista_items', 'agendas.tipo', '=', 'lista_items.id')
-        ->select('agendas.id','profesional_id','start','end','lista_items.nombre as title','lista_items.background as backgroundColor','lista_items.color as textColor')
+        ->select('agendas.id','profesional_id','agendas.tipo','start','end','lista_items.nombre as title','lista_items.background as backgroundColor','lista_items.color as textColor')
         ->find($id);
 
         return $response;
@@ -132,7 +132,7 @@ class AgendaController extends Controller
             } else {
                 $response = Agenda::withoutTrashed()
                     ->join('lista_items', 'agendas.tipo', '=', 'lista_items.id')
-                    ->select('agendas.id','profesional_id','start','end','lista_items.nombre as title','lista_items.background as backgroundColor','lista_items.color as textColor')
+                    ->select('agendas.id','profesional_id','agendas.tipo','start','end','lista_items.nombre as title','lista_items.background as backgroundColor','lista_items.color as textColor')
                     ->orderBy('agendas.id', 'desc')
                     ->where('profesional_id', '=', $id)
                     ->get();

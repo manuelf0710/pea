@@ -104,9 +104,6 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
 
     this.end_time = { ...end_timeVar };
 
-    console.log("la data en el contrller modal ", this.data);
-    console.log("la data en el contrller modal ", start);
-
     this.formulario = this.FormBuilder.group({
       id: [id],
       profesional_id: [profesional_id, [Validators.required]],
