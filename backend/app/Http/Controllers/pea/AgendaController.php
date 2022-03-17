@@ -115,6 +115,8 @@ class AgendaController extends Controller
      */
     public function show($id, Request $request)
     {
+
+        return response()->json($request->all());
         $pageSize = $request->get('pageSize');
         $pageSize == '' ? $pageSize = 20 : $pageSize;
 

@@ -78,7 +78,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::post('productosprocesarcargue/{id}', 'pea\ProductoController@ImportClientesByProductoRepso')->name('import.clientesbyproductorepso');
 
 		/*rutyas de agenda */
-		Route::get('agenda/profesional/{id}', 'pea\AgendaController@show')->name('agenda.show');
+		Route::post('agenda/profesionalagenda/{id}', 'pea\AgendaController@show')->name('agenda.show');
 		Route::post('agenda/profesional/{id}', 'pea\AgendaController@store')->name('agenda.store');
 	});
 });

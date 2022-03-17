@@ -1,10 +1,11 @@
-import { Component, OnInit, LOCALE_ID, Inject } from "@angular/core";
+import { Component, OnInit, LOCALE_ID, Inject, ViewChild } from "@angular/core";
 import { formatDate } from "@angular/common";
 import {
   CalendarOptions,
   DateSelectArg,
   EventClickArg,
   EventApi,
+  FullCalendarComponent,
 } from "@fullcalendar/angular";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { INITIAL_EVENTS, createEventId } from "../../event-utils";
@@ -24,7 +25,20 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =
     environment.apiUrl + environment.comun.buscarUsers + "?profile=2";
-  public profesionalSeleccionado: any;
+  public profesionalSeleccionado = { id: 2, nombre: "nombre prueba" };
+  calendarApi: any;
+  public startDateView: any;
+  public endDateView: any;
+
+  @ViewChild("calendar") calendarComponent: FullCalendarComponent;
+
+  ngAfterViewInit() {
+    this.calendarApi = this.calendarComponent.getApi();
+    /*this.startDateView = this.calendarApi.view.currentStart;
+    this.endDateView = this.calendarApi.view.currentEnd;*/
+    this.formatDateView(this.calendarApi.view);
+  }
+
   public agendaProfesional = [];
   loading: boolean = false;
   calendarVisible = true;
@@ -86,6 +100,10 @@ export class GenerarAgendaComponent implements OnInit {
 
   ngOnInit(): void {}
 
+  handleMonthChange(info) {
+    console.log("informacdión sue ", info);
+  }
+
   handleCalendarToggle() {
     this.calendarVisible = !this.calendarVisible;
   }
@@ -137,7 +155,6 @@ export class GenerarAgendaComponent implements OnInit {
       size: "xs",
       keyboard: false,
     });
-    console.log("st6art tune time", start_time);
     let info = {
       id: null,
       profesional_id: this.profesionalSeleccionado.id,
@@ -248,8 +265,22 @@ export class GenerarAgendaComponent implements OnInit {
     } */
   }
 
+  formatDateView(dat) {
+    this.startDateView = formatDate(
+      dat.currentStart,
+      "yyyy-MM-dd",
+      this.locale
+    );
+    this.endDateView = formatDate(dat.currentEnd, "yyyy-MM-dd", this.locale);
+  }
+
   handleEvents(events: EventApi[]) {
     this.currentEvents = events;
+    console.log("los eventos ", this.currentEvents);
+    if (this.calendarComponent) {
+      this.calendarApi = this.calendarComponent.getApi();
+      this.formatDateView(this.calendarApi.view);
+    }
   }
 
   agregarAgenda(ev) {
@@ -276,9 +307,16 @@ export class GenerarAgendaComponent implements OnInit {
   seleccionadoProfesional(item) {
     this.loading = true;
     this.profesionalSeleccionado = item;
-    //this.formulario.get("profesional_id").setValue(item.id);
     this.agendaProfesional = [];
-    this._AgendaService.getAgendaProfesional(item.id).subscribe(
+    this.getAgendaProfesional(item.id);
+  }
+
+  getAgendaProfesional(id) {
+    let data = {
+      startDateView: this.startDateView,
+      endDateView: this.endDateView,
+    };
+    this._AgendaService.postAgendaProfesional(id, data).subscribe(
       (res: any) => {
         this.calendarVisible = true;
         this.calendarOptions.events = res;

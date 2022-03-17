@@ -143,6 +143,30 @@
           </div>
         </div>
       </div>
+
+      <div class="col-md-12">
+        <div class="row">
+          <!--<label
+            formArrayName="daysRepeat"
+            *ngFor="let order of ordersFormArray.controls; let i = index"
+          >
+            <input type="checkbox" [formControlName]="i" />
+            {{ daysRepeat[i].name }}
+          </label>-->
+          <div
+            class="col-md-2"
+            formArrayName="daysRepeat"
+            *ngFor="let item of ordersFormArray.controls; let i = index"
+          >
+            <div class="form-group bg-light">
+              <label for="day" placement="top">{{ daysRepeat[i].name }}</label>
+              <div class="input-group text-center">
+                <input type="checkbox" [formControlName]="i" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

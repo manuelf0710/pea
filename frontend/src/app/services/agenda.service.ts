@@ -11,10 +11,11 @@ import { environment } from "../../environments/environment";
 export class AgendaService {
   constructor(private _http: HttpClient) {}
 
-  getAgendaProfesional(id: number): Observable<any> {
+  postAgendaProfesional(id: number, data: any): Observable<any> {
     return this._http
-      .get<any>(
-        environment.apiUrl + environment.agenda.getAgendaProfesional + id
+      .post<any>(
+        environment.apiUrl + environment.agenda.getAgendaProfesional + id,
+        data
       )
       .pipe(
         map((lista) => {

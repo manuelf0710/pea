@@ -1,5 +1,11 @@
 import { Component, OnInit, Input } from "@angular/core";
-import { FormGroup, FormBuilder, Validators } from "@angular/forms";
+import {
+  FormGroup,
+  FormBuilder,
+  Validators,
+  FormArray,
+  FormControl,
+} from "@angular/forms";
 import { NgbActiveModal, NgbTimeStruct } from "@ng-bootstrap/ng-bootstrap";
 
 import { ToastService } from "../../../../../shared/services/toast.service";
@@ -30,6 +36,15 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
 
   public start_time!: NgbTimeStruct;
   public end_time!: NgbTimeStruct;
+  public daysRepeat = [
+    { id: 1, name: "Lun", nameLong: "Lunes", visible: true, checked: false },
+    { id: 2, name: "Mar", nameLong: "Martes", visible: true, checked: false },
+    { id: 3, name: "Mi", nameLong: "Miercoles", visible: true, checked: false },
+    { id: 4, name: "Jue", nameLong: "Jueves", visible: true, checked: false },
+    { id: 5, name: "Vi", nameLong: "viernes", visible: true, checked: false },
+    //{ id: 6, name: "Sa", nameLong: "Sabado", visible: false, checked: false },
+  ];
+
   public respuesta = {
     status: "close",
     data: [],
@@ -60,6 +75,10 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.loading = false;
+  }
+
+  get ordersFormArray() {
+    return this.formulario.controls.daysRepeat as FormArray;
   }
 
   private buildForm() {
@@ -113,7 +132,15 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
       end: [end, [Validators.required]],
       end_time: [],
       tipo: [tipo, [Validators.required]],
+      daysRepeat: new FormArray([]),
     });
+    this.addCheckboxes();
+  }
+
+  private addCheckboxes() {
+    this.daysRepeat.forEach(() =>
+      this.ordersFormArray.push(new FormControl(false))
+    );
   }
 
   formatearFechaGuardar(fecha, horas) {
@@ -123,8 +150,13 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
   guardar(event: Event) {
     event.preventDefault();
     if (this.formulario.valid) {
+      const selectedDays = this.formulario.value.daysRepeat
+        .map((checked, i) => (checked ? this.daysRepeat[i].id : null))
+        .filter((v) => v !== null);
+
       let value = {
         ...this.formulario.value,
+        selectedDays: selectedDays,
       };
 
       value.start = this.formatearFechaGuardar(value.start, value.start_time);
