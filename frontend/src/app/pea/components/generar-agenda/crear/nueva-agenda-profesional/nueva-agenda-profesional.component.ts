@@ -89,6 +89,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
     let start_time = null;
     let end = null;
     let tipo = null;
+    let repeat_end = null;
 
     if (this.data) {
       id = this.data.id;
@@ -133,6 +134,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
       end_time: [],
       tipo: [tipo, [Validators.required]],
       daysRepeat: new FormArray([]),
+      repeat_end: [end]
     });
     this.addCheckboxes();
   }

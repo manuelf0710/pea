@@ -25,7 +25,7 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =
     environment.apiUrl + environment.comun.buscarUsers + "?profile=2";
-  public profesionalSeleccionado = { id: 2, nombre: "nombre prueba" };
+  public profesionalSeleccionado = { id: 10, nombre: "Diana prueba" };
   calendarApi: any;
   public startDateView: any;
   public endDateView: any;
@@ -47,6 +47,52 @@ export class GenerarAgendaComponent implements OnInit {
       left: "prev,next today",
       center: "title",
       right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+    },
+    customButtons: {
+      prev: {
+        text: "<",
+        click: this.getPrevEvents.bind(this),
+      },
+      next: {
+        text: ">",
+        click: this.getNextEvents.bind(this),
+      },
+      dayGridMonth: {
+        // this overrides the month button
+        text: "Mes",
+        click: () => {
+          const calendarApi = this.calendarComponent.getApi();
+          calendarApi.changeView("dayGridMonth");
+          this.changeViewRender();
+        },
+      },
+      timeGridWeek: {
+        // this overrides the week button
+        text: "Semana",
+        click: () => {
+          const calendarApi = this.calendarComponent.getApi();
+          calendarApi.changeView("timeGridWeek");
+          this.changeViewRender();
+        },
+      },
+      timeGridDay: {
+        // this overrides the day button
+        text: "Día",
+        click: () => {
+          const calendarApi = this.calendarComponent.getApi();
+          calendarApi.changeView("timeGridDay");
+          this.changeViewRender();
+        },
+      },
+      listWeek: {
+        // this overrides the day button
+        text: "Agenda",
+        click: () => {
+          const calendarApi = this.calendarComponent.getApi();
+          calendarApi.changeView("listWeek");
+          this.changeViewRender();
+        },
+      },
     },
     slotDuration: "00:30:00",
     slotLabelInterval: "00:30:00",
@@ -81,7 +127,7 @@ export class GenerarAgendaComponent implements OnInit {
     select: this.handleDateSelect.bind(this),
     eventClick: this.handleEventClick.bind(this),
     eventsSet: this.handleEvents.bind(this),
-    eventAdd: this.handleEvents.bind(this),
+    eventAdd: this.handleEventsAdd.bind(this),
     /* you can update a remote database when these fire:
     eventAdd:
     eventChange:
@@ -99,6 +145,38 @@ export class GenerarAgendaComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {}
+
+  validateLoadData() {
+    if (this.profesionalSeleccionado && this.calendarComponent) {
+      return true;
+    } else return false;
+  }
+
+  changeViewRender() {
+    this.calendarApi = this.calendarComponent.getApi();
+
+    if (this.validateLoadData) this.formatDateView(this.calendarApi.view);
+    this.getAgendaProfesional(this.profesionalSeleccionado.id);
+  }
+
+  getPrevEvents(arg: any) {
+    if (this.validateLoadData) {
+      this.calendarApi = this.calendarComponent.getApi();
+      this.calendarApi.prev();
+      this.formatDateView(this.calendarApi.view);
+      this.getAgendaProfesional(this.profesionalSeleccionado.id);
+      this.calendarApi.render();
+    }
+  }
+  getNextEvents(arg: any) {
+    if (this.validateLoadData) {
+      this.calendarApi = this.calendarComponent.getApi();
+      this.calendarApi.next();
+      this.formatDateView(this.calendarApi.view);
+      this.getAgendaProfesional(this.profesionalSeleccionado.id);
+      this.calendarApi.render();
+    }
+  }
 
   handleMonthChange(info) {
     console.log("informacdión sue ", info);
@@ -282,6 +360,9 @@ export class GenerarAgendaComponent implements OnInit {
       this.formatDateView(this.calendarApi.view);
     }
   }
+  handleEventsAdd(events: any) {
+    console.log("nada eventsadd ", events);
+  }
 
   agregarAgenda(ev) {
     console.log("el evento ", ev);
@@ -316,6 +397,7 @@ export class GenerarAgendaComponent implements OnInit {
       startDateView: this.startDateView,
       endDateView: this.endDateView,
     };
+    this.loading = true;
     this._AgendaService.postAgendaProfesional(id, data).subscribe(
       (res: any) => {
         this.calendarVisible = true;
