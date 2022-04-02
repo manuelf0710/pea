@@ -97,7 +97,7 @@ class AgendaController extends Controller
 
         if ($diffOnMinutes > 0) {
             $countRanges = $diffOnMinutes / $this->minutesToAdd;
-            for ($i = 0; $i <= $countRanges; $i++) {
+            for ($i = 0; $i < $countRanges; $i++) {
                 $newStartDate = $newDate->addMinutes($i * $this->minutesToAdd, 'minute');
                 $dateStartToMysql = $newStartDate->toDateTimeString();
 
