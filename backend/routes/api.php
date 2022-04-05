@@ -80,5 +80,6 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		/*rutyas de agenda */
 		Route::post('agenda/profesionalagenda/{id}', 'pea\AgendaController@show')->name('agenda.show');
 		Route::post('agenda/profesional/{id}', 'pea\AgendaController@store')->name('agenda.store');
+		Route::post('agenda/agendadisponible', 'pea\AgendaController@enableAgenda')->name('agenda.enable');
 	});
 });

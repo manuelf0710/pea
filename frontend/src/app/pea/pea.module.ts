@@ -28,6 +28,7 @@ import { AgendaService } from "../services/agenda.service";
 
 import { FullCalendarModule } from "@fullcalendar/angular";
 import { NuevaAgendaProfesionalComponent } from "./components/generar-agenda/crear/nueva-agenda-profesional/nueva-agenda-profesional.component";
+import { NuevacitaComponent } from './components/productorepsodetallesprod/nuevacita/nuevacita.component';
 
 @NgModule({
   declarations: [
@@ -39,6 +40,7 @@ import { NuevaAgendaProfesionalComponent } from "./components/generar-agenda/cre
     GenerarAgendaComponent,
     ProductorepsodetallesprodComponent,
     NuevaAgendaProfesionalComponent,
+    NuevacitaComponent,
   ],
   imports: [
     CommonModule,

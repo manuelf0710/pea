@@ -94,9 +94,12 @@ export class GenerarAgendaComponent implements OnInit {
         },
       },
     },
-    slotDuration: "00:30:00",
-    slotLabelInterval: "00:30:00",
+    slotDuration: "00:15:00",
+    slotLabelInterval: "00:15:00",
     hiddenDays: [6, 0],
+    eventOverlap:true,
+    droppable:false,
+    editable:false,
     businessHours: {
       // days of week. an array of zero-based day of week integers (0=Sunday)
       daysOfWeek: [1, 2, 3, 4, 5], // Monday - Thursday
@@ -120,7 +123,6 @@ export class GenerarAgendaComponent implements OnInit {
     //initialEvents: INITIAL_EVENTS, // alternatively, use the `events` setting to fetch from a feed
     //initialEvents: this.loadForProfesional(),
     weekends: true,
-    editable: true,
     selectable: true,
     selectMirror: true,
     dayMaxEvents: true,

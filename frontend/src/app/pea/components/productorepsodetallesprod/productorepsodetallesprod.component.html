@@ -54,6 +54,10 @@
               <span class="badge badge-success p-1 ml-1">
                 {{ odsDetalles.cantidad }}</span
               >
+              duracion min
+              <span class="badge badge-info p-1 ml-1">
+                {{  odsDetalles.tipo_producto.tiempo  }}</span
+              >              
             </div>
           </div>
         </div>
@@ -393,7 +397,7 @@
               <thead class="thead-light">
                 <tr>
                   <th>Profesional</th>
-                  <th>Fecha cita Disponible</th>
+                  <th>Fecha cita Disponible (Y-m-d)</th>
                   <th>Hora Cita</th>
                   <th></th>
                 </tr>
@@ -411,16 +415,18 @@
                 </tr>
               </thead>
               <tbody>
-                <tr>
-                  <td>Katerine</td>
-                  <td>22/02/2022</td>
-                  <td>11:00</td>
-                  <td>
-                    <button class="btn btn-sm btn-outline-secondary">
-                      <i class="fa fa-calendar"></i> Reservar
-                    </button>
-                  </td>
-                </tr>
+                <ng-container *ngFor="let item of agendasDisponibles">
+                  <tr  *ngIf="item.minutes >= odsDetalles.tipo_producto.tiempo">
+                    <td>{{ item.profesional | uppercase}}</td>
+                    <td>{{ item.onlydate }}</td>
+                    <td>{{ item.start }} hasta {{item.end}}  libres {{item.minutes}} minutos</td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-secondary" (click)="openModalNewCita(item)">
+                        <i class="fa fa-calendar"></i> Reservar
+                      </button>
+                    </td>
+                  </tr>
+                </ng-container>
               </tbody>
             </table>
           </ng-template>

@@ -23,6 +23,8 @@ class AgendaController extends Controller
 {
 
     public $minutesToAdd = 15;
+    public $tiempos = array();
+    public $rango = 15;
     /**
      * Display a listing of the resource.
      *
@@ -65,6 +67,138 @@ class AgendaController extends Controller
     public function create()
     {
         //
+    }
+
+    function minutosInterval($fecha_i, $fecha_f)
+    {
+        $minutos = (strtotime($fecha_i) - strtotime($fecha_f)) / 60;
+        $minutos = abs($minutos);
+        $minutos = floor($minutos);
+        return $minutos;
+    }
+
+
+    public function unique_multidim_array($array, $key)
+    {
+        $temp_array = array();
+        $i = 0;
+        $key_array = array();
+        $response_array = array();
+
+        foreach ($array as $val) {
+            if (!in_array($val[$key], $key_array)) {
+                $key_array[$i] = $val[$key];
+                $temp_array[$i] = $val;
+            }
+            $i++;
+        }
+        /*order index array para evitar que queden asi las llaves [0]=[valores] [4]=[valores] y pasen a tener orden consecutivi asi [0]=[valores], [1]=[valores]*/
+
+        $i = 0;
+        foreach ($temp_array as $cat) {
+            $response_array[$i] = $cat;
+            $i++;
+        }
+        return $response_array;
+    }
+
+    public function sumarTiempos($arreglo)
+    {
+        $size = count($arreglo);
+        if ($size > 0) {
+            $arr = array(
+                "start" => $arreglo[0]['start'],
+                "end" => $arreglo[$size - 1]['end'],
+                "agenda_id" => $arreglo[0]['agenda_id'],
+                "profesional" => $arreglo[0]['profesional'],
+                "profesional_id" => $arreglo[0]['profesional'],
+                "onlydate" => $arreglo[0]['onlydate'],
+                "minutes" => $size * $this->rango
+            );
+            array_push($this->tiempos, $arr);
+        }
+    }
+
+    public function enableAgenda()
+    {
+        $citas = DB::table('citas')
+            ->join('users', 'citas.profesional_id', '=', 'users.id')
+            ->select(
+                "citas.id as id",
+                "citas.start",
+                "citas.end",
+                "citas.agenda_id",
+                "users.id as profesional_id",
+                "users.name as profesional"
+            )
+            ->where('citas.ocupado', '=', 1);
+
+        $citas = $citas->addSelect(DB::raw(
+            "date_format(citas.start, '%Y-%m-%d') onlydate"
+        ))
+            ->orderBy('citas.id', 'asc')
+            ->get();
+
+
+        //echo ("diferencia de minutos " . $this->minutosInterval('2022-03-28 08:00:00', '2022-03-28 08:15:00') . ' citastotal = ' . count($citas) . '<br>');
+        $citas = json_decode($citas, true);
+
+        $uniquesProfesionalescitas = $this->unique_multidim_array($citas, 'profesional_id');
+        $uniquesDatesCitas = $this->unique_multidim_array($citas, 'onlydate');
+
+        $data = [];
+        $index = 0;
+        $recolector = array();
+        foreach ($uniquesProfesionalescitas as $profesionalItem) {
+            foreach ($uniquesDatesCitas as $uniquesCitas) {
+                foreach ($citas as $cita) {
+                    if ($uniquesCitas['onlydate'] == $cita['onlydate']  && $profesionalItem['profesional_id'] == $cita['profesional_id']) {
+                        $actual = $index;
+                        $siguiente = $index + 1;
+
+                        //echo ('<br>' . $citas[$siguiente - 1]['start']);
+
+                        if ($siguiente < count($citas) && $this->minutosInterval($cita['start'], $citas[$siguiente]['start']) == 15) {
+                            array_push($recolector, array(
+                                "profesional" => $cita['profesional'],
+                                "profesional_id" => $cita['profesional_id'],
+                                "id" => $cita['id'],
+                                "start" => $cita['start'],
+                                "onlydate" => $cita['onlydate'],
+                                "end" => $cita['end'],
+                                "agenda_id" => $cita['agenda_id'],
+                            ));
+                            //array_push($this->tiempos, array("item"=>$cita->id, "start"=>$cita->start, "end"=>$cita->end));
+                        } else {
+                            //echo('<br>'.count($citas).' - siguiente '.$siguiente.' index '.$index. ' start = '.$cita->start. ' - otro '.$citas[$siguiente]['start']);
+                            array_push($recolector, array(
+                                "profesional" => $cita['profesional'],
+                                "profesional_id" => $cita['profesional_id'],
+                                "id" => $cita['id'],
+                                "start" => $cita['start'],
+                                "onlydate" => $cita['onlydate'],
+                                "end" => $cita['end'],
+                                "agenda_id" => $cita['agenda_id'],
+                            ));
+                            //array_push($this->tiempos, array("item"=>$cita->id, "start" => $cita->start, "end"=>$cita->end));
+                            //array_push($recolector, array("item"=> -2, "start" => -2));
+                            $this->sumarTiempos($recolector);
+                            $recolector = array();
+                        }
+                        $index++;
+                    }
+                }
+            }
+        }
+
+        $response = array(
+            'status' => 'ok',
+            'code' => 200,
+            'data'   => $this->tiempos,
+            'msg'    => 'Consulta de tiempos disponibles realizados'
+        );
+
+        return response()->json($response);
     }
 
 
@@ -120,14 +254,6 @@ class AgendaController extends Controller
     {
         $validator = Validator::make($request->all(), Agenda::rules($request));
         if (!($validator->fails())) {
-            $modelo = new Agenda();
-            $modelo->profesional_id = $id;
-            $modelo->tipo    = $request->post('tipo');
-            $modelo->start    = $request->post('start');
-            $modelo->end    = $request->post('end');
-            //$modelo->save();
-
-
             $datesArray = array();
             $timeStart = $this->obtenerHoraFecha($request->post('start'));
             $timeEnd = $this->obtenerHoraFecha($request->post('end'));
@@ -162,6 +288,8 @@ class AgendaController extends Controller
                             "dateToMysql" => $dateToMysql,
                             "dayNumber" => $dayNumber,
                             "diffOnMinutes" => $diffOnMinutes,
+                            "timeStart" => $timeStart,
+                            "timeEnd" => $timeEnd,
                             "index" => $i,
                             "datesList" => $datesList
                         ));
@@ -169,14 +297,20 @@ class AgendaController extends Controller
                 }
             }
 
-
             foreach ($datesArray as $item) {
+
+                $modelo = new Agenda();
+                $modelo->profesional_id = $id;
+                $modelo->tipo    = $request->post('tipo');
+                $modelo->start    = $item['onlyDate'] . ' ' . $item['timeStart'];
+                $modelo->end    = $item['onlyDate'] . ' ' . $item['timeEnd'];
+                $modelo->save();
                 foreach ($item['datesList'] as $newRecordCita) {
                     $newRecord = new Cita();
                     $newRecord->profesional_id = $newRecordCita['profesional_id'];
                     $newRecord->start = $newRecordCita['start'];
                     $newRecord->end = $newRecordCita['end'];
-
+                    $newRecord->agenda_id = $modelo->id;
                     $newRecord->save();
                 }
             }
@@ -225,13 +359,75 @@ class AgendaController extends Controller
                     ->globalSearch($globalSearch)
                     ->get();
             } else {
-                $response = Agenda::withoutTrashed()
+                /*$response = Agenda::withoutTrashed()
                     ->join('lista_items', 'agendas.tipo', '=', 'lista_items.id')
                     ->select('agendas.id', 'profesional_id', 'agendas.tipo', 'start', 'end', 'lista_items.nombre as title', 'lista_items.background as backgroundColor', 'lista_items.color as textColor')
+                    ->addSelect(DB::raw(' case agendas.tipo 
+                        when 1
+                            then "background"
+                            else ""
+                            end display
+                        '))
                     ->orderBy('agendas.id', 'desc')
                     ->where('profesional_id', '=', $id)
                     ->whereDate('start', '>=', $request->post('startDateView'))
                     ->whereDate('end', '<=', $request->post('endDateView'))
+                    ->get();*/
+                /*$response = Cita::withoutTrashed()
+                    ->join('lista_items', 'citas.ocupado', '=', 'lista_items.id')
+                    ->select(
+                        'citas.id',
+                        'profesional_id',
+                        'citas.ocupado as tipo',
+                        'start',
+                        'end',
+                        'lista_items.nombre as title',
+                        'lista_items.background as backgroundColor',
+                        'lista_items.color as textColor'
+                    )
+                    ->orderBy('citas.id', 'desc')
+                    ->where('profesional_id', '=', $id)
+                    ->whereDate('start', '>=', $request->post('startDateView'))
+                    ->whereDate('end', '<=', $request->post('endDateView'))
+                    ->get();*/
+
+                $agendas = DB::table('agendas')
+                    ->join('lista_items', 'agendas.tipo', '=', 'lista_items.id')
+                    ->select(
+                        'agendas.id',
+                        'profesional_id',
+                        'agendas.tipo',
+                        'start',
+                        'end',
+                        'lista_items.nombre as title',
+                        'lista_items.background as backgroundColor',
+                        'lista_items.color as textColor'
+                    )
+                    ->addSelect(DB::raw('"background" as display'))
+                    ->orderBy('agendas.id', 'desc')
+                    ->where('profesional_id', '=', $id)
+                    ->whereDate('start', '>=', $request->post('startDateView'))
+                    ->whereDate('end', '<=', $request->post('endDateView'));
+
+                $response = DB::table('citas')
+                    ->join('lista_items', 'citas.ocupado', '=', 'lista_items.id')
+                    ->select(
+                        'citas.id',
+                        'profesional_id',
+                        'citas.ocupado as tipo',
+                        'start',
+                        'end',
+                        'lista_items.nombre as title',
+                        'lista_items.background as backgroundColor',
+                        'lista_items.color as textColor'
+                    )
+                    ->addSelect(DB::raw('"" as display'))
+                    ->orderBy('citas.id', 'desc')
+                    ->where('profesional_id', '=', $id)
+                    ->where('citas.ocupado', '=', 2)
+                    ->whereDate('start', '>=', $request->post('startDateView'))
+                    ->whereDate('end', '<=', $request->post('endDateView'))
+                    ->union($agendas)
                     ->get();
             }
         } else {

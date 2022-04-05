@@ -7,13 +7,26 @@ import { productoRepso } from "../../models/productoRepso";
 import { ProductosrepsoService } from "../../services/productosrepso.service";
 import { ProductoService } from "../../services/producto.service";
 import { ClienteService } from "src/app/services/cliente.service";
+import { AgendaService } from './../../../services/agenda.service';
 import { ToastService } from "src/app/shared/services/toast.service";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { NuevacitaComponent } from './nuevacita/nuevacita.component';
 
 export interface gestionPersona {
   id:number;
   cedula: number;
   estado: String;
   estado_id: number;
+  nombre: String;
+}
+
+export interface agendasDisponiblesProfesionales {
+  minutes:number;
+  start: String;
+  end: String;
+  onlydate: String;
+  agenda_id: number;
+  profesional_id: number;
   nombre: String;
 }
 
@@ -37,6 +50,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   urlSubidaArchivo!: String;
   active: number = 1;
   personaGestion !: gestionPersona;
+  agendasDisponibles !: agendasDisponiblesProfesionales;
 
   constructor(
     private _ToastService: ToastService,
@@ -44,6 +58,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     private _ProductosrepsoService: ProductosrepsoService,
     private _ProductoService: ProductoService,
     private _ClienteService: ClienteService,
+    private _AgendaService: AgendaService,
+    private modalService: NgbModal,
     private readonly route: ActivatedRoute
   ) {}
 
@@ -117,6 +133,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this.personaGestion = item
       this.mostrarRegistro = true;
     }
+
+    this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : '';
     
     console.log("registropersona ",this.personaGestion);
   }
@@ -178,7 +196,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         this._ClienteService
           .getClienteByCedula(this.formulario.get("cedula").value)
           .subscribe((resp: any) => {
-            //this.formulario.get("nombre").setValue(resp.nombre);
+             //this.formulario.get("nombre").setValue(resp.nombre);
             this.formulario.patchValue({
               nombre: resp.nombre,
               correo: resp.email,
@@ -189,7 +207,48 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     }
   }
 
+  agendaDisponibleProfesionales(){
+    this.loading = true;
+    this._AgendaService
+      .postAgendaProfesionalAllProfesional({
+        "data":2
+      })
+      .subscribe((res: any) => {
+        if (res.status == "error") {
+          this._ToastService.danger(res.msg);
+        }
+        if (res.code == 200) {
+          this._ToastService.success(res.msg);
+          this.agendasDisponibles = res.data;
+        }
+        this.loading = false;
+      });
+  }
+
   dateSeleccionado(evento){}
 
   guardar(ev) {}
+
+  openModalNewCita(cita:any){
+    const modalRef = this.modalService.open(NuevacitaComponent, {
+      backdrop: "static",
+      size: "xs",
+      keyboard: false,
+    });
+
+    modalRef.componentInstance.data = {cita:cita, odsDetalles: this.odsDetalles, persona:this.personaGestion};
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+          //this.dataTableReload.reload(result.data.data);
+          
+
+          
+        }
+      })
+      .catch((error) => {});    
+  }
+
+
 }

@@ -101,48 +101,52 @@ class HomeController extends Controller
         //echo ("diferencia de minutos " . $this->minutosInterval('2022-03-28 08:00:00', '2022-03-28 08:15:00') . ' citastotal = ' . count($citas) . '<br>');
         $citas = json_decode($citas, true);
 
+        $uniquesProfesionalescitas = $this->unique_multidim_array($citas, 'profesional_id');
         $uniquesDatesCitas = $this->unique_multidim_array($citas, 'onlydate');
 
         $this->orderArrayByDay($citas);
 
+
+
         $data = [];
         $index = 0;
         $recolector = array();
+        foreach ($uniquesProfesionalescitas as $profesionalItem) {
+            foreach ($uniquesDatesCitas as $uniquesCitas) {
+                foreach ($citas as $cita) {
+                    if ($uniquesCitas['onlydate'] == $cita['onlydate']  && $profesionalItem['profesional_id'] == $cita['profesional_id']) {
+                        $actual = $index;
+                        $siguiente = $index + 1;
 
-        foreach ($uniquesDatesCitas as $uniquesCitas) {
-            foreach ($citas as $cita) {
-                if ($uniquesCitas['onlydate'] == $cita['onlydate']) {
-                    $actual = $index;
-                    $siguiente = $index + 1;
+                        //echo ('<br>' . $citas[$siguiente - 1]['start']);
 
-                    //echo ('<br>' . $citas[$siguiente - 1]['start']);
-
-                    if ($siguiente < count($citas) && $this->minutosInterval($cita['start'], $citas[$siguiente]['start']) == 15) {
-                        array_push($recolector, array(
-                            "profesional" => $cita['profesional'],
-                            "profesional_id" => $cita['profesional_id'],
-                            "id" => $cita['id'],
-                            "start" => $cita['start'],
-                            "end" => $cita['end'],
-                            "agenda_id" => $cita['agenda_id'],
-                        ));
-                        //array_push($this->tiempos, array("item"=>$cita->id, "start"=>$cita->start, "end"=>$cita->end));
-                    } else {
-                        //echo('<br>'.count($citas).' - siguiente '.$siguiente.' index '.$index. ' start = '.$cita->start. ' - otro '.$citas[$siguiente]['start']);
-                        array_push($recolector, array(
-                            "profesional" => $cita['profesional'],
-                            "profesional_id" => $cita['profesional_id'],
-                            "id" => $cita['id'],
-                            "start" => $cita['start'],
-                            "end" => $cita['end'],
-                            "agenda_id" => $cita['agenda_id'],
-                        ));
-                        //array_push($this->tiempos, array("item"=>$cita->id, "start" => $cita->start, "end"=>$cita->end));
-                        //array_push($recolector, array("item"=> -2, "start" => -2));
-                        $this->sumarTiempos($recolector);
-                        $recolector = array();
+                        if ($siguiente < count($citas) && $this->minutosInterval($cita['start'], $citas[$siguiente]['start']) == 15) {
+                            array_push($recolector, array(
+                                "profesional" => $cita['profesional'],
+                                "profesional_id" => $cita['profesional_id'],
+                                "id" => $cita['id'],
+                                "start" => $cita['start'],
+                                "end" => $cita['end'],
+                                "agenda_id" => $cita['agenda_id'],
+                            ));
+                            //array_push($this->tiempos, array("item"=>$cita->id, "start"=>$cita->start, "end"=>$cita->end));
+                        } else {
+                            //echo('<br>'.count($citas).' - siguiente '.$siguiente.' index '.$index. ' start = '.$cita->start. ' - otro '.$citas[$siguiente]['start']);
+                            array_push($recolector, array(
+                                "profesional" => $cita['profesional'],
+                                "profesional_id" => $cita['profesional_id'],
+                                "id" => $cita['id'],
+                                "start" => $cita['start'],
+                                "end" => $cita['end'],
+                                "agenda_id" => $cita['agenda_id'],
+                            ));
+                            //array_push($this->tiempos, array("item"=>$cita->id, "start" => $cita->start, "end"=>$cita->end));
+                            //array_push($recolector, array("item"=> -2, "start" => -2));
+                            $this->sumarTiempos($recolector);
+                            $recolector = array();
+                        }
+                        $index++;
                     }
-                    $index++;
                 }
             }
         }

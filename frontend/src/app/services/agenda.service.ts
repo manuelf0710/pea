@@ -24,6 +24,19 @@ export class AgendaService {
       );
   }
 
+  postAgendaProfesionalAllProfesional( data: any): Observable<any> {
+    return this._http
+      .post<any>(
+        environment.apiUrl + environment.agenda.postAgendaDisponibleAllProfesional,
+        data
+      )
+      .pipe(
+        map((lista) => {
+          return lista;
+        })
+      );
+  }  
+
   public postAgenda(id, data) {
     return this._http.post<any>(
       environment.apiUrl + environment.agenda.postAgendaProfesional + id,
