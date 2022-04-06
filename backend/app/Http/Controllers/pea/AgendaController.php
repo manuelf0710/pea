@@ -25,6 +25,8 @@ class AgendaController extends Controller
     public $minutesToAdd = 15;
     public $tiempos = array();
     public $rango = 15;
+    public $launchTimeStart = 12; /* hora */
+    public $launchTimeEnd = 14;
     /**
      * Display a listing of the resource.
      *
@@ -237,12 +239,15 @@ class AgendaController extends Controller
 
                 $newEndDate = $newDate->addMinutes(($i + 1) * $this->minutesToAdd, 'minute');
                 $dateEndToMysql = $newEndDate->toDateTimeString();
+                $startTimeHour = $newStartDate->format('H');
 
 
                 array_push($response, array(
                     "profesional_id" => $profesional_id,
                     "start" => $dateStartToMysql,
                     "end" => $dateEndToMysql,
+                    "ocupado" => ($startTimeHour*1 >= $this->launchTimeStart && $startTimeHour*1 < $this->launchTimeEnd) ? 2 : 1,
+                    //"starttimehour" => $startTimeHour*1,
                     "index" => $i + 1
                 ));
             }
@@ -310,6 +315,7 @@ class AgendaController extends Controller
                     $newRecord->profesional_id = $newRecordCita['profesional_id'];
                     $newRecord->start = $newRecordCita['start'];
                     $newRecord->end = $newRecordCita['end'];
+                    $newRecord->ocupado = $newRecordCita['ocupado'];
                     $newRecord->agenda_id = $modelo->id;
                     $newRecord->save();
                 }
@@ -317,11 +323,10 @@ class AgendaController extends Controller
 
 
 
-
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => $this->getAgendaById($modelo->id),
+                'data'   => $datesArray,
                 'msg'    => 'Guardado'
             );
         } else {
@@ -409,7 +414,7 @@ class AgendaController extends Controller
                     ->whereDate('start', '>=', $request->post('startDateView'))
                     ->whereDate('end', '<=', $request->post('endDateView'));
 
-                $response = DB::table('citas')
+                $citas = DB::table('citas')
                     ->join('lista_items', 'citas.ocupado', '=', 'lista_items.id')
                     ->select(
                         'citas.id',
@@ -429,6 +434,15 @@ class AgendaController extends Controller
                     ->whereDate('end', '<=', $request->post('endDateView'))
                     ->union($agendas)
                     ->get();
+
+                    $totalCitas = count($citas);
+
+                    $response = array(
+                        'code' => 200,
+                        'status' => $totalCitas > 0 ? "ok": "nodata",
+                        'msg' => $totalCitas > 0 ? "Agenda cargada exitosamente": "No hay agenda en la fecha consultada",
+                        'data' => $citas,
+                    );                    
             }
         } else {
 
@@ -512,7 +526,7 @@ class AgendaController extends Controller
         if (!empty($find)) {
             $find->delete();
             $response = [
-                'status' => 'success',
+                'status' => 'ok',
                 'code' => 200,
                 'data' => $find,
                 'msg'  => 'Registro eliminado'

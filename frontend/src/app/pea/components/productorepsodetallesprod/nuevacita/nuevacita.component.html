@@ -1,13 +1,14 @@
 <div *ngIf="loading">
-    <!--<button type="button" class=" close" aria-label="Close" (click)="closeModal()">
+  <!--<button type="button" class=" close" aria-label="Close" (click)="closeModal()">
         <i class="fa fa-close text-darks"></i>
       </button>-->
-    <app-loading></app-loading>
-  </div>
+  <app-loading></app-loading>
+</div>
 
+<form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
   <div class="modal-header">
     <h3 class="modal-title" id="modal-basic-title">
-      <span > Nueva Cita </span>
+      <span> Nueva Cita </span>
     </h3>
     <button
       type="button"
@@ -17,111 +18,120 @@
     >
       <i class="fa fa-close"></i>
     </button>
-  </div>  
+  </div>
   <div class="modal-body" style="min-height: 380px">
     <div class="row">
-        <div class="alert alert-info w-100">
-            <div class="col-md-6">Profesional : {{data.cita.profesional}}</div>
-            <div class="col-md-6">Tipo: {{data.odsDetalles.tipo_producto.name}}</div>
-            <div class="col-md-6">realizado a: {{data.persona.nombre}} Cédula {{data.persona.cedula}}</div>
-            <div class="col-md-6"></div>
+      <div class="alert alert-info w-100">
+        {{ data | json }}
+        <div class="col-md-6">Profesional : {{ data.cita.profesional }}</div>
+        <div class="col-md-6">
+          Tipo: {{ data.odsDetalles.tipo_producto.name }}
         </div>
+        <div class="col-md-6">
+          realizado a: {{ data.persona.nombre }} Cédula
+          {{ data.persona.cedula }}
+        </div>
+        <div class="col-md-6">
+          Tiempo servicio:
+          <span class="badge badge-warning">{{
+            data.odsDetalles.tipo_producto.tiempo
+          }}</span>
+          minutos
+        </div>
+      </div>
     </div>
     <div class="row">
-        <div class="col-md-6">
-            <div class="form-group">
-              <label for="regional">inicio (d/m/Y)</label>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"
-                    ><i class="fa fa-calendar"></i
-                  ></span>
-                </div>
-                <input
-                  type="text"
-                  name="start"
-                  id="start"
-                  class="form-control form-control-sm"
-                  readonly
-                  ngbDatepicker
-                  #d="ngbDatepicker"
-                />
-             
-              </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">inicio (d/m/Y)</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-calendar"></i
+              ></span>
             </div>
-          </div> 
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="regional">Hora inicio</label>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"
-                    ><i class="fa fa-clock-o"></i
-                  ></span>
-                </div>
-                <ngb-timepicker
-                  
-                  [(ngModel)]="start_time"
-                  [spinners]="false"
-                  [size]="'small'"
-                ></ngb-timepicker>
-              </div>
+            <input
+              type="text"
+              name="start"
+              id="start"
+              class="form-control form-control-sm"
+              formControlName="start"
+              readonly
+              ngbDatepicker
+              #d="ngbDatepicker"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Hora inicio</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-clock-o"></i
+              ></span>
             </div>
-          </div>                 
-        <div class="col-md-6">
-            <div class="form-group">
-              <label for="regional">Final (d/m/Y)</label>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"
-                    ><i class="fa fa-calendar"></i
-                  ></span>
-                </div>
-                <input
-                  type="text"
-                  name="start"
-                  id="start"
-                  class="form-control form-control-sm"
-                  readonly
-                  ngbDatepicker
-                  #d2="ngbDatepicker"
-                />
-              </div>
+            <ngb-timepicker
+              formControlName="start_time"
+              [(ngModel)]="start_time"
+              [spinners]="false"
+              [size]="'small'"
+            ></ngb-timepicker>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Final (d/m/Y)</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-calendar"></i
+              ></span>
             </div>
-          </div>  
-          <div class="col-md-6">
-            <div class="form-group">
-              <label for="regional">Hora Fin</label>
-              <div class="input-group">
-                <div class="input-group-prepend">
-                  <span class="input-group-text"
-                    ><i class="fa fa-clock-o"></i
-                  ></span>
-                </div>
-                <ngb-timepicker
-                  
-                  [(ngModel)]="end_time"
-                  [spinners]="false"
-                  [size]="'small'"
-                ></ngb-timepicker>
-              </div>
+            <input
+              type="text"
+              name="end"
+              id="end"
+              class="form-control form-control-sm"
+              formControlName="end"
+              readonly
+              ngbDatepicker
+              #d2="ngbDatepicker"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Hora Fin</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-clock-o"></i
+              ></span>
             </div>
-          </div>                
+            <ngb-timepicker
+              formControlName="end_time"
+              [(ngModel)]="end_time"
+              [spinners]="false"
+              [size]="'small'"
+            ></ngb-timepicker>
+          </div>
+        </div>
+      </div>
     </div>
-</div>
+  </div>
 
-<div class="modal-footer">
+  <div class="modal-footer">
     <div class="row">
       <div class="col-12 col-lg-12 col-md-12 text-right">
         <button type="button" class="btn btn-dark" (click)="closeModal()">
           Salir</button
         >&nbsp;
-        <button
-          type="submit"
-          class="btn btn-primary"
-        >
-          Reservar
-        </button>
+        <button type="submit" class="btn btn-primary">Crear Cita</button>
       </div>
     </div>
   </div>
+</form>

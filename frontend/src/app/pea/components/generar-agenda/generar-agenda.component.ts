@@ -25,7 +25,8 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =
     environment.apiUrl + environment.comun.buscarUsers + "?profile=2";
-  public profesionalSeleccionado = { id: 10, nombre: "Diana prueba" };
+  //public profesionalSeleccionado = { id: 10, nombre: "Diana prueba" };
+  public profesionalSeleccionado!: { id: number; nombre: String };
   calendarApi: any;
   public startDateView: any;
   public endDateView: any;
@@ -97,9 +98,9 @@ export class GenerarAgendaComponent implements OnInit {
     slotDuration: "00:15:00",
     slotLabelInterval: "00:15:00",
     hiddenDays: [6, 0],
-    eventOverlap:true,
-    droppable:false,
-    editable:false,
+    eventOverlap: true,
+    droppable: false,
+    editable: false,
     businessHours: {
       // days of week. an array of zero-based day of week integers (0=Sunday)
       daysOfWeek: [1, 2, 3, 4, 5], // Monday - Thursday
@@ -252,7 +253,31 @@ export class GenerarAgendaComponent implements OnInit {
       .then((result) => {
         if (result.status == "ok") {
           //this.dataTableReload.reload(result.data.data);
-          let nuevaAgenda = {
+          console.log("afuera", result.data.data);
+          /*
+          result.data.data.forEach(function (dia, index) {
+            dia.datesList.forEach(function (item, idx) {
+              console.log("entro");
+              let nuevaAgenda = {
+                backgroundColor: item["backgroundColor"],
+                end: item["end"],
+                id: item["id"],
+                profesional_id: item["profesional_id"],
+                start: item["start"],
+                textColor: item["textColor"],
+                title: item["title"],
+                tipo: item["tipo"],
+              };
+
+              calendarApi.addEvent(nuevaAgenda);
+            });
+          }); */
+          this.getAgendaProfesional(
+            //result.data.data[0].datesList[0].profesional_id
+            this.profesionalSeleccionado.id
+          );
+
+          /*let nuevaAgenda = {
             backgroundColor: result.data.data.backgroundColor,
             end: result.data.data.end,
             id: result.data.data.id,
@@ -263,7 +288,7 @@ export class GenerarAgendaComponent implements OnInit {
             tipo: result.data.data.tipo,
           };
 
-          calendarApi.addEvent(nuevaAgenda);
+          calendarApi.addEvent(nuevaAgenda);*/
         }
       })
       .catch((error) => {});
@@ -403,8 +428,12 @@ export class GenerarAgendaComponent implements OnInit {
     this._AgendaService.postAgendaProfesional(id, data).subscribe(
       (res: any) => {
         this.calendarVisible = true;
-        this.calendarOptions.events = res;
-        this.agendaProfesional = res;
+        this.calendarOptions.events = res.data;
+        this.agendaProfesional = res.data;
+        res.status == "ok"
+          ? this._ToastService.success(res.msg)
+          : this._ToastService.warning(res.msg);
+
         this.loading = false;
       },
       (error: any) => {
