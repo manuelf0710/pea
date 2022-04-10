@@ -60,6 +60,13 @@ export class UtilService {
       fixed = Math.pow(10, fixed);
       return Math.floor(num * fixed) / fixed;
     }
+    formatearFechaGuardar(fecha, horas) {
+      let hour = horas.hour < 10 ? "0" + horas.hour : horas.hour;
+      let minute = horas.minute < 10 ? "0" + horas.minute : horas.minute;
+      let second = horas.second < 10 ? "0" + horas.second : horas.second;
+  
+      return fecha + " " + hour + ":" + minute + ":" + second;
+    }    
 }
 
 @Component({

@@ -43,4 +43,10 @@ export class AgendaService {
       data
     );
   }
+  public postCita(data) {
+    return this._http.post<any>(
+      environment.apiUrl + environment.agenda.postCita,
+      data
+    );
+  }
 }

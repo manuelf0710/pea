@@ -21,22 +21,31 @@
   </div>
   <div class="modal-body" style="min-height: 380px">
     <div class="row">
-      <div class="alert alert-info w-100">
+      <div class="card">
         {{ data | json }}
-        <div class="col-md-6">Profesional : {{ data.cita.profesional }}</div>
-        <div class="col-md-6">
-          Tipo: {{ data.odsDetalles.tipo_producto.name }}
-        </div>
-        <div class="col-md-6">
+        <div class="card-header">
           realizado a: {{ data.persona.nombre }} Cédula
           {{ data.persona.cedula }}
         </div>
-        <div class="col-md-6">
-          Tiempo servicio:
-          <span class="badge badge-warning">{{
-            data.odsDetalles.tipo_producto.tiempo
-          }}</span>
-          minutos
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              Profesional : {{ data.cita.profesional }}
+            </div>
+            <div class="col-md-6">
+              {{ data.odsDetalles.tipo_producto.name }}
+            </div>
+            <div class="col-md-6">disponible desde: {{ data.cita.start }}</div>
+            <div class="col-md-6">disponible hasta: {{ data.cita.end }}</div>
+
+            <div class="col-md-6">
+              Tiempo servicio:
+              <span class="badge badge-warning">{{
+                data.odsDetalles.tipo_producto.tiempo
+              }}</span>
+              minutos
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -118,6 +127,18 @@
               [spinners]="false"
               [size]="'small'"
             ></ngb-timepicker>
+          </div>
+          <div
+            *ngIf="
+              formulario.get('end_time').errors &&
+              formulario.get('end_time').touched
+            "
+          >
+            <small
+              *ngIf="formulario.get('end_time').hasError('required')"
+              class="form-text text-danger"
+              >el campo hora fin no debe estar vacío.</small
+            >
           </div>
         </div>
       </div>

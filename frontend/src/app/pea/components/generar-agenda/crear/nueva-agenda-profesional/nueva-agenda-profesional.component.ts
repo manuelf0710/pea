@@ -145,13 +145,6 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
     );
   }
 
-  formatearFechaGuardar(fecha, horas) {
-    let hour = horas.hour < 10 ? "0" + horas.hour : horas.hour;
-    let minute = horas.minute < 10 ? "0" + horas.minute : horas.minute;
-    let second = horas.second < 10 ? "0" + horas.second : horas.second;
-
-    return fecha + " " + hour + ":" + minute + ":" + second;
-  }
 
   guardar(event: Event) {
     event.preventDefault();
@@ -164,8 +157,8 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
         ...this.formulario.value,
         selectedDays: selectedDays,
       };
-      value.start = this.formatearFechaGuardar(value.start, value.start_time);
-      value.end = this.formatearFechaGuardar(value.end, value.end_time);
+      value.start = this._UtilService.formatearFechaGuardar(value.start, value.start_time);
+      value.end = this._UtilService.formatearFechaGuardar(value.end, value.end_time);
 
       this._UtilService
         .confirm({

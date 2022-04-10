@@ -115,7 +115,8 @@ class AgendaController extends Controller
                 "profesional" => $arreglo[0]['profesional'],
                 "profesional_id" => $arreglo[0]['profesional'],
                 "onlydate" => $arreglo[0]['onlydate'],
-                "minutes" => $size * $this->rango
+                "dateformat_name" => $arreglo[0]['dateformat_name'],
+                "minutes" => $size * $this->rango,
             );
             array_push($this->tiempos, $arr);
         }
@@ -159,7 +160,8 @@ class AgendaController extends Controller
                         $siguiente = $index + 1;
 
                         //echo ('<br>' . $citas[$siguiente - 1]['start']);
-
+                        $dateFormatNameData = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $cita['start']);
+                        $dateFormatName = $dateFormatNameData->locale('es')->isoFormat('dddd DD, MMMM');;
                         if ($siguiente < count($citas) && $this->minutosInterval($cita['start'], $citas[$siguiente]['start']) == 15) {
                             array_push($recolector, array(
                                 "profesional" => $cita['profesional'],
@@ -169,6 +171,7 @@ class AgendaController extends Controller
                                 "onlydate" => $cita['onlydate'],
                                 "end" => $cita['end'],
                                 "agenda_id" => $cita['agenda_id'],
+                                "dateformat_name" => $dateFormatName
                             ));
                             //array_push($this->tiempos, array("item"=>$cita->id, "start"=>$cita->start, "end"=>$cita->end));
                         } else {
@@ -181,6 +184,7 @@ class AgendaController extends Controller
                                 "onlydate" => $cita['onlydate'],
                                 "end" => $cita['end'],
                                 "agenda_id" => $cita['agenda_id'],
+                                "dateformat_name" => $dateFormatName
                             ));
                             //array_push($this->tiempos, array("item"=>$cita->id, "start" => $cita->start, "end"=>$cita->end));
                             //array_push($recolector, array("item"=> -2, "start" => -2));

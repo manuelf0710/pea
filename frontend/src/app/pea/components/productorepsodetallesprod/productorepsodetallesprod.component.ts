@@ -7,13 +7,13 @@ import { productoRepso } from "../../models/productoRepso";
 import { ProductosrepsoService } from "../../services/productosrepso.service";
 import { ProductoService } from "../../services/producto.service";
 import { ClienteService } from "src/app/services/cliente.service";
-import { AgendaService } from './../../../services/agenda.service';
+import { AgendaService } from "./../../../services/agenda.service";
 import { ToastService } from "src/app/shared/services/toast.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { NuevacitaComponent } from './nuevacita/nuevacita.component';
+import { NuevacitaComponent } from "./nuevacita/nuevacita.component";
 
 export interface gestionPersona {
-  id:number;
+  id: number;
   cedula: number;
   estado: String;
   estado_id: number;
@@ -21,7 +21,7 @@ export interface gestionPersona {
 }
 
 export interface agendasDisponiblesProfesionales {
-  minutes:number;
+  minutes: number;
   start: String;
   end: String;
   onlydate: String;
@@ -35,7 +35,6 @@ export interface agendasDisponiblesProfesionales {
   templateUrl: "./productorepsodetallesprod.component.html",
   styleUrls: ["./productorepsodetallesprod.component.css"],
 })
-
 export class ProductorepsodetallesprodComponent implements OnInit {
   id!: number;
   odsDetalles: productoRepso;
@@ -49,8 +48,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   public archivoscargados: any[] = [];
   urlSubidaArchivo!: String;
   active: number = 1;
-  personaGestion !: gestionPersona;
-  agendasDisponibles !: agendasDisponiblesProfesionales;
+  personaGestion!: gestionPersona;
+  agendasDisponibles!: agendasDisponiblesProfesionales;
 
   constructor(
     private _ToastService: ToastService,
@@ -79,25 +78,27 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.formulario = this.FormBuilder.group({
       cedula: ["", [Validators.required]],
       nombre: ["", [Validators.required]],
-      dependencia_id: ["", [Validators.required]],
-      email: ["", [Validators.required]],
-      telefono: ["", [Validators.required]],
-      division: ["", [Validators.required]],
-      subdivision: ["", [Validators.required]],
-      cargo: ["", [Validators.required]],
-      direccion: ["", [Validators.required]],
-      ciudad_id: ["", [Validators.required]],
-      barrio: ["", [Validators.required]],
-      otrosi: ["", [Validators.required]],
+      dependencia: [null],
+      dependencia_id: [null],
+      email: [null],
+      telefono: [null],
+      division: [null],
+      subdivision: [null],
+      cargo: [null],
+      direccion: [null],
+      ciudad: [null],
+      ciudad_id: [null],
+      barrio: [null],
+      otrosi: [null],
 
-      fecha_ingreso: ["", [Validators.required]],
+      fecha_ingreso: [null],
       modalidad: ["", [Validators.required]],
       descripcion: ["", [Validators.required]],
-      numero_citas: [""],
-      fecha_seguimiento: [""],
-      estado_programacion: [""],
-      comentarios: [""],
-      pyp_ergonomia: [""],
+      numero_citas: [null],
+      fecha_seguimiento: [null],
+      estado_programacion: [null],
+      comentarios: [null],
+      pyp_ergonomia: ["", [Validators.required]],
     });
 
     this.formularioArchivo = this.FormBuilder.group({
@@ -124,19 +125,27 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.mostrarRegistro = !this.mostrarRegistro;
   }
 
-  gestionProgramacion(item){
+  gestionProgramacion(item) {
     this.mostrarRegistro = !this.mostrarRegistro;
-    if(this.personaGestion === undefined){
-      this.personaGestion = item
+    if (this.personaGestion === undefined) {
+      this.personaGestion = item;
     }
-    if(this.personaGestion.cedula != item.cedula){
-      this.personaGestion = item
+    if (this.personaGestion.cedula != item.cedula) {
+      this.personaGestion = item;
       this.mostrarRegistro = true;
     }
 
-    this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : '';
-    
-    console.log("registropersona ",this.personaGestion);
+    this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
+
+    console.log("registropersona ", this.personaGestion);
+    this.setvaluesFormulario();
+  }
+
+  setvaluesFormulario() {
+    this.formulario.patchValue({
+      nombre: this.personaGestion.nombre,
+      cedula: this.personaGestion.cedula,
+    });
   }
 
   openCargaExcel() {
@@ -196,7 +205,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         this._ClienteService
           .getClienteByCedula(this.formulario.get("cedula").value)
           .subscribe((resp: any) => {
-             //this.formulario.get("nombre").setValue(resp.nombre);
+            //this.formulario.get("nombre").setValue(resp.nombre);
             this.formulario.patchValue({
               nombre: resp.nombre,
               correo: resp.email,
@@ -207,11 +216,11 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     }
   }
 
-  agendaDisponibleProfesionales(){
+  agendaDisponibleProfesionales() {
     this.loading = true;
     this._AgendaService
       .postAgendaProfesionalAllProfesional({
-        "data":2
+        data: 2,
       })
       .subscribe((res: any) => {
         if (res.status == "error") {
@@ -225,30 +234,38 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       });
   }
 
-  dateSeleccionado(evento){}
+  dateSeleccionado(evento) {}
 
   guardar(ev) {}
 
-  openModalNewCita(cita:any){
-    const modalRef = this.modalService.open(NuevacitaComponent, {
-      backdrop: "static",
-      size: "xs",
-      keyboard: false,
-    });
+  openModalNewCita(cita: any) {
+    console.log("el formulario ", this.formulario);
+    if (this.formulario.valid) {
+      const modalRef = this.modalService.open(NuevacitaComponent, {
+        backdrop: "static",
+        size: "xs",
+        keyboard: false,
+      });
 
-    modalRef.componentInstance.data = {cita:cita, odsDetalles: this.odsDetalles, persona:this.personaGestion};
+      modalRef.componentInstance.data = {
+        cita: cita,
+        odsDetalles: this.odsDetalles,
+        persona: this.personaGestion,
+        info: { ...this.formulario.value },
+      };
 
-    modalRef.result
-      .then((result) => {
-        if (result.status == "ok") {
-          //this.dataTableReload.reload(result.data.data);
-          
-
-          
-        }
-      })
-      .catch((error) => {});    
+      modalRef.result
+        .then((result) => {
+          if (result.status == "ok") {
+            //this.dataTableReload.reload(result.data.data);
+          }
+        })
+        .catch((error) => {});
+    } else {
+      this.formulario.markAllAsTouched();
+      this._ToastService.info(
+        "debe ingresar los datos del formulariio, sección gestionar programación"
+      );
+    }
   }
-
-
 }
