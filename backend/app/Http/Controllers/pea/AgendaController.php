@@ -113,7 +113,7 @@ class AgendaController extends Controller
                 "end" => $arreglo[$size - 1]['end'],
                 "agenda_id" => $arreglo[0]['agenda_id'],
                 "profesional" => $arreglo[0]['profesional'],
-                "profesional_id" => $arreglo[0]['profesional'],
+                "profesional_id" => $arreglo[0]['profesional_id'],
                 "onlydate" => $arreglo[0]['onlydate'],
                 "dateformat_name" => $arreglo[0]['dateformat_name'],
                 "minutes" => $size * $this->rango,

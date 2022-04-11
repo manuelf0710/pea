@@ -38,7 +38,7 @@ export interface agendasDisponiblesProfesionales {
 export class ProductorepsodetallesprodComponent implements OnInit {
   id!: number;
   odsDetalles: productoRepso;
-  productosLista: [];
+  productosLista: any[];
   loading: boolean = true;
   mostrarRegistro: boolean = false;
   mostrarCargaExcel: boolean = false;
@@ -238,8 +238,22 @@ export class ProductorepsodetallesprodComponent implements OnInit {
 
   guardar(ev) {}
 
+  actualizarProducto(product) {
+    let index: any;
+    index = this.productosLista.findIndex((prod) => product.id === prod["id"]);
+    if (index) {
+      this.productosLista[index] = product;
+    }
+  }
+
   openModalNewCita(cita: any) {
     console.log("el formulario ", this.formulario);
+    console.log("el dato de la citaa ", cita);
+    console.log("lapersonagetsion aid ", this.personaGestion);
+    if (this.personaGestion.estado_id != 9) {
+      this._ToastService.info("esta persona ya ha sido programada");
+      return;
+    }
     if (this.formulario.valid) {
       const modalRef = this.modalService.open(NuevacitaComponent, {
         backdrop: "static",
@@ -257,7 +271,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       modalRef.result
         .then((result) => {
           if (result.status == "ok") {
-            //this.dataTableReload.reload(result.data.data);
+            this.actualizarProducto(result.data.data.producto);
           }
         })
         .catch((error) => {});

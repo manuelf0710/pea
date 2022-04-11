@@ -119,6 +119,8 @@ class CitaController extends Controller
                 ->join('productos_repso','productos.producto_repso_id','=','productos_repso.id')
                 ->join('tipo_productos','productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
                 ->select('productos.id as producto_id','tipo_productos.id as tipoproducto_id','tipo_productos.name','tipo_productos.tiempo')
+                ->addSelect(DB::raw(' sysdate() as ahora
+                '))                
                 ->where('productos.id','=',$producto_id)
                 ->first();
                 
@@ -129,8 +131,23 @@ class CitaController extends Controller
             ->whereBetween('start', [$start, $newDateEnd])
             //->toSql();
             ->get();
-            
 
+        /*
+        * Validar que la fecha inicio no sea mayor que la fecha fin
+        */
+            if ($dateStart->gt($dateEnd)) { 
+                $response = array(
+                    'status' => 'errortime',
+                    'code' => 200,
+                    'data'   => -1,
+                    'msg'    => 'Fecha inicio '.$dateStart.' no debe ser mayor a '.$dateEnd
+                ); 
+                return response()->json($response);                 
+            }  
+            
+        /*
+        * Validar que la diferencia en minutos sea igual al tiempo del servicio
+         */
 
             $diffMinutes = $this->getDiffMinutes($request->post('start'), $request->post('end'));
                        
@@ -144,6 +161,9 @@ class CitaController extends Controller
                 return response()->json($response);                               
             }
 
+            /*
+            * Validar que no haya ningun sector ocupado en la tabla citas para guardar la cita.
+             */
             $validarOcupado = $this->validarOcupado($datesAgenda, $productoInfo->tiempo);
             if(count($validarOcupado) > 0){          
                 if(array_key_exists('status', $validarOcupado)){
@@ -162,7 +182,7 @@ class CitaController extends Controller
             }
 
 
-                        /*
+            /*
             * Actualizar en la tabla de productos la información
              */
 
@@ -173,6 +193,11 @@ class CitaController extends Controller
                 $productoToUpdate->descripcion = $info['descripcion'];
                 $productoToUpdate->profesional_id = $profesional_id;
                 $productoToUpdate->modalidad = $info['modalidad'];
+                $productoToUpdate->fecha_programacion = $productoInfo->ahora;
+                $productoToUpdate->fecha_inicio = $request->post('start');
+                $productoToUpdate->fecha_fin = $request->post('end');
+                $productoToUpdate->estado_id = 7;
+                $productoToUpdate->save();
             }
 
 
@@ -180,7 +205,7 @@ class CitaController extends Controller
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => array('producto' =>$productoInfo, 'data' => $request->post()),
+                'data'   => array('producto'=> $this->getProductoData($producto_id) ,  'productoinfo' =>$productoInfo, 'data' => $request->post()),
                 'msg'    => 'cita guardada correctamente'
             );
             
@@ -195,6 +220,16 @@ class CitaController extends Controller
         return response()->json($response);
     }
 
+
+function getProductoData($id){
+    $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+    ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
+    ->select('productos.id', 'clientes.cedula', 'clientes.nombre', 'productos.estado_id', 'estadoprogramaciones.nombre as estado')
+    ->withoutTrashed()->orderBy('productos.id', 'desc')
+    ->where('productos.id', '=', $id)
+    ->first();
+    return $response;
+}
 
   /*
   * Validar que las fracciones de tiempo y los resultados que la consulta sean iguales
