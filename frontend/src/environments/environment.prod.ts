@@ -1,10 +1,15 @@
 export const environment = {
   production: true,
-  apiUrl: "http://localhost:8000/api",
-  server_root: "http://localhost:8000",
+  apiUrl: "https://pea-ecp.com/api/",
+  server_root: "https://pea-ecp.com",
   auth: {
     postLogin: "auth/login",
     refreshToken: "auth/refresh",
+  },
+  productos: {
+    getByIdProductoRepso: "pea/productobyrepsoid/",
+    posByIdProductoRepso: "pea/productobyrepsoid/",
+    getProcesarCargue: "pea/productosprocesarcargue/",
   },
   tipoproductos: {
     getAll: "pea/tipoproductoslist",
@@ -21,5 +26,26 @@ export const environment = {
   comun: {
     getRegionales: "comun/regionaleslist",
     buscarContrato: "comun/buscarcontrato",
+    getClienteByCedula: "comun/getcliente/",
+    buscarUsers: "comun/buscarusers",
+  },
+  imports: {
+    uploadExcelToProductRepso: "files/uploads/",
+    importExcelToProductRepso: "imports/importclientesproducto/",
+  },
+  agenda: {
+    getAgendaProfesional: "pea/agenda/profesionalagenda/",
+    postAgendaProfesional: "pea/agenda/profesional/",
+    postAgendaDisponibleAllProfesional: "pea/agenda/agendadisponible/",
+    postCita: "pea/cita",
   },
 };
+
+/*
+ * For easier debugging in development mode, you can import the following file
+ * to ignore zone related error stack frames such as `zone.run`, `zoneDelegate.invokeTask`.
+ *
+ * This import should be commented out in production mode because it will have a negative impact
+ * on performance if an error is thrown.
+ */
+// import 'zone.js/dist/zone-error';  // Included with Angular CLI.

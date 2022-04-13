@@ -18,6 +18,22 @@ export interface gestionPersona {
   estado: String;
   estado_id: number;
   nombre: String;
+  dependencia: String;
+  email: String;
+  telefono: String;
+  division: String;
+  subdivision: String;
+  cargo: String;
+  direccion: String;
+  barrio: String;
+  otrosi: String;
+  modalidad: String;
+  descripcion: String;
+  numero_citas: String;
+  fecha_seguimiento: String;
+  comentarios: String;
+  ciudad: String;
+  pyp_ergonomia: String;
 }
 
 export interface agendasDisponiblesProfesionales {
@@ -145,6 +161,24 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.formulario.patchValue({
       nombre: this.personaGestion.nombre,
       cedula: this.personaGestion.cedula,
+      dependencia: this.personaGestion.dependencia,
+      email: this.personaGestion.email,
+      telefono: this.personaGestion.telefono,
+      division: this.personaGestion.division,
+      subdivision: this.personaGestion.subdivision,
+      cargo: this.personaGestion.cargo,
+      direccion: this.personaGestion.direccion,
+      ciudad: this.personaGestion.ciudad,
+      barrio: this.personaGestion.barrio,
+      otrosi: this.personaGestion.otrosi,
+      modalidad: this.personaGestion.modalidad,
+      descripcion: this.personaGestion.descripcion,
+      numero_citas: this.personaGestion.numero_citas,
+      fecha_seguimiento: this.personaGestion.fecha_seguimiento,
+      estado_id: this.personaGestion.estado_id,
+      estado_programacion: this.personaGestion.estado,
+      comentarios: this.personaGestion.comentarios,
+      pyp_ergonomia: this.personaGestion.pyp_ergonomia,
     });
   }
 
@@ -239,10 +273,13 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   guardar(ev) {}
 
   actualizarProducto(product) {
+    console.log("en function actualziarProducto ", product);
     let index: any;
     index = this.productosLista.findIndex((prod) => product.id === prod["id"]);
-    if (index) {
+    console.log("el index encontrado index  =", index);
+    if (index >= 0) {
       this.productosLista[index] = product;
+      console.log("dentro de if index ", this.productosLista[index]);
     }
   }
 
@@ -272,6 +309,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         .then((result) => {
           if (result.status == "ok") {
             this.actualizarProducto(result.data.data.producto);
+            this.formulario.reset();
+            this.mostrarRegistro = false;
           }
         })
         .catch((error) => {});

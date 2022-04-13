@@ -195,9 +195,30 @@ class ProductoController extends Controller
                 ->paginate($pageSize);
         } else {
             $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+                ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
+                ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
                 ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
-                ->select('productos.id', 'clientes.cedula', 'clientes.nombre', 'productos.estado_id', 'estadoprogramaciones.nombre as estado')
+                ->select(
+                    'productos.id',
+                    'productos.modalidad',
+                    'productos.descripcion',
+                    'clientes.cedula',
+                    'clientes.nombre',
+                    'productos.estado_id',
+                    'estadoprogramaciones.nombre as estado',
+                    'dependencias.nombre as dependencia',
+                    'clientes.email',
+                    'clientes.telefono',
+                    'clientes.division',
+                    'clientes.subdivision',
+                    'clientes.cargo',
+                    'clientes.direccion',
+                    'ciudades.nombre as ciudad',
+                    'clientes.barrio',
+                )
                 //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
+                ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+                ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
                 ->withoutTrashed()->orderBy('productos.id', 'desc')
                 ->where('producto_repso_id', '=', $id)
                 ->paginate($pageSize);
@@ -239,7 +260,7 @@ class ProductoController extends Controller
                 $importClientes = new ClientesImport;
 
                 Excel::import($importClientes, public_path() . '/' . $request->get('nombrearchivo'));
-
+                /*          
                 $totalImport = count($importClientes->clientesImportar);
                 if ($totalImport > $find->cantidad) {
                     $response = array(
@@ -248,8 +269,8 @@ class ProductoController extends Controller
                         'validator' => "Las cantidades no corresponden"
                     );
                     $validacion = 1;
-                }
-
+                }*/
+                /*
                 if (($totalImport + $find->total_productos) > $find->cantidad) {
                     $response = array(
                         'status' => 'error',
@@ -257,7 +278,7 @@ class ProductoController extends Controller
                         'validator' => "Las cantidades no corresponden, registros existentes"
                     );
                     $validacion = 1;
-                }
+                }*/
 
                 $find->archivo = $request->get('nombrearchivo');
                 $find->save();
@@ -273,7 +294,7 @@ class ProductoController extends Controller
                     }
                 } else {
                     //return response()->json($importClientes->clientesImportar);
-                    return response()->json($response);
+                    //return response()->json($response);
                 }
 
                 $response = array(

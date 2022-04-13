@@ -77,14 +77,15 @@ class CitaController extends Controller
         return $timePart[1];
     }
 
-/*
+    /*
 * function getDiffMinutes obtener la diferencia en minutos entre fecha inicio fecha fin y el valor retornado debe ser igual al tiemnpo del servicio
- */    
+ */
 
-    function getDiffMinutes($start, $end){
+    function getDiffMinutes($start, $end)
+    {
         $start = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $start);
         $end = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $end);
-        $minutesDiff=$start->diffInMinutes($end);
+        $minutesDiff = $start->diffInMinutes($end);
         return $minutesDiff;
     }
     /**
@@ -109,76 +110,75 @@ class CitaController extends Controller
 
 
             $timestart = $this->obtenerHoraFecha($request->post('start'));
-            $timeend = $this->obtenerHoraFecha($request->post('end'));  
-            
-            $dateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('start'));
-            $dateEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('end'));   
-            $newDateEnd = $dateEnd->subMinute($this->minutesToAdd, 'minute');         
-            
-            $productoInfo = DB::table('productos') 
-                ->join('productos_repso','productos.producto_repso_id','=','productos_repso.id')
-                ->join('tipo_productos','productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
-                ->select('productos.id as producto_id','tipo_productos.id as tipoproducto_id','tipo_productos.name','tipo_productos.tiempo')
-                ->addSelect(DB::raw(' sysdate() as ahora
-                '))                
-                ->where('productos.id','=',$producto_id)
-                ->first();
-                
-            $datesAgenda = DB::table('citas')
-            ->where('citas.agenda_id', '=', $agenda_id)
-            /*->whereDate('start','>=', $start)
-            ->whereDate('end','<', $end) */
-            ->whereBetween('start', [$start, $newDateEnd])
-            //->toSql();
-            ->get();
+            $timeend = $this->obtenerHoraFecha($request->post('end'));
 
-        /*
+            $dateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('start'));
+            $dateEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('end'));
+            $newDateEnd = $dateEnd->subMinute($this->minutesToAdd, 'minute');
+
+            $productoInfo = DB::table('productos')
+                ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
+                ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
+                ->select('productos.id as producto_id', 'tipo_productos.id as tipoproducto_id', 'tipo_productos.name', 'tipo_productos.tiempo')
+                ->addSelect(DB::raw(' sysdate() as ahora
+                '))
+                ->where('productos.id', '=', $producto_id)
+                ->first();
+
+            $datesAgenda = DB::table('citas')
+                ->where('citas.agenda_id', '=', $agenda_id)
+                /*->whereDate('start','>=', $start)
+            ->whereDate('end','<', $end) */
+                ->whereBetween('start', [$start, $newDateEnd])
+                //->toSql();
+                ->get();
+
+            /*
         * Validar que la fecha inicio no sea mayor que la fecha fin
         */
-            if ($dateStart->gt($dateEnd)) { 
+            if ($dateStart->gt($dateEnd)) {
                 $response = array(
                     'status' => 'errortime',
                     'code' => 200,
                     'data'   => -1,
-                    'msg'    => 'Fecha inicio '.$dateStart.' no debe ser mayor a '.$dateEnd
-                ); 
-                return response()->json($response);                 
-            }  
-            
-        /*
+                    'msg'    => 'Fecha inicio ' . $dateStart . ' no debe ser mayor a ' . $dateEnd
+                );
+                return response()->json($response);
+            }
+
+            /*
         * Validar que la diferencia en minutos sea igual al tiempo del servicio
          */
 
             $diffMinutes = $this->getDiffMinutes($request->post('start'), $request->post('end'));
-                       
-            if($diffMinutes != $productoInfo->tiempo){
+
+            if ($diffMinutes != $productoInfo->tiempo) {
                 $response = array(
                     'status' => 'errortime',
                     'code' => 200,
                     'data'   => -1,
-                    'msg'    => 'el tiempo de la cita es diferente de '.$productoInfo->tiempo.' minutos'
-                ); 
-                return response()->json($response);                               
+                    'msg'    => 'el tiempo de la cita es diferente de ' . $productoInfo->tiempo . ' minutos'
+                );
+                return response()->json($response);
             }
 
             /*
             * Validar que no haya ningun sector ocupado en la tabla citas para guardar la cita.
              */
             $validarOcupado = $this->validarOcupado($datesAgenda, $productoInfo->tiempo);
-            if(count($validarOcupado) > 0){          
-                if(array_key_exists('status', $validarOcupado)){
-                    if($validarOcupado['size'] > 0){
-                        return  response()->json($validarOcupado);                    
-                    }                    
-                }                
+            if (count($validarOcupado) > 0) {
+                if (array_key_exists('status', $validarOcupado)) {
+                    if ($validarOcupado['size'] > 0) {
+                        return  response()->json($validarOcupado);
+                    }
+                }
             }
 
-            
-            foreach($datesAgenda as $item){
-                DB::table('citas')
-                ->where('id',  $item->id)
-                ->update(['producto_id' => $producto_id, 'start' => $item->start, 'end'=> $item->end, 'ocupado'=>2]);                
 
+            foreach ($datesAgenda as $item) {
+                DB::table('citas')
+                    ->where('id',  $item->id)
+                    ->update(['producto_id' => $producto_id, 'start' => $item->start, 'end' => $item->end, 'ocupado' => 2]);
             }
 
 
@@ -188,7 +188,7 @@ class CitaController extends Controller
 
             $productoToUpdate = Producto::find($producto_id);
 
-            
+
             if (!empty($productoToUpdate)) {
                 $productoToUpdate->descripcion = $info['descripcion'];
                 $productoToUpdate->profesional_id = $profesional_id;
@@ -205,11 +205,9 @@ class CitaController extends Controller
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => array('producto'=> $this->getProductoData($producto_id) ,  'productoinfo' =>$productoInfo, 'data' => $request->post()),
+                'data'   => array('producto' => $this->getProductoData($producto_id),  'productoinfo' => $productoInfo, 'data' => $request->post()),
                 'msg'    => 'cita guardada correctamente'
             );
-            
-
         } else {
             $response = array(
                 'status' => 'error',
@@ -221,41 +219,63 @@ class CitaController extends Controller
     }
 
 
-function getProductoData($id){
-    $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
-    ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
-    ->select('productos.id', 'clientes.cedula', 'clientes.nombre', 'productos.estado_id', 'estadoprogramaciones.nombre as estado')
-    ->withoutTrashed()->orderBy('productos.id', 'desc')
-    ->where('productos.id', '=', $id)
-    ->first();
-    return $response;
-}
+    function getProductoData($id)
+    {
+        $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+            ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
+            ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
+            ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
+            ->select(
+                'productos.id',
+                'productos.modalidad',
+                'productos.descripcion',
+                'clientes.cedula',
+                'clientes.nombre',
+                'productos.estado_id',
+                'estadoprogramaciones.nombre as estado',
+                'dependencias.nombre as dependencia',
+                'clientes.email',
+                'clientes.telefono',
+                'clientes.division',
+                'clientes.subdivision',
+                'clientes.cargo',
+                'clientes.direccion',
+                'ciudades.nombre as ciudad',
+                'clientes.barrio',
+            )
+            //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
+            ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+            ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
+            ->where('productos.id', '=', $id)
+            ->first();
+        return $response;
+    }
 
-  /*
+    /*
   * Validar que las fracciones de tiempo y los resultados que la consulta sean iguales
-   */  
-    function validarOcupado($datesAgenda, $tiempo){
+   */
+    function validarOcupado($datesAgenda, $tiempo)
+    {
         $response = array();
         $fracciones = $tiempo / $this->minutesToAdd;
-        if($fracciones == count($datesAgenda)){
-            $arr_output = array_filter(json_decode($datesAgenda, true), function($item){
-                if($item['ocupado'] != 1){
-                  return $item;
+        if ($fracciones == count($datesAgenda)) {
+            $arr_output = array_filter(json_decode($datesAgenda, true), function ($item) {
+                if ($item['ocupado'] != 1) {
+                    return $item;
                 }
-              });
+            });
 
-              $response = array(
+            $response = array(
                 'status' => 'errorocupado',
                 "msg" => "Las horas elegidas no son validas, se encuentran ocupadas",
                 "data" => $arr_output,
                 "size" => count($arr_output)
 
-            );              
+            );
             return $response;
         }
 
         return $response;
-
     }
 
     /**
@@ -352,14 +372,14 @@ function getProductoData($id){
                     ->union($agendas)
                     ->get();
 
-                    $totalCitas = count($citas);
+                $totalCitas = count($citas);
 
-                    $response = array(
-                        'code' => 200,
-                        'status' => $totalCitas > 0 ? "ok": "nodata",
-                        'msg' => $totalCitas > 0 ? "Agenda cargada exitosamente": "No hay agenda en la fecha consultada",
-                        'data' => $citas,
-                    );                    
+                $response = array(
+                    'code' => 200,
+                    'status' => $totalCitas > 0 ? "ok" : "nodata",
+                    'msg' => $totalCitas > 0 ? "Agenda cargada exitosamente" : "No hay agenda en la fecha consultada",
+                    'data' => $citas,
+                );
             }
         } else {
 

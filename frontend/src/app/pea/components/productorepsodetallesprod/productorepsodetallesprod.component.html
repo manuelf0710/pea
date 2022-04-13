@@ -198,7 +198,7 @@
       <thead>
         <tr>
           <th></th>
-          <th>Fecha Prog</th>
+          <th>Fecha Prog (d/m/Y)</th>
           <th>Cédula</th>
           <th>Nombre</th>
           <th>Estado</th>
@@ -227,7 +227,7 @@
                 </button>
               </div>
             </td>
-            <td></td>
+            <td>{{ item.fecha_programacion }}</td>
             <td>{{ item.cedula }}</td>
             <td>{{ item.nombre }}</td>
             <td>{{ item.estado }}</td>
@@ -646,7 +646,7 @@
                       ></span>
                     </div>
                     <input
-                      type="number"
+                      type="text"
                       name="estado_programacion"
                       id="estado_programacion"
                       class="form-control form-control-sm"
