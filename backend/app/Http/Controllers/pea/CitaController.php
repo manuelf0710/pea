@@ -88,6 +88,35 @@ class CitaController extends Controller
         $minutesDiff = $start->diffInMinutes($end);
         return $minutesDiff;
     }
+
+    function validarFechaInicioPermitida($dateStart, $minDateStart){
+        $response = array();
+        if ($dateStart->lt($minDateStart)) {
+            $response = array(
+                'status' => 'errortime',
+                'code' => 200,
+                'data'   => -1,
+                'msg'    => 'Fecha hora inicio ' . $dateStart . ' no debe ser menor a ' . $minDateStart
+            );
+        } 
+        return $response;       
+    }
+
+    function validarFechaFinPermitida($dateEnd, $maxDateStart){
+        $response = array();
+        if ($dateEnd->gt($maxDateStart)) {
+            $response = array(
+                'status' => 'errortime',
+                'code' => 200,
+                'data'   => -1,
+                'msg'    => 'Fecha hora fin ' . $dateEnd . ' no debe ser mayor a ' . $maxDateStart
+            );
+        }  
+        return $response;       
+    }    
+
+
+
     /**
      * Store a newly created resource in storage.
      *
@@ -123,38 +152,29 @@ class CitaController extends Controller
             $minDateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $dataCita['start']);
             $maxDateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $dataCita['end']);
             /*
-            * Validar que la fecha hora inicio no sea mayor que la fecha fin hora permitida
+            * Validar que la fecha hora inicio no sea mayor que la fecha inicio hora permitida
             */
-            if ($dateStart->lt($minDateStart)) {
-                $response = array(
-                    'status' => 'errortime',
-                    'code' => 200,
-                    'data'   => -1,
-                    'msg'    => 'Fecha hora inicio ' . $dateStart . ' no debe ser mayor a ' . $minDateStart
-                );
-                return response()->json($response);
+            $validarMin = $this->validarFechaInicioPermitida($dateStart, $minDateStart);
+            if (count($validarMin) > 0) {
+                return response()->json($validarMin);
             }
 
             /*echo('la cita start pérmitida = '.$dataCita['start']);
             echo('la cita start ingresada ='.$dateStart);*/
 
+           
+
             /*
             * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
              */
-            if ($dateEnd->gt($maxDateStart)) {
-                $response = array(
-                    'status' => 'errortime',
-                    'code' => 200,
-                    'data'   => -1,
-                    'msg'    => 'Fecha hora fin ' . $dateEnd . ' no debe ser mayor a ' . $maxDateStart
-                );
-                return response()->json($response);
+            $validarMax = $this->validarFechaFinPermitida($dateEnd, $maxDateStart);
+            if (count($validarMax) > 0) {
+                return response()->json($validarMax);
             }            
 
             /*echo('la cita end pérmitida = '.$dataCita['end']);
             echo('la cita end ingresada ='.$dateStart);            
             return; */
-
 
             /*
             * Validar que la fecha fin no sea mayo
