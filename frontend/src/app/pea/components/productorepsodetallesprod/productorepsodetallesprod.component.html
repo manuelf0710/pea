@@ -727,10 +727,22 @@
                 </tr>
                 <tr>
                   <th>
-                    <input type="text" class="form-control form-control-sm" />
+                    <input
+                      type="text"
+                      class="form-control form-control-sm"
+                      formControlName="profesionalsearch"
+                      id="profesionalsearch"
+                      name="profesionalsearch"
+                    />
                   </th>
                   <th>
-                    <input type="text" class="form-control form-control-sm" />
+                    <input
+                      type="text"
+                      class="form-control form-control-sm"
+                      formControlName="fechadisponiblesearch"
+                      id="fechadisponiblesearch"
+                      name="fechadisponiblesearch"
+                    />
                   </th>
                   <th>
                     <input type="text" class="form-control form-control-sm" />
@@ -739,9 +751,22 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let item of agendasDisponibles">
+                <ng-container
+                  *ngFor="
+                    let item of agendasDisponibles
+                      | filterfor
+                        : {
+                            profesional:
+                              formulario.get('profesionalsearch').value,
+                            dateformat_name: formulario.get(
+                              'fechadisponiblesearch'
+                            ).value
+                          }
+                        : true
+                  "
+                >
                   <tr *ngIf="item.minutes >= odsDetalles.tipo_producto.tiempo">
-                    <td>{{ item.profesional | uppercase }}</td>
+                    <td>{{ item.profesional }}</td>
                     <td>{{ item.dateformat_name }}</td>
                     <td>
                       {{ item.start }} hasta {{ item.end }} libres

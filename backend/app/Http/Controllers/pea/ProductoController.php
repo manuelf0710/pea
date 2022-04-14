@@ -202,6 +202,8 @@ class ProductoController extends Controller
                     'productos.id',
                     'productos.modalidad',
                     'productos.descripcion',
+                    'productos.comentarios',
+                    'productos.pyp_ergonomia',
                     'clientes.cedula',
                     'clientes.nombre',
                     'productos.estado_id',

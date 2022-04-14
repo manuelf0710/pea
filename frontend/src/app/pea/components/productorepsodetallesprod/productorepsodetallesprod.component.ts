@@ -115,6 +115,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       estado_programacion: [null],
       comentarios: [null],
       pyp_ergonomia: ["", [Validators.required]],
+      profesionalsearch:[""],
+      fechadisponiblesearch:[""]
     });
 
     this.formularioArchivo = this.FormBuilder.group({

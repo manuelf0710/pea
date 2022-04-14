@@ -107,6 +107,7 @@ class CitaController extends Controller
             $producto_id = $request->post('producto_id');
             $ocupado = $request->post('ocupado');
             $info = $request->post('info');
+            $dataCita = $request->post('cita');
 
 
             $timestart = $this->obtenerHoraFecha($request->post('start'));
@@ -115,6 +116,49 @@ class CitaController extends Controller
             $dateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('start'));
             $dateEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('end'));
             $newDateEnd = $dateEnd->subMinute($this->minutesToAdd, 'minute');
+
+            /*
+            * mínimo horario para inicio de cita
+             */
+            $minDateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $dataCita['start']);
+            $maxDateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $dataCita['end']);
+            /*
+            * Validar que la fecha hora inicio no sea mayor que la fecha fin hora permitida
+            */
+            if ($dateStart->lt($minDateStart)) {
+                $response = array(
+                    'status' => 'errortime',
+                    'code' => 200,
+                    'data'   => -1,
+                    'msg'    => 'Fecha hora inicio ' . $dateStart . ' no debe ser mayor a ' . $minDateStart
+                );
+                return response()->json($response);
+            }
+
+            /*echo('la cita start pérmitida = '.$dataCita['start']);
+            echo('la cita start ingresada ='.$dateStart);*/
+
+            /*
+            * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
+             */
+            if ($dateEnd->gt($maxDateStart)) {
+                $response = array(
+                    'status' => 'errortime',
+                    'code' => 200,
+                    'data'   => -1,
+                    'msg'    => 'Fecha hora fin ' . $dateEnd . ' no debe ser mayor a ' . $maxDateStart
+                );
+                return response()->json($response);
+            }            
+
+            /*echo('la cita end pérmitida = '.$dataCita['end']);
+            echo('la cita end ingresada ='.$dateStart);            
+            return; */
+
+
+            /*
+            * Validar que la fecha fin no sea mayo
+             */
 
             $productoInfo = DB::table('productos')
                 ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
@@ -197,6 +241,8 @@ class CitaController extends Controller
                 $productoToUpdate->fecha_inicio = $request->post('start');
                 $productoToUpdate->fecha_fin = $request->post('end');
                 $productoToUpdate->estado_id = 7;
+                $productoToUpdate->pyp_ergonomia = $info['pyp_ergonomia'];
+                $productoToUpdate->comentarios = $info['comentarios'];
                 $productoToUpdate->save();
             }
 
@@ -229,6 +275,7 @@ class CitaController extends Controller
                 'productos.id',
                 'productos.modalidad',
                 'productos.descripcion',
+                'productos.comentarios',
                 'clientes.cedula',
                 'clientes.nombre',
                 'productos.estado_id',
