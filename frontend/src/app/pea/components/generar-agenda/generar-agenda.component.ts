@@ -206,6 +206,8 @@ export class GenerarAgendaComponent implements OnInit {
       this._ToastService.info("debe seleccionar primero un profesional");
       return;
     }
+
+    console.log("la agenda del profesional ", this.agendaProfesional);
     const calendarApi = selectInfo.view.calendar;
 
     let start = calendarApi.formatDate(selectInfo.startStr, {

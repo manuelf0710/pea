@@ -27,6 +27,12 @@ class AgendaController extends Controller
     public $rango = 15;
     public $launchTimeStart = 12; /* hora */
     public $launchTimeEnd = 14;
+    public $today;
+
+    public function __construct()
+    {
+        $this->today = date('Y-m-d');
+    }
     /**
      * Display a listing of the resource.
      *
@@ -250,11 +256,64 @@ class AgendaController extends Controller
                     "profesional_id" => $profesional_id,
                     "start" => $dateStartToMysql,
                     "end" => $dateEndToMysql,
-                    "ocupado" => ($startTimeHour*1 >= $this->launchTimeStart && $startTimeHour*1 < $this->launchTimeEnd) ? 2 : 1,
+                    "ocupado" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 2 : 1,
                     //"starttimehour" => $startTimeHour*1,
                     "index" => $i + 1
                 ));
             }
+        }
+        return $response;
+    }
+
+    /*
+    *que solo exista una agenda por dia. para el profesional
+     */
+    public function validarOnlyEnableAgendaByDay($dateInput, $profesional_id, $tipo)
+    {
+        $agendas = DB::table('agendas')
+            ->select(
+                'agendas.id',
+                'profesional_id',
+                'agendas.tipo',
+                'start',
+                'end'
+            )
+            ->where('profesional_id', '=', $profesional_id)
+            ->where('tipo', '=', $tipo)
+            ->whereRaw("date_format(start, '%Y-%m-%d') =  " . "'$dateInput'")
+            ->get();
+
+        return $agendas;
+    }
+
+    public function validateDataMayorToToday($dateStart)
+    {
+        $time = $dateStart->format('H:i:s');
+        $today = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $this->today . ' ' . $time);
+        //return $dateStart->diffInDays($today);
+
+        $response = array();
+        if ($dateStart->lte($today)) { /* lte fecha menor o igual a hoy*/
+            $response = array(
+                'status' => 'errortime',
+                'code' => 200,
+                'data'   => -1,
+                'msg'    => 'no se puede programar una fecha inferior o igual a hoy = ' . $today
+            );
+        }
+        return $response;
+    }
+
+    function validarFechaFinPermitida($dateEnd, $maxDateStart)
+    {
+        $response = array();
+        if ($dateEnd->gt($maxDateStart)) {
+            $response = array(
+                'status' => 'errortime',
+                'code' => 200,
+                'data'   => -1,
+                'msg'    => 'Fecha hora fin ' . $dateEnd . ' no debe ser mayor a ' . $maxDateStart
+            );
         }
         return $response;
     }
@@ -271,6 +330,34 @@ class AgendaController extends Controller
             $dateRepeat = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('repeat_end') . ' ' . $timeStart);
             $diffOnDays = $dateStart->diffInDays($dateRepeat);
             $diffOnMinutes = $dateStart->diffInMinutes($dateEnd);
+
+            /*
+            * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
+             */
+            $validarMax = $this->validarFechaFinPermitida($dateStart, $dateRepeat);
+            if (count($validarMax) > 0) {
+                return response()->json($validarMax);
+            }
+
+            /*
+            *  Validar que solo permita guardar fechas mayores a hoy
+            */
+
+            $validateDataMayorToToday = $this->validateDataMayorToToday($dateStart);
+
+            if (count($validateDataMayorToToday) > 0) {
+                return response()->json($validateDataMayorToToday);
+            }
+
+            /*
+            * $request->post('tipo'); 1 = disponible, 2, bloqueo, 3 informe.
+            */
+
+            /*$agendaByDay = $this->validarOnlyEnableAgendaByDay($request, $id, $request->post('tipo'));
+
+            return response()->json($agendaByDay);*/
+
+
             if ($diffOnDays >= 0) {
                 for ($i = 0; $i <= $diffOnDays; $i++) {
                     $newDate = $dateStart;
@@ -313,26 +400,33 @@ class AgendaController extends Controller
                 $modelo->tipo    = $request->post('tipo');
                 $modelo->start    = $item['onlyDate'] . ' ' . $item['timeStart'];
                 $modelo->end    = $item['onlyDate'] . ' ' . $item['timeEnd'];
-                $modelo->save();
-                foreach ($item['datesList'] as $newRecordCita) {
-                    $newRecord = new Cita();
-                    $newRecord->profesional_id = $newRecordCita['profesional_id'];
-                    $newRecord->start = $newRecordCita['start'];
-                    $newRecord->end = $newRecordCita['end'];
-                    $newRecord->ocupado = $newRecordCita['ocupado'];
-                    $newRecord->agenda_id = $modelo->id;
-                    $newRecord->save();
+
+                $agendaByDay = $this->validarOnlyEnableAgendaByDay($item['onlyDate'], $id, $request->post('tipo'));
+                //echo ('existe una ' . json_encode($agendaByDay));
+                if (count($agendaByDay) == 0) {
+
+                    $modelo->save();
+
+                    foreach ($item['datesList'] as $newRecordCita) {
+                        $newRecord = new Cita();
+                        $newRecord->profesional_id = $newRecordCita['profesional_id'];
+                        $newRecord->start = $newRecordCita['start'];
+                        $newRecord->end = $newRecordCita['end'];
+                        $newRecord->ocupado = $newRecordCita['ocupado'];
+                        $newRecord->agenda_id = $modelo->id;
+                        $newRecord->save();
+                    }
                 }
             }
 
+            return
 
-
-            $response = array(
-                'status' => 'ok',
-                'code' => 200,
-                'data'   => $datesArray,
-                'msg'    => 'Guardado'
-            );
+                $response = array(
+                    'status' => 'ok',
+                    'code' => 200,
+                    'data'   => $datesArray,
+                    'msg'    => 'Guardado'
+                );
         } else {
             $response = array(
                 'status' => 'error',
@@ -413,6 +507,7 @@ class AgendaController extends Controller
                         'lista_items.color as textColor'
                     )
                     ->addSelect(DB::raw('"background" as display'))
+                    ->selectRaw("date_format(agendas.start, '%d/%m/%Y') as onlydate")
                     ->orderBy('agendas.id', 'desc')
                     ->where('profesional_id', '=', $id)
                     ->whereDate('start', '>=', $request->post('startDateView'))
@@ -431,6 +526,7 @@ class AgendaController extends Controller
                         'lista_items.color as textColor'
                     )
                     ->addSelect(DB::raw('"" as display'))
+                    ->selectRaw("date_format(citas.start, '%d/%m/%Y') as onlydate")
                     ->orderBy('citas.id', 'desc')
                     ->where('profesional_id', '=', $id)
                     ->where('citas.ocupado', '=', 2)
@@ -439,14 +535,14 @@ class AgendaController extends Controller
                     ->union($agendas)
                     ->get();
 
-                    $totalCitas = count($citas);
+                $totalCitas = count($citas);
 
-                    $response = array(
-                        'code' => 200,
-                        'status' => $totalCitas > 0 ? "ok": "nodata",
-                        'msg' => $totalCitas > 0 ? "Agenda cargada exitosamente": "No hay agenda en la fecha consultada",
-                        'data' => $citas,
-                    );                    
+                $response = array(
+                    'code' => 200,
+                    'status' => $totalCitas > 0 ? "ok" : "nodata",
+                    'msg' => $totalCitas > 0 ? "Agenda cargada exitosamente" : "No hay agenda en la fecha consultada",
+                    'data' => $citas,
+                );
             }
         } else {
 

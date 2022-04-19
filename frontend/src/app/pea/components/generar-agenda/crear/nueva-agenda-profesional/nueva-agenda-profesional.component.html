@@ -27,6 +27,7 @@
       <div class="col-md-6">
         <div class="form-group">
           <label for="regional">inicio (d/m/Y)</label>
+          {{ data | json }}
           <div class="input-group">
             <div class="input-group-prepend">
               <span class="input-group-text"
@@ -186,7 +187,7 @@
             <input type="checkbox" [formControlName]="i" />
             {{ daysRepeat[i].name }}
           </label>-->
-          <div
+          <!--<div
             class="col-md-2"
             formArrayName="daysRepeat"
             *ngFor="let item of ordersFormArray.controls; let i = index"
@@ -197,7 +198,7 @@
                 <input type="checkbox" [formControlName]="i" />
               </div>
             </div>
-          </div>
+          </div>-->
         </div>
       </div>
     </div>
