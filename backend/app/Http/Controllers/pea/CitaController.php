@@ -89,7 +89,8 @@ class CitaController extends Controller
         return $minutesDiff;
     }
 
-    function validarFechaInicioPermitida($dateStart, $minDateStart){
+    function validarFechaInicioPermitida($dateStart, $minDateStart)
+    {
         $response = array();
         if ($dateStart->lt($minDateStart)) {
             $response = array(
@@ -98,11 +99,12 @@ class CitaController extends Controller
                 'data'   => -1,
                 'msg'    => 'Fecha hora inicio ' . $dateStart . ' no debe ser menor a ' . $minDateStart
             );
-        } 
-        return $response;       
+        }
+        return $response;
     }
 
-    function validarFechaFinPermitida($dateEnd, $maxDateStart){
+    function validarFechaFinPermitida($dateEnd, $maxDateStart)
+    {
         $response = array();
         if ($dateEnd->gt($maxDateStart)) {
             $response = array(
@@ -111,9 +113,9 @@ class CitaController extends Controller
                 'data'   => -1,
                 'msg'    => 'Fecha hora fin ' . $dateEnd . ' no debe ser mayor a ' . $maxDateStart
             );
-        }  
-        return $response;       
-    }    
+        }
+        return $response;
+    }
 
 
 
@@ -139,6 +141,7 @@ class CitaController extends Controller
             $dataCita = $request->post('cita');
 
 
+
             $timestart = $this->obtenerHoraFecha($request->post('start'));
             $timeend = $this->obtenerHoraFecha($request->post('end'));
 
@@ -162,7 +165,7 @@ class CitaController extends Controller
             /*echo('la cita start pérmitida = '.$dataCita['start']);
             echo('la cita start ingresada ='.$dateStart);*/
 
-           
+
 
             /*
             * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
@@ -170,7 +173,7 @@ class CitaController extends Controller
             $validarMax = $this->validarFechaFinPermitida($dateEnd, $maxDateStart);
             if (count($validarMax) > 0) {
                 return response()->json($validarMax);
-            }            
+            }
 
             /*echo('la cita end pérmitida = '.$dataCita['end']);
             echo('la cita end ingresada ='.$dateStart);            
@@ -263,6 +266,7 @@ class CitaController extends Controller
                 $productoToUpdate->estado_id = 7;
                 $productoToUpdate->pyp_ergonomia = $info['pyp_ergonomia'];
                 $productoToUpdate->comentarios = $info['comentarios'];
+                $productoToUpdate->fecha_seguimiento = $info['fecha_seguimiento'];
                 $productoToUpdate->save();
             }
 

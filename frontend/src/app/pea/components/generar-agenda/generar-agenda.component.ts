@@ -24,7 +24,7 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 })
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =
-    environment.apiUrl + environment.comun.buscarUsers + "?profile=2";
+    environment.apiUrl + environment.comun.buscarUsers + "?profile=3";
   //public profesionalSeleccionado = { id: 10, nombre: "Diana prueba" };
   public profesionalSeleccionado!: { id: number; nombre: String };
   calendarApi: any;
@@ -305,6 +305,10 @@ export class GenerarAgendaComponent implements OnInit {
     console.log("ingresaste manuelf ", clickInfo.event);
 
     console.log("valores ", clickInfo.event.start);
+    if(clickInfo.event.extendedProps.origen=='decitasproducto'){
+      this._ToastService.info("este evento no se puede editar");
+      return;
+    }
 
     const calendarApi = clickInfo.event;
 

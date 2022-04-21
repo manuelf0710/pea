@@ -7,13 +7,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+
 class User extends Authenticatable implements JWTSubject
 {
     use Notifiable;
 
     public $timestamps = true;
 
-    use SoftDeletes;    
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -41,7 +42,7 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
-	
+
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -60,17 +61,22 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
-	/*
+    /*
 	* Relationships
-	*/	
-	
-   public function perfil()
-   {
-    return $this->belongsTo('App\Perfil', 'perfil_id', 'id');
-   } 
-   
-   public function profesional()
-   {
-    return $this->belongsTo('App\Perfil', 'perfil_id', 'id');
-   }    
+	*/
+
+    public function perfil()
+    {
+        return $this->belongsTo('App\Perfil', 'perfil_id', 'id');
+    }
+
+    public function profesional()
+    {
+        return $this->belongsTo('App\Perfil', 'perfil_id', 'id');
+    }
+    public function scopeProfile($query, $profile)
+    {
+        if ($profile != '')
+            return $query->where('users.perfil_id', '=', "$profile");
+    }
 }

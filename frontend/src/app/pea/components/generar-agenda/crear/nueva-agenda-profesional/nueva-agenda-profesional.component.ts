@@ -182,6 +182,9 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
                   let messageError = this._ToastService.errorMessage(res.msg);
                   this._ToastService.danger(messageError);
                 }
+                if (res.status == "errorocupado" || res.status == "errortime") {
+                  this._ToastService.warning(res.msg);
+                }                
                 this.loading = false;
               });
           },

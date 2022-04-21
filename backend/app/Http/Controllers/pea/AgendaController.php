@@ -419,14 +419,13 @@ class AgendaController extends Controller
                 }
             }
 
-            return
 
-                $response = array(
-                    'status' => 'ok',
-                    'code' => 200,
-                    'data'   => $datesArray,
-                    'msg'    => 'Guardado'
-                );
+            $response = array(
+                'status' => 'ok',
+                'code' => 200,
+                'data'   => $datesArray,
+                'msg'    => 'Guardado'
+            );
         } else {
             $response = array(
                 'status' => 'error',
@@ -462,56 +461,30 @@ class AgendaController extends Controller
                     ->globalSearch($globalSearch)
                     ->get();
             } else {
-                /*$response = Agenda::withoutTrashed()
-                    ->join('lista_items', 'agendas.tipo', '=', 'lista_items.id')
-                    ->select('agendas.id', 'profesional_id', 'agendas.tipo', 'start', 'end', 'lista_items.nombre as title', 'lista_items.background as backgroundColor', 'lista_items.color as textColor')
-                    ->addSelect(DB::raw(' case agendas.tipo 
-                        when 1
-                            then "background"
-                            else ""
-                            end display
-                        '))
-                    ->orderBy('agendas.id', 'desc')
-                    ->where('profesional_id', '=', $id)
-                    ->whereDate('start', '>=', $request->post('startDateView'))
-                    ->whereDate('end', '<=', $request->post('endDateView'))
-                    ->get();*/
-                /*$response = Cita::withoutTrashed()
-                    ->join('lista_items', 'citas.ocupado', '=', 'lista_items.id')
-                    ->select(
-                        'citas.id',
-                        'profesional_id',
-                        'citas.ocupado as tipo',
-                        'start',
-                        'end',
-                        'lista_items.nombre as title',
-                        'lista_items.background as backgroundColor',
-                        'lista_items.color as textColor'
-                    )
-                    ->orderBy('citas.id', 'desc')
-                    ->where('profesional_id', '=', $id)
-                    ->whereDate('start', '>=', $request->post('startDateView'))
-                    ->whereDate('end', '<=', $request->post('endDateView'))
-                    ->get();*/
-
+                $startDateView = $request->post('startDateView');
+                $endDateView = $request->post('endDateView');
+                /*
                 $agendas = DB::table('agendas')
                     ->join('lista_items', 'agendas.tipo', '=', 'lista_items.id')
                     ->select(
                         'agendas.id',
                         'profesional_id',
                         'agendas.tipo',
-                        'start',
-                        'end',
-                        'lista_items.nombre as title',
                         'lista_items.background as backgroundColor',
                         'lista_items.color as textColor'
                     )
+                    ->addSelect(DB::raw('"" as producto_id'))
                     ->addSelect(DB::raw('"background" as display'))
+                    ->addSelect(DB::raw('"deagenda" as origen'))
                     ->selectRaw("date_format(agendas.start, '%d/%m/%Y') as onlydate")
-                    ->orderBy('agendas.id', 'desc')
+                    ->selectRaw("lista_items.nombre as title")
+                    ->selectRaw("agendas.start as start")
+                    ->selectRaw("agendas.end as end")
                     ->where('profesional_id', '=', $id)
-                    ->whereDate('start', '>=', $request->post('startDateView'))
-                    ->whereDate('end', '<=', $request->post('endDateView'));
+                    ->whereRaw("date_format(start , '%Y-%m-%d') >=  " . "'$startDateView'")
+                    ->whereRaw("date_format(end , '%Y-%m-%d') <=  " . "'$endDateView'");
+
+
 
                 $citas = DB::table('citas')
                     ->join('lista_items', 'citas.ocupado', '=', 'lista_items.id')
@@ -519,21 +492,100 @@ class AgendaController extends Controller
                         'citas.id',
                         'profesional_id',
                         'citas.ocupado as tipo',
-                        'start',
-                        'end',
-                        'lista_items.nombre as title',
                         'lista_items.background as backgroundColor',
-                        'lista_items.color as textColor'
+                        'lista_items.color as textColor',
+                        'citas.producto_id'
                     )
                     ->addSelect(DB::raw('"" as display'))
+                    ->addSelect(DB::raw('"decitas" as origen'))
                     ->selectRaw("date_format(citas.start, '%d/%m/%Y') as onlydate")
-                    ->orderBy('citas.id', 'desc')
+                    ->addSelect(DB::raw("(SELECT concat(tipo_productos.name,' - ', clientes.nombre)
+                    FROM   productos,
+                           clientes,
+                           productos_repso,
+                           tipo_productos
+                    WHERE  productos.id = citas.producto_id
+                           AND productos.cedula = clientes.cedula
+                           AND productos.producto_repso_id = productos_repso.id
+                           AND productos_repso.tipoproducto_id = tipo_productos.id) as title"))
+
+                    ->selectRaw("min(start) as start")
+                    ->selectRaw("max(end) as end")
                     ->where('profesional_id', '=', $id)
                     ->where('citas.ocupado', '=', 2)
-                    ->whereDate('start', '>=', $request->post('startDateView'))
-                    ->whereDate('end', '<=', $request->post('endDateView'))
+                    ->whereRaw("date_format(start , '%Y-%m-%d') >=  " . "'$startDateView'")
+                    ->whereRaw("date_format(end , '%Y-%m-%d') <=  " . "'$endDateView'")
+                    ->whereNotNull('citas.producto_id')
+                    ->groupBy('citas.producto_id')
                     ->union($agendas)
-                    ->get();
+                    ->get(); */
+
+                //$totalCitas = count($citas);
+               $citas = DB::select("SELECT citas.id,
+                                    citas.profesional_id,
+                                    citas.ocupado AS tipo,
+                                    lista_items.background as backgroundColor,
+                                    lista_items.color AS textColor,
+                                    citas.producto_id,
+                                    '' AS display,
+                                    'decitasproducto' AS origen,
+                                    date_format(citas.start, '%d/%m/%Y') AS onlydate,
+                                    (SELECT concat(tipo_productos.NAME, ' - ', clientes.nombre, ' -',lista_items.nombre)
+                                        FROM productos, clientes, productos_repso, tipo_productos
+                                        WHERE productos.id = citas.producto_id
+                                        AND productos.cedula = clientes.cedula
+                                        AND productos.producto_repso_id = productos_repso.id
+                                        AND productos_repso.tipoproducto_id = tipo_productos.id) AS title,
+                                        min(start) AS  start, 
+                                        max(end) AS end
+                                FROM citas
+                                inner join productos on citas.producto_id = productos.id
+                                inner join lista_items on productos.estado_id = lista_items.id
+                                WHERE citas.profesional_id = 10
+                                AND citas.ocupado = 2
+                                AND date_format(start, '%Y-%m-%d') >= '".$startDateView."'
+                                AND date_format(end, '%Y-%m-%d') <= '".$endDateView."'
+                                AND citas.producto_id IS NOT NULL
+                                GROUP BY citas.producto_id
+                                UNION
+                                SELECT citas.id,
+                                    profesional_id,
+                                    citas.ocupado AS tipo,
+                                    lista_items.background as backgroundColor,
+                                    lista_items.color AS textColor,
+                                    citas.producto_id,
+                                    '' AS display,
+                                    'decitas' AS origen,
+                                    date_format(citas.start, '%d/%m/%Y') AS onlydate,
+                                    lista_items.nombre AS title,
+                                    citas.start AS
+                                start, citas.end AS end
+                                FROM citas
+                                INNER JOIN lista_items ON citas.ocupado = lista_items.id
+                                WHERE profesional_id =  '".$id."'
+                                AND citas.ocupado in (2, 3)
+                                AND date_format(start, '%Y-%m-%d') >=  '".$startDateView."'
+                                AND date_format(end, '%Y-%m-%d') <=  '".$endDateView."'
+                                AND citas.producto_id IS NULL
+                                UNION
+                                
+                                SELECT concat('agenda','_',agendas.id),
+                                    profesional_id,
+                                    agendas.tipo,
+                                    lista_items.background AS backgroundcolor,
+                                    lista_items.color AS textcolor,
+                                    '' AS producto_id,
+                                    'background' AS display,
+                                    'deagenda' AS origen,
+                                    date_format(agendas.start, '%d/%m/%Y') AS onlydate,
+                                    lista_items.nombre AS title,
+                                    agendas.start AS
+                                start, agendas.end AS end
+                                FROM agendas
+                                INNER JOIN lista_items ON agendas.tipo = lista_items.id
+                                WHERE profesional_id =  '".$id."'
+                                AND date_format(start, '%Y-%m-%d') >=  '".$startDateView."'
+                                AND date_format(end, '%Y-%m-%d') <=  '".$endDateView."'");
 
                 $totalCitas = count($citas);
 
