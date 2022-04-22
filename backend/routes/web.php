@@ -17,7 +17,9 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Auth::routes();
+//Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/', 'AngularController@index')->name('inicio');
+Route::get('/home', 'AngularController@index')->name('home');
 Route::get('/test', 'HomeController@test')->name('testHoras');
+Route::any('/{any}', 'AngularController@index')->where('any', '^(?!api).*$');

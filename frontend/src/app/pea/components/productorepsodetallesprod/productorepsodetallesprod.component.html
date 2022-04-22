@@ -630,6 +630,18 @@
                       <i class="fa fa-calendar" (click)="d.toggle()"></i>
                     </div>
                   </div>
+                  <div
+                    *ngIf="
+                      formulario.get('fecha_seguimiento').errors &&
+                      formulario.get('fecha_seguimiento').touched
+                    "
+                  >
+                    <small
+                      *ngIf="formulario.get('fecha_seguimiento').hasError('required')"
+                      class="form-text text-danger"
+                      >el campo fecha seguimiento no debe estar vacío.</small
+                    >
+                  </div>                  
                 </div>
               </div>
 

@@ -111,7 +111,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       modalidad: ["", [Validators.required]],
       descripcion: ["", [Validators.required]],
       numero_citas: [null],
-      fecha_seguimiento: [null],
+      fecha_seguimiento: ["", [Validators.required]],
       estado_programacion: [null],
       comentarios: [null],
       pyp_ergonomia: ["", [Validators.required]],
