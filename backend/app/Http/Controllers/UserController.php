@@ -28,6 +28,17 @@ class UserController extends Controller
 	 * @return \Illuminate\Contracts\Support\Renderable
 	 */
 
+	 public function listarAll(Request $request){
+		$profile = $request->post('profile');
+
+		$productos = User::withoutTrashed()
+			->select('id', 'name as nombre')
+			->where("status", "=", "1")
+			->profile($profile)
+			->get();
+		return response()->json($productos);
+	 }
+
 
 	public function buscarUser(Request $request)
 	{

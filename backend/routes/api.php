@@ -48,6 +48,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::post('contratoslist', 'comun\ContratoController@listado')->name('contratos.listado');
 		Route::post('buscarcontrato', 'comun\ContratoController@buscarContrato')->name('contratos.buscar');
 		Route::post('buscarusers', 'UserController@buscarUser')->name('users.buscar');
+		Route::get('listarusuarios', 'UserController@listarAll')->name('users.listar.all');
 
 		Route::get('getcliente/{id}', 'comun\ClienteController@show')->name('cliente.show');
 	});
