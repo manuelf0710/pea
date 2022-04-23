@@ -115,8 +115,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       estado_programacion: [null],
       comentarios: [null],
       pyp_ergonomia: ["", [Validators.required]],
-      profesionalsearch:[""],
-      fechadisponiblesearch:[""]
+      profesionalsearch: [""],
+      fechadisponiblesearch: [""],
     });
 
     this.formularioArchivo = this.FormBuilder.group({
@@ -153,9 +153,15 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this.mostrarRegistro = true;
     }
 
-    this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
+    //this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
 
     console.log("registropersona ", this.personaGestion);
+    if (item.estado_id == 9) {
+      this.agendaDisponibleProfesionales();
+    } else {
+      this.agendasDisponibles = null;
+    }
+
     this.setvaluesFormulario();
   }
 
@@ -254,17 +260,24 @@ export class ProductorepsodetallesprodComponent implements OnInit {
 
   agendaDisponibleProfesionales() {
     this.loading = true;
+    let formData = {
+      tipo_producto: this.odsDetalles.tipo_producto.id,
+    };
     this._AgendaService
       .postAgendaProfesionalAllProfesional({
-        data: 2,
+        ...formData,
       })
       .subscribe((res: any) => {
         if (res.status == "error") {
           this._ToastService.danger(res.msg);
         }
         if (res.code == 200) {
-          this._ToastService.success(res.msg);
           this.agendasDisponibles = res.data;
+          if (res.data.length > 0) {
+            this._ToastService.success(res.msg);
+          } else {
+            this._ToastService.info("no existen agendas disponibles");
+          }
         }
         this.loading = false;
       });

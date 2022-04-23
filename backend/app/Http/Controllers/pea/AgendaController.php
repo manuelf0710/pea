@@ -128,10 +128,13 @@ class AgendaController extends Controller
         }
     }
 
-    public function enableAgenda()
+    public function enableAgenda( Request $request )
     {
-        $citas = DB::table('citas')
+        $tipoproducto_id = $request->post('tipo_producto');
+        $citas = DB::table('agendas')
+            ->join('citas', 'agendas.id', '=', 'citas.agenda_id')
             ->join('users', 'citas.profesional_id', '=', 'users.id')
+            ->join('tipoproducto_users', 'users.id', '=', 'tipoproducto_users.user_id')
             ->select(
                 "citas.id as id",
                 "citas.start",
@@ -140,7 +143,9 @@ class AgendaController extends Controller
                 "users.id as profesional_id",
                 "users.name as profesional"
             )
-            ->where('citas.ocupado', '=', 1);
+            ->where('tipoproducto_users.tipoproducto_id', '=', $tipoproducto_id)
+            ->where('citas.ocupado', '=', 1)
+            ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$this->today'");
 
         $citas = $citas->addSelect(DB::raw(
             "date_format(citas.start, '%Y-%m-%d') onlydate"
@@ -258,6 +263,7 @@ class AgendaController extends Controller
                     "end" => $dateEndToMysql,
                     "ocupado" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 2 : 1,
                     //"starttimehour" => $startTimeHour*1,
+                    "razon_bloqueo" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 'Almuerzo' : null,
                     "index" => $i + 1
                 ));
             }
@@ -279,7 +285,7 @@ class AgendaController extends Controller
                 'end'
             )
             ->where('profesional_id', '=', $profesional_id)
-            ->where('tipo', '=', $tipo)
+            ->where('tipo', '=', '1')
             ->whereRaw("date_format(start, '%Y-%m-%d') =  " . "'$dateInput'")
             ->get();
 
@@ -318,6 +324,7 @@ class AgendaController extends Controller
         return $response;
     }
 
+
     public function store(Request $request, $id)
     {
         $validator = Validator::make($request->all(), Agenda::rules($request));
@@ -330,7 +337,8 @@ class AgendaController extends Controller
             $dateRepeat = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('repeat_end') . ' ' . $timeStart);
             $diffOnDays = $dateStart->diffInDays($dateRepeat);
             $diffOnMinutes = $dateStart->diffInMinutes($dateEnd);
-
+            
+            
             /*
             * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
              */
@@ -338,6 +346,16 @@ class AgendaController extends Controller
             if (count($validarMax) > 0) {
                 return response()->json($validarMax);
             }
+
+
+            /*
+            * validar que fecha hora inicio no sea mayuor que fecha hhora fina
+             */
+
+            $validarMax = $this->validarFechaFinPermitida($dateStart, $dateEnd);
+            if (count($validarMax) > 0) {
+                return response()->json($validarMax);
+            }             
 
             /*
             *  Validar que solo permita guardar fechas mayores a hoy
@@ -352,10 +370,55 @@ class AgendaController extends Controller
             /*
             * $request->post('tipo'); 1 = disponible, 2, bloqueo, 3 informe.
             */
+            //$getDateStart = explode(" ", $dateStart);           
+            $getDateStart = $dateStart->format('Y-m-d');
+            $agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart, $id, 1);
 
-            /*$agendaByDay = $this->validarOnlyEnableAgendaByDay($request, $id, $request->post('tipo'));
+                switch($request->post('tipo')) {
 
-            return response()->json($agendaByDay);*/
+                    case 1:                    
+                        //$agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart[0], $id, $request->post('tipo'));  
+                        if (count($agendaByDayValidateStart) > 0) {
+                            if($request->post('tipo') == '1'){
+                            $response = array(
+                                'status' => 'errortime',
+                                'code' => 200,
+                                'data'   => -1,
+                                'msg'    => 'ya existe una agenda programada para el profesional seleccionado en la fecha '.$getDateStart[0]
+                            );                
+                            return response()->json($response);
+                            } 
+                        }        
+                    break;
+                    
+                    case 2:                    
+                        if (count($agendaByDayValidateStart) == 0) {
+                            $response = array(
+                                'status' => 'errortime',
+                                'code' => 200,
+                                'data'   => -1,
+                                'msg'    => 'Para almacenar un tiempo de bloqueo primero debe tener una agenda programada y sobre esta bloquear el tiempo'
+                            );                
+                            return response()->json($response);                        
+                        }                   
+                    break;                    
+                    case 3:                    
+                        if (count($agendaByDayValidateStart) == 0) {
+                            $response = array(
+                                'status' => 'errortime',
+                                'code' => 200,
+                                'data'   => -1,
+                                'msg'    => 'Para almacenar un tiempo de informe primero debe tener una agenda programada y sobre esta agregar el tiempo'
+                            );                
+                            return response()->json($response);                        
+                        }                     
+                    break;                    
+                    default:                    
+                    }
+
+            
+
+            //return 'el tipo = '.$request->post('tipo');
 
 
             if ($diffOnDays >= 0) {
@@ -413,6 +476,7 @@ class AgendaController extends Controller
                         $newRecord->start = $newRecordCita['start'];
                         $newRecord->end = $newRecordCita['end'];
                         $newRecord->ocupado = $newRecordCita['ocupado'];
+                        $newRecord->razon_bloqueo = $newRecordCita['razon_bloqueo'];
                         $newRecord->agenda_id = $modelo->id;
                         $newRecord->save();
                     }
@@ -557,7 +621,7 @@ class AgendaController extends Controller
                                     '' AS display,
                                     'decitas' AS origen,
                                     date_format(citas.start, '%d/%m/%Y') AS onlydate,
-                                    lista_items.nombre AS title,
+                                    citas.razon_bloqueo AS title,
                                     citas.start AS
                                 start, citas.end AS end
                                 FROM citas

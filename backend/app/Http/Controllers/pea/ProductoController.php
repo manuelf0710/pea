@@ -286,13 +286,22 @@ class ProductoController extends Controller
                 $find->save();
                 if ($validacion == 0) {
                     foreach ($importClientes->clientesImportar as $item) {
-                        $producto = new Producto();
-                        $producto->producto_repso_id = $id;
-                        $producto->estado_id = 9;
-                        $producto->cedula = $item['cedula'];
-                        $producto->dependencia_id = $item['dependencia_id'];
-                        $producto->user_id = auth()->user()->id;
-                        $producto->save();
+                        $getClient = DB::table('productos')
+                                    ->where('producto_repso_id', '=', $id)
+                                    ->where('cedula', '=', $item['cedula'])
+                                    ->first();
+                        if(!$getClient) {
+                            if($item['cedula']>100000){
+                                $producto = new Producto();
+                                $producto->producto_repso_id = $id;
+                                $producto->estado_id = 9;
+                                $producto->cedula = $item['cedula'];
+                                $producto->dependencia_id = $item['dependencia_id'];
+                                $producto->user_id = auth()->user()->id;
+                                $producto->save();
+                            }
+                        }
+
                     }
                 } else {
                     //return response()->json($importClientes->clientesImportar);

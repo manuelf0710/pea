@@ -207,8 +207,16 @@ export class GenerarAgendaComponent implements OnInit {
       return;
     }
 
-    console.log("la agenda del profesional ", this.agendaProfesional);
     const calendarApi = selectInfo.view.calendar;
+
+    /*
+    * prevent que los eventos se creen desde kla vista mensual
+     */
+
+    if(calendarApi.view.type=='dayGridMonth'){
+      this._ToastService.info("no se pueden agregar eventos desde la vista mensual");
+      return;
+    }
 
     let start = calendarApi.formatDate(selectInfo.startStr, {
       month: "2-digit",
