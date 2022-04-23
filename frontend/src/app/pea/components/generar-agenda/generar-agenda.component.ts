@@ -13,6 +13,8 @@ import esLocale from "@fullcalendar/core/locales/es";
 import { UtilService } from "../../../shared/services/util.service";
 import { ToastService } from "../../../shared/services/toast.service";
 import { AgendaService } from "../../../services/agenda.service";
+import { ComunService } from "../../../services/comun.service";
+
 import { NuevaAgendaProfesionalComponent } from "../generar-agenda/crear/nueva-agenda-profesional/nueva-agenda-profesional.component";
 import { environment } from "../../../../environments/environment";
 import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
@@ -30,6 +32,7 @@ export class GenerarAgendaComponent implements OnInit {
   calendarApi: any;
   public startDateView: any;
   public endDateView: any;
+  public profesionalesList = [];
 
   @ViewChild("calendar") calendarComponent: FullCalendarComponent;
 
@@ -142,12 +145,37 @@ export class GenerarAgendaComponent implements OnInit {
   constructor(
     private _AgendaService: AgendaService,
     private _UtilService: UtilService,
+    private _ComunService: ComunService,
     private _ToastService: ToastService,
     private modalService: NgbModal,
     @Inject(LOCALE_ID) public locale: string
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.loadForProfesionales();
+  }
+
+  activeLi(id) {
+    if (this.profesionalSeleccionado && this.profesionalSeleccionado.id == id) {
+      return "active";
+    }
+  }
+
+  loadForProfesionales() {
+    this.loading = true;
+    this._ComunService.getUsersAll(3).subscribe(
+      (res: any) => {
+        this.profesionalesList = res;
+        this.loading = false;
+      },
+      (error: any) => {
+        this.loading = false;
+      },
+      () => {
+        this.loading = false;
+      }
+    );
+  }
 
   validateLoadData() {
     if (this.profesionalSeleccionado && this.calendarComponent) {
@@ -210,11 +238,13 @@ export class GenerarAgendaComponent implements OnInit {
     const calendarApi = selectInfo.view.calendar;
 
     /*
-    * prevent que los eventos se creen desde kla vista mensual
+     * prevent que los eventos se creen desde kla vista mensual
      */
 
-    if(calendarApi.view.type=='dayGridMonth'){
-      this._ToastService.info("no se pueden agregar eventos desde la vista mensual");
+    if (calendarApi.view.type == "dayGridMonth") {
+      this._ToastService.info(
+        "no se pueden agregar eventos desde la vista mensual"
+      );
       return;
     }
 
@@ -313,7 +343,7 @@ export class GenerarAgendaComponent implements OnInit {
     console.log("ingresaste manuelf ", clickInfo.event);
 
     console.log("valores ", clickInfo.event.start);
-    if(clickInfo.event.extendedProps.origen=='decitasproducto'){
+    if (clickInfo.event.extendedProps.origen == "decitasproducto") {
       this._ToastService.info("este evento no se puede editar");
       return;
     }

@@ -32,6 +32,7 @@ export const environment = {
     buscarContrato: "comun/buscarcontrato",
     getClienteByCedula: "comun/getcliente/",
     buscarUsers: "comun/buscarusers",
+    getlistarAllUsers: "comun/listarusuarios/",
   },
   imports: {
     uploadExcelToProductRepso: "files/uploads/",

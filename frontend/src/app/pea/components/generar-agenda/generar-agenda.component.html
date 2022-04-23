@@ -15,16 +15,30 @@
     </div>
     <div class="col-md-3">
       <div class="form-group">
-        <label for="profesional" class="text-secondary">Profesional</label>
-        <app-autocomplete
+        <label for="profesional" class="text-secondary">Profesional:</label>
+        <!--<app-autocomplete
           [url]="urlProfesionales"
           (seleccionado)="seleccionadoProfesional($event)"
           [labelValue]="'profesional'"
-        ></app-autocomplete>
-        <p *ngIf="profesionalSeleccionado">
-          {{ profesionalSeleccionado.nombre }}
+        ></app-autocomplete>-->
+        <p *ngIf="profesionalSeleccionado" class="font-weight-bold text-right">
+          <i class="fa fa-user-o"></i> {{ profesionalSeleccionado.nombre }}
         </p>
       </div>
+      <ul class="list-group">
+        <a
+          (click)="seleccionadoProfesional(item)"
+          class="list-group-item list-group-item-action"
+          *ngFor="let item of profesionalesList; let i = index"
+          [ngClass]="
+            profesionalSeleccionado && profesionalSeleccionado.id == item.id
+              ? 'active'
+              : ''
+          "
+        >
+          {{ i + 1 + ").  " + item.nombre | titlecase }}
+        </a>
+      </ul>
     </div>
   </div>
 </div>

@@ -21,4 +21,19 @@ export class ComunService {
         })
       );
   }
+  getUsersAll(profile: number): Observable<any> {
+    return this._http
+      .get<any>(
+        environment.apiUrl +
+          environment.comun.getlistarAllUsers +
+          "?profile=" +
+          profile
+      )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
 }
