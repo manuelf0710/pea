@@ -324,6 +324,20 @@ class AgendaController extends Controller
         return $response;
     }
 
+    public function validarUniqueDayselectable($start, $end){
+        $response = array();
+               
+        if($start !== $end){
+            $response = array(
+                'status' => 'errortime',
+                'code' => 200,
+                'data'   => -1,
+                'msg'    => 'fecha inicio '.$start.' es diferente de '.$end.', estas fechas deben ser iguales, lo que varia es la hora'
+            );
+        }
+        return $response; 
+    }
+
 
     public function store(Request $request, $id)
     {
@@ -337,7 +351,15 @@ class AgendaController extends Controller
             $dateRepeat = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('repeat_end') . ' ' . $timeStart);
             $diffOnDays = $dateStart->diffInDays($dateRepeat);
             $diffOnMinutes = $dateStart->diffInMinutes($dateEnd);
-            
+
+            /*
+            * validar que no permita seleccionar varios dias en rango en fullcalendar
+             */
+
+             $validarUnicoDay = $this->validarUniqueDayselectable($dateStart->format('Y-m-d'), $dateEnd->format('Y-m-d'));
+             if (count($validarUnicoDay) > 0) {
+                return response()->json($validarUnicoDay);
+            }
             
             /*
             * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
@@ -450,12 +472,14 @@ class AgendaController extends Controller
                             "timeStart" => $timeStart,
                             "timeEnd" => $timeEnd,
                             "index" => $i,
+                            "id" => '',
                             "datesList" => $datesList
                         ));
                     }
                 }
             }
 
+            $indexAgenda = 0;
             foreach ($datesArray as $item) {
 
                 $modelo = new Agenda();
@@ -469,6 +493,10 @@ class AgendaController extends Controller
                 if (count($agendaByDay) == 0) {
 
                     $modelo->save();
+                    /*
+                     * Set value agenda id de modelo agenda recien guardado
+                     */
+                    $datesArray[$indexAgenda]['id'] = $modelo->id;
 
                     foreach ($item['datesList'] as $newRecordCita) {
                         $newRecord = new Cita();
@@ -481,6 +509,7 @@ class AgendaController extends Controller
                         $newRecord->save();
                     }
                 }
+                $indexAgenda++;
             }
 
 

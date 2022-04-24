@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from "@angular/core";
 import {
+  ValidatorFn,
   FormGroup,
   FormBuilder,
   Validators,
@@ -75,6 +76,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
   ngOnInit(): void {
     this.buildForm();
     this.loading = false;
+    this.setUserCategoryValidators();
   }
 
   get ordersFormArray() {
@@ -90,6 +92,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
     let end = null;
     let tipo = null;
     let repeat_end = null;
+    let razon_bloqueo = null;
 
     if (this.data) {
       id = this.data.id;
@@ -133,6 +136,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
       end: [end, [Validators.required]],
       end_time: [],
       tipo: [tipo, [Validators.required]],
+      razon_bloqueo: [razon_bloqueo],
       daysRepeat: new FormArray([]),
       repeat_end: [end],
     });
@@ -145,6 +149,21 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
     );
   }
 
+  setUserCategoryValidators() {
+    const razon_bloqueo = this.formulario.get("razon_bloqueo");
+    this.formulario.get("tipo").valueChanges.subscribe((tipoSeleccionado) => {
+      if (tipoSeleccionado > 1) {
+        razon_bloqueo.setValidators([
+          Validators.required,
+          Validators.minLength(5),
+          Validators.maxLength(25),
+        ]);
+      } else {
+        razon_bloqueo.setValidators(null);
+      }
+      razon_bloqueo.updateValueAndValidity();
+    });
+  }
 
   guardar(event: Event) {
     event.preventDefault();
@@ -157,8 +176,14 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
         ...this.formulario.value,
         selectedDays: selectedDays,
       };
-      value.start = this._UtilService.formatearFechaGuardar(value.start, value.start_time);
-      value.end = this._UtilService.formatearFechaGuardar(value.end, value.end_time);
+      value.start = this._UtilService.formatearFechaGuardar(
+        value.start,
+        value.start_time
+      );
+      value.end = this._UtilService.formatearFechaGuardar(
+        value.end,
+        value.end_time
+      );
 
       this._UtilService
         .confirm({
@@ -177,6 +202,9 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
                   this._ToastService.success(
                     "agenda " + res.msg + " correctamente"
                   );
+                  this.formulario.patchValue({
+                    id: res.data[0].id,
+                  });
                 }
                 if (res.status == "error") {
                   let messageError = this._ToastService.errorMessage(res.msg);
@@ -184,7 +212,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
                 }
                 if (res.status == "errorocupado" || res.status == "errortime") {
                   this._ToastService.warning(res.msg);
-                }                
+                }
                 this.loading = false;
               });
           },

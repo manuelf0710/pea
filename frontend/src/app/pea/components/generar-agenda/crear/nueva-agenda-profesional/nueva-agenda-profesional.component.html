@@ -28,6 +28,8 @@
         <div class="form-group">
           <label for="regional">inicio (d/m/Y)</label>
           {{ data | json }}
+          el idddd
+          {{ formulario.get("id").value }}
           <div class="input-group">
             <div class="input-group-prepend">
               <span class="input-group-text"
@@ -122,6 +124,7 @@
 
       <div class="col-md-6">
         <div class="form-group">
+          <div>Valid: {{ formulario.valid ? "👍" : "👎" }}</div>
           <label for="regional">Tipo</label>
           <div class="input-group">
             <div class="input-group-prepend">
@@ -145,7 +148,50 @@
         </div>
       </div>
 
-      <div class="col-md-12">
+      <div class="col-md-12" *ngIf="formulario.get('tipo').value > 1">
+        <div class="form-group">
+          <label for="regional">Comentario Bloqueo</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-comment"></i
+              ></span>
+            </div>
+            <input
+              type="text"
+              name="razon_bloqueo"
+              id="razon_bloqueo"
+              class="form-control form-control-sm"
+              formControlName="razon_bloqueo"
+              [maxlength]="25"
+            />
+          </div>
+          <div
+            *ngIf="
+              formulario.get('razon_bloqueo').errors &&
+              formulario.get('razon_bloqueo').touched
+            "
+          >
+            <small
+              *ngIf="formulario.get('razon_bloqueo').hasError('required')"
+              class="form-text text-danger"
+              >el campo comentario bloqueo no debe estar vacío.</small
+            >
+            <small
+              *ngIf="formulario.get('razon_bloqueo').hasError('minlength')"
+              class="form-text text-danger"
+              >el campo comentario debe ser mayor a 5 caracteres.</small
+            >
+            <small
+              *ngIf="formulario.get('razon_bloqueo').hasError('maxlength')"
+              class="form-text text-danger"
+              >el campo comentario debe ser menor a 25 caracteres.</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-12 mt-2">
         <div class="row">
           <div class="col-md-12">
             <div class="form-group">

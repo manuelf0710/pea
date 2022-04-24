@@ -27,8 +27,8 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =
     environment.apiUrl + environment.comun.buscarUsers + "?profile=3";
-  //public profesionalSeleccionado = { id: 10, nombre: "Diana prueba" };
-  public profesionalSeleccionado!: { id: number; nombre: String };
+  public profesionalSeleccionado = { id: 2, nombre: "Adriana Santis Santois" };
+  //public profesionalSeleccionado!: { id: number; nombre: String };
   calendarApi: any;
   public startDateView: any;
   public endDateView: any;
