@@ -35,7 +35,8 @@ class Agenda extends Model
             'profesional_id' => 'required',
             'start' => 'required',
             'end' => 'required',
-            'tipo' => 'required',
+            'tipo' => 'required|in:1,2,3',
+            'razon_bloqueo' => 'required_if:tipo, 2,3',
         ];
 		return $rules;
 	}    

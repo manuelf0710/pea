@@ -202,9 +202,11 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
                   this._ToastService.success(
                     "agenda " + res.msg + " correctamente"
                   );
-                  this.formulario.patchValue({
-                    id: res.data[0].id,
-                  });
+                  if(this.formulario.get("tipo").value == 1){
+                    this.formulario.patchValue({
+                      id: res.data[0].id,
+                    });
+                  }
                 }
                 if (res.status == "error") {
                   let messageError = this._ToastService.errorMessage(res.msg);
