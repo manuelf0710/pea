@@ -28,6 +28,7 @@ class AgendaController extends Controller
     public $launchTimeStart = 12; /* hora */
     public $launchTimeEnd = 14;
     public $today;
+    private $hasError = false;
 
     public function __construct()
     {
@@ -261,9 +262,11 @@ class AgendaController extends Controller
                     "profesional_id" => $profesional_id,
                     "start" => $dateStartToMysql,
                     "end" => $dateEndToMysql,
-                    "ocupado" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 2 : 1,
+                    //"ocupado" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 2 : 1,
+                    "ocupado" => 1,
                     //"starttimehour" => $startTimeHour*1,
-                    "razon_bloqueo" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 'Almuerzo' : null,
+                    //"razon_bloqueo" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 'Almuerzo' : null,
+                    "razon_bloqueo" => null,
                     "index" => $i + 1
                 ));
             }
@@ -373,9 +376,8 @@ class AgendaController extends Controller
   public function getMinimoAndMaxId($datesAgenda){
       $minimo = 0;
       $maximo = 0;
-      $index = 0;
       for($i= 0; $i < count($datesAgenda); $i++){
-        if($index == 0) {
+        if($i == 0) {
             $minimo = $datesAgenda[$i]->id; 
             $maximo = $datesAgenda[$i]->id; 
          }
@@ -383,7 +385,6 @@ class AgendaController extends Controller
          $maximo = $maximo < $datesAgenda[$i]->id ? $datesAgenda[$i]->id : $maximo;
               
       
-      $index ++;
   } 
   //echo("el minimo es ".$minimo. ' y el maximo = '.$maximo);
   return array('minimo' => $minimo,  'maximo' => $maximo);
@@ -405,6 +406,14 @@ class AgendaController extends Controller
 
         return $response;
 
+    }
+
+    public function getCitasAgenda($dateStart, $newDateEnd, $agendaId){
+        $datesAgenda = DB::table('citas')
+        ->where('citas.agenda_id', '=', $agendaId)
+        ->whereBetween('start', [$dateStart, $newDateEnd])
+        ->get();  
+        return $datesAgenda;      
     }
 
 
@@ -505,17 +514,11 @@ class AgendaController extends Controller
                     break;                    
                     default:                    
                     }
-
-            if($request->post('tipo') == 2 || $request->post('tipo') == 3){
+            /*
+            if($request->post('tipo') == 2 || $request->post('tipo') == 3 && ($diffOnDays == 0)){
                 //echo json_encode($agendaByDayValidateStart);
-                
-                $datesAgenda = DB::table('citas')
-                ->where('citas.agenda_id', '=', $agendaByDayValidateStart[0]->id)
-                ->whereBetween('start', [$dateStart, $newDateEnd])
-                ->get();
-                /*
-                * validar que ninguna fracción de tiempo este ocupada antes de actualziar los eventos de bloque 2, informe 3.
-                 */
+                $datesAgenda = $this->getCitasAgenda($dateStart, $newDateEnd, $agendaByDayValidateStart[0]->id);
+     
                 $validateOcupadosFraccionestiempo = $this->validarOcupado($datesAgenda);
                 if (count($validateOcupadosFraccionestiempo) > 0) {
                     return response()->json($validateOcupadosFraccionestiempo);
@@ -535,7 +538,7 @@ class AgendaController extends Controller
 
                 $guardarBloqueo = $this->guardarBloqueoAndInforme($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo'));
                 return response()->json($guardarBloqueo);
-            }
+            } */
 
             //return 'el tipo = '.$request->post('tipo');
             //echo ' otherfield'. $agendaByDayValidateStart[0]->id;
@@ -556,6 +559,7 @@ class AgendaController extends Controller
                     if ($dayNumber != 6 && $dayNumber != 7) {
 
                         $datesList = $this->addMinutesToDate($timeStart, $timeEnd, $id, $dateStart, $dateRepeat, $dateEnd, $diffOnMinutes, $newDate);
+                        //$datesList = array();
 
                         array_push($datesArray, array(
                             "dateStart" => $dateStart,
@@ -575,48 +579,80 @@ class AgendaController extends Controller
                     }
                 }
             }
-            if($request->post('tipo') == '1'){
             $indexAgenda = 0;
             foreach ($datesArray as $item) {
+                    if($request->post('tipo') == '1'){
+                    $modelo = new Agenda();
+                    $modelo->profesional_id = $id;
+                    $modelo->tipo    = $request->post('tipo');
+                    $modelo->start    = $item['onlyDate'] . ' ' . $item['timeStart'];
+                    $modelo->end    = $item['onlyDate'] . ' ' . $item['timeEnd'];
 
-                $modelo = new Agenda();
-                $modelo->profesional_id = $id;
-                $modelo->tipo    = $request->post('tipo');
-                $modelo->start    = $item['onlyDate'] . ' ' . $item['timeStart'];
-                $modelo->end    = $item['onlyDate'] . ' ' . $item['timeEnd'];
+                    $agendaByDay = $this->validarOnlyEnableAgendaByDay($item['onlyDate'], $id, $request->post('tipo'));
+                    //echo ('existe una ' . json_encode($agendaByDay));
+                    if (count($agendaByDay) == 0) {
 
-                $agendaByDay = $this->validarOnlyEnableAgendaByDay($item['onlyDate'], $id, $request->post('tipo'));
-                //echo ('existe una ' . json_encode($agendaByDay));
-                if (count($agendaByDay) == 0) {
+                        $modelo->save();
+                        /*
+                        * Set value agenda id de modelo agenda recien guardado
+                        */
+                        $datesArray[$indexAgenda]['id'] = $modelo->id;
 
-                    $modelo->save();
-                    /*
-                     * Set value agenda id de modelo agenda recien guardado
-                     */
-                    $datesArray[$indexAgenda]['id'] = $modelo->id;
+                        foreach ($item['datesList'] as $newRecordCita) {
+                            $newRecord = new Cita();
+                            $newRecord->profesional_id = $newRecordCita['profesional_id'];
+                            $newRecord->start = $newRecordCita['start'];
+                            $newRecord->end = $newRecordCita['end'];
+                            $newRecord->ocupado = $newRecordCita['ocupado'];
+                            $newRecord->razon_bloqueo = $newRecordCita['razon_bloqueo'];
+                            $newRecord->agenda_id = $modelo->id;
+                            $newRecord->save();
+                        }
+                    }
+                }else{
+                    $agendaByDay = $this->validarOnlyEnableAgendaByDay($item['onlyDate'], $id, $request->post('tipo'));
+                    if (count($agendaByDay) > 0) {
+                        //echo("antessS?");
+                        //echo("entro en agendaday > 0 || ");
+                        //echo(json_encode($item).' chhhc');
 
-                    foreach ($item['datesList'] as $newRecordCita) {
-                        $newRecord = new Cita();
-                        $newRecord->profesional_id = $newRecordCita['profesional_id'];
-                        $newRecord->start = $newRecordCita['start'];
-                        $newRecord->end = $newRecordCita['end'];
-                        $newRecord->ocupado = $newRecordCita['ocupado'];
-                        $newRecord->razon_bloqueo = $newRecordCita['razon_bloqueo'];
-                        $newRecord->agenda_id = $modelo->id;
-                        $newRecord->save();
+                        $newDateEndMenosminutesToAdd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $item['onlyDate'] . ' ' . $item['timeEnd']);
+                        $newDateEndValidator = $newDateEndMenosminutesToAdd->subMinute($this->minutesToAdd, 'minute');
+
+                        $datesAgenda = $this->getCitasAgenda($item['onlyDate'] . ' ' . $item['timeStart'], $newDateEndValidator, $agendaByDay[0]->id);
+                        //echo(json_encode($datesAgenda).'--]');
+                        //echo($item['onlyDate'] . ' ' . $item['timeStart'].' =inicio & end ='.$item['onlyDate'] . ' ' . $item['timeEnd'].'&agenda_id = '.$agendaByDay[0]->id.'(?)');
+                        $validateOcupadosFraccionestiempo = $this->validarOcupado($datesAgenda);
+                        //echo(json_encode($validateOcupadosFraccionestiempo).'(?)');
+                        $datesAgenda = $datesAgenda->toArray();
+                        //echo('datesagenda '.$indexAgenda.' ='.json_encode($datesAgenda));
+                        if (count($validateOcupadosFraccionestiempo) == 0) {
+                            //echo("ingresa ".json_encode($datesAgenda));
+                            $minimoAndMaxId = $this->getMinimoAndMaxId($datesAgenda);
+                            //echo(json_encode($minimoAndMaxId).' (??)');
+                            if($minimoAndMaxId['minimo'] == 0 || $minimoAndMaxId['maximo'] == 0){
+                                
+                            }else{
+                                $guardarBloqueo = $this->guardarBloqueoAndInforme($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo')); 
+                            }
+
+                            
+                            
+                        }  
+                        
+                        //echo(json_encode($datesAgenda));
                     }
                 }
                 $indexAgenda++;
             }
-        }else{
-            echo $datesAgenda;
-        }
+       
 
 
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
                 'data'   => $datesArray,
+                //'data'   => 21,
                 'msg'    => 'Guardado'
             );
         } else {
