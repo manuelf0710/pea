@@ -98,6 +98,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
       id = this.data.id;
       profesional_id = this.data.profesional_id;
       profesional = this.data.profesional;
+      razon_bloqueo = this.data.extendedprops?.razon_bloqueo;
       start = `${parseInt(this.data.start.split("/")[2])}-${parseInt(
         this.data.start.split("/")[1]
       )}-${parseInt(this.data.start.split("/")[0])}`;
@@ -168,6 +169,13 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
   guardar(event: Event) {
     event.preventDefault();
     if (this.formulario.valid) {
+
+      let tipoGuardar = null;
+      if(this.data.id && (this.data.tipo == 2 || this.data.tipo == 3)){
+        console.log("es un evento valido para actualizar");
+        tipoGuardar = 1;      
+      }      
+
       const selectedDays = this.formulario.value.daysRepeat
         .map((checked, i) => (checked ? this.daysRepeat[i].id : null))
         .filter((v) => v !== null);
@@ -175,6 +183,7 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
       let value = {
         ...this.formulario.value,
         selectedDays: selectedDays,
+        extendedprops : this.data.extendedprops
       };
       value.start = this._UtilService.formatearFechaGuardar(
         value.start,
@@ -202,11 +211,11 @@ export class NuevaAgendaProfesionalComponent implements OnInit {
                   this._ToastService.success(
                     "agenda " + res.msg + " correctamente"
                   );
-                  if(this.formulario.get("tipo").value == 1){
+                  /*if(this.formulario.get("tipo").value == 1){
                     this.formulario.patchValue({
                       id: res.data[0].id,
                     });
-                  }
+                  } */
                 }
                 if (res.status == "error") {
                   let messageError = this._ToastService.errorMessage(res.msg);

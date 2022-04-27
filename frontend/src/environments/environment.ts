@@ -41,6 +41,7 @@ export const environment = {
   agenda: {
     getAgendaProfesional: "pea/agenda/profesionalagenda/",
     postAgendaProfesional: "pea/agenda/profesional/",
+    putAgendaProfesional: "pea/agenda/cita/",
     postAgendaDisponibleAllProfesional: "pea/agenda/agendadisponible/",
     postCita: "pea/cita",
   },

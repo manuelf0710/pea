@@ -27,12 +27,14 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =
     environment.apiUrl + environment.comun.buscarUsers + "?profile=3";
-  public profesionalSeleccionado = { id: 2, nombre: "Adriana Santis Santois" };
-  //public profesionalSeleccionado!: { id: number; nombre: String };
+  //public profesionalSeleccionado = { id: 2, nombre: "Adriana Santis Santois" };
+  public profesionalSeleccionado!: { id: number; nombre: String };
   calendarApi: any;
   public startDateView: any;
   public endDateView: any;
   public profesionalesList = [];
+  public buscarProfesional = '';
+
 
   @ViewChild("calendar") calendarComponent: FullCalendarComponent;
 
@@ -230,6 +232,7 @@ export class GenerarAgendaComponent implements OnInit {
   }
 
   handleDateSelect(selectInfo: DateSelectArg) {
+    console.log("handle date select");
     if (!this.profesionalSeleccionado) {
       this._ToastService.info("debe seleccionar primero un profesional");
       return;
@@ -285,6 +288,7 @@ export class GenerarAgendaComponent implements OnInit {
       end: end,
       end_time: end_time,
       tipo: null,
+      extendedprops:null
     };
 
     modalRef.componentInstance.data = info;
@@ -294,41 +298,10 @@ export class GenerarAgendaComponent implements OnInit {
         if (result.status == "ok") {
           //this.dataTableReload.reload(result.data.data);
           console.log("afuera", result.data.data);
-          /*
-          result.data.data.forEach(function (dia, index) {
-            dia.datesList.forEach(function (item, idx) {
-              console.log("entro");
-              let nuevaAgenda = {
-                backgroundColor: item["backgroundColor"],
-                end: item["end"],
-                id: item["id"],
-                profesional_id: item["profesional_id"],
-                start: item["start"],
-                textColor: item["textColor"],
-                title: item["title"],
-                tipo: item["tipo"],
-              };
-
-              calendarApi.addEvent(nuevaAgenda);
-            });
-          }); */
           this.getAgendaProfesional(
             //result.data.data[0].datesList[0].profesional_id
             this.profesionalSeleccionado.id
           );
-
-          /*let nuevaAgenda = {
-            backgroundColor: result.data.data.backgroundColor,
-            end: result.data.data.end,
-            id: result.data.data.id,
-            profesional_id: result.data.data.profesional_id,
-            start: result.data.data.start,
-            textColor: result.data.data.textColor,
-            title: result.data.data.title,
-            tipo: result.data.data.tipo,
-          };
-
-          calendarApi.addEvent(nuevaAgenda);*/
         }
       })
       .catch((error) => {});
@@ -380,6 +353,7 @@ export class GenerarAgendaComponent implements OnInit {
       end: end.split(" ")[0],
       end_time: end_time,
       tipo: clickInfo.event.extendedProps.tipo,
+      extendedprops : clickInfo.event.extendedProps
     };
 
     console.log("esta es la infooo ", info);
@@ -389,18 +363,11 @@ export class GenerarAgendaComponent implements OnInit {
     modalRef.result
       .then((result) => {
         if (result.status == "ok") {
-          //this.dataTableReload.reload(result.data.data);
-          let nuevaAgenda = {
-            backgroundColor: result.data.data.backgroundColor,
-            end: result.data.data.end,
-            id: result.data.data.id,
-            profesional_id: result.data.data.profesional_id,
-            start: result.data.data.start,
-            textColor: result.data.data.textColor,
-            title: result.data.data.title,
-          };
 
-          //calendarApi.addEvent(nuevaAgenda);
+          this.getAgendaProfesional(
+            //result.data.data[0].datesList[0].profesional_id
+            this.profesionalSeleccionado.id
+          );
         }
       })
       .catch((error) => {});

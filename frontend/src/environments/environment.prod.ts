@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: "https://pea-ecp.com/api/",
+  apiUrl: "https://pea-ecp.com/index.php/api/",
   server_root: "https://pea-ecp.com",
   auth: {
     postLogin: "auth/login",
@@ -28,6 +28,7 @@ export const environment = {
     buscarContrato: "comun/buscarcontrato",
     getClienteByCedula: "comun/getcliente/",
     buscarUsers: "comun/buscarusers",
+    getlistarAllUsers: "comun/listarusuarios/",
   },
   imports: {
     uploadExcelToProductRepso: "files/uploads/",

@@ -38,10 +38,15 @@ export class AgendaService {
   }  
 
   public postAgenda(id, data) {
-    return this._http.post<any>(
-      environment.apiUrl + environment.agenda.postAgendaProfesional + id,
-      data
-    );
+    if(data.id ==null){
+      return this._http.post<any>(
+        environment.apiUrl + environment.agenda.postAgendaProfesional + id,
+        data
+      );
+    }else{
+      return this._http.put<any>(environment.apiUrl + environment.agenda.putAgendaProfesional + data.id, data);
+    }
+
   }
   public postCita(data) {
     return this._http.post<any>(

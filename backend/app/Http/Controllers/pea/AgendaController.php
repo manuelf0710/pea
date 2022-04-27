@@ -750,9 +750,12 @@ class AgendaController extends Controller
                     ->get(); */
 
                 //$totalCitas = count($citas);
-               $citas = DB::select("SELECT citas.id,
+               $citas = DB::select("SELECT 
+                                    citas.agenda_id as agenda_id,
+                                    citas.id,
                                     citas.profesional_id,
                                     citas.ocupado AS tipo,
+                                    citas.razon_bloqueo as razon_bloqueo,
                                     lista_items.background as backgroundColor,
                                     lista_items.color AS textColor,
                                     citas.producto_id,
@@ -777,9 +780,11 @@ class AgendaController extends Controller
                                 AND citas.producto_id IS NOT NULL
                                 GROUP BY citas.producto_id
                                 UNION
-                                SELECT citas.id,
+                                SELECT citas.agenda_id as agenda_id,
+                                    citas.id,
                                     profesional_id,
                                     citas.ocupado AS tipo,
+                                    citas.razon_bloqueo as razon_bloqueo,
                                     lista_items.background as backgroundColor,
                                     lista_items.color AS textColor,
                                     citas.producto_id,
@@ -798,9 +803,11 @@ class AgendaController extends Controller
                                 AND citas.producto_id IS NULL
                                 UNION
                                 
-                                SELECT concat('agenda','_',agendas.id),
+                                SELECT  agendas.id as agenda_id,
+                                    concat('agenda','_',agendas.id),
                                     profesional_id,
                                     agendas.tipo,
+                                    '' as razon_bloqueo,
                                     lista_items.background AS backgroundcolor,
                                     lista_items.color AS textcolor,
                                     '' AS producto_id,
@@ -860,27 +867,31 @@ class AgendaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $rules = Producto::rules($request, $request->documento);
-        $validator = Validator::make($request->all(), $rules, Producto::$customMessages);
 
-        $update_producto = Producto::find($id);
+        $validator = Validator::make($request->all(), Cita::rules($request));
+        
+        $extendedProps = $request->post('extendedprops');
+        /*
+        echo(' el profesional '.$request->post('profesional_id'));
+        echo json_encode($extendedProps);
+        echo(' la agenda es ='.$extendedProps['agenda_id']);
+        echo(' el tipo=='.$request->post('tipo'));*/
+
+        $tipo = $request->post('tipo');
+        if(is_array($extendedProps)){
+            
+        }
+        
+        
+        $cita = cita::find($id);
         if (!($validator->fails())) {
-            $update_producto->sitio_id          = $request->sitio_id;
-            $update_producto->descripcion       = $request->descripcion;
-            $update_producto->sitio_id          = $request->sitio_id;
-            $update_producto->cantidad          = $request->cantidad;
-            $update_producto->estado_repso      = $request->estado_repso;
-            $update_producto->estado_id         = $request->estado_id;
-            $update_producto->cedula            = $request->cedula;
-            $update_producto->dependencia_id    = $request->dependencia_id;
-            $update_producto->modalidad         = $request->modalidad;
-            $update_producto->ciudad_id         = $request->ciudad_id;
-            $update_producto->observaciones     = $request->observaciones;
-            $update_producto->save();
+            $cita->ocupado = $tipo == 1 ? $tipo : $tipo;
+            $cita->razon_bloqueo =  $tipo == 1 ? null : $request->post('razon_bloqueo');
+            $cita->save();
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => $update_producto,
+                'data'   => $cita,
                 'msg'    => 'Actualizado',
             );
         } else {

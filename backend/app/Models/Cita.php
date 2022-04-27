@@ -23,6 +23,7 @@ class Cita extends Model
         'start',
         'end',
         'ocupado',
+        'razon_bloqueo'
     ];	
 
     protected $dates = ['deleted_at'];
@@ -35,11 +36,11 @@ class Cita extends Model
 	{
         $rules = [
             'profesional_id' => 'required',
-            'agenda_id' => 'required',
-            'producto_id' => 'required',
+            //'agenda_id' => 'required',
+            //'producto_id' => 'required',
             'start' => 'required',
             'end' => 'required',
-            'ocupado' => 'required',
+            //'ocupado' => 'required',
         ];
 		return $rules;
 	}    
