@@ -11,11 +11,11 @@
 <div class="row">
 
         <div class="col-sm-3 col-3 col-lg-2 text-center  mr-1" *ngFor="let modulo of modulos | filterfor : { nombre: modulosearch, descripcion: modulosearch }: false  ">
-          <div class="col ">
+          <div class="col-sm-12 ">
                 <button  type="button" class="btn btn-lg bg-light border border-dark" (click)="goTo(modulo)">
                   <i class="fa fa-5x fa-server text-dark"></i>
-                 {{modulo.nombre}}
-                </button>
+                 <br>{{modulo.nombre}}
+                </button><br>
 				 {{modulo.descripcion}}
           </div>
         </div> 
