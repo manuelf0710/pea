@@ -129,7 +129,7 @@ class AgendaController extends Controller
         }
     }
 
-    public function enableAgenda( Request $request )
+    public function enableAgenda(Request $request)
     {
         $tipoproducto_id = $request->post('tipo_producto');
         $citas = DB::table('agendas')
@@ -327,93 +327,94 @@ class AgendaController extends Controller
         return $response;
     }
 
-    public function validarUniqueDayselectable($start, $end){
+    public function validarUniqueDayselectable($start, $end)
+    {
         $response = array();
-               
-        if($start !== $end){
+
+        if ($start !== $end) {
             $response = array(
                 'status' => 'errortime',
                 'code' => 200,
                 'data'   => -1,
-                'msg'    => 'fecha inicio '.$start.' es diferente de '.$end.', estas fechas deben ser iguales, lo que varia es la hora'
+                'msg'    => 'fecha inicio ' . $start . ' es diferente de ' . $end . ', estas fechas deben ser iguales, lo que varia es la hora'
             );
         }
-        return $response; 
+        return $response;
     }
 
     /*
   * Validar que las fracciones de tiempo ninguna este ocupada con valor 2 o 3
    */
-  function validarOcupado($datesAgenda)
-  {
-      $response = array();
-      if (count($datesAgenda) > 0) {
-          $arr_output = array_filter(json_decode($datesAgenda, true), function ($item) {
-              if ($item['ocupado'] != 1) {
-                  return $item;
-              }
-          });
-          if(count($arr_output)){
-            $response = array(
-                'status' => 'errorocupado',
-                "msg" => "Las horas elegidas no son validas, algunas horas se encuentran ocupadas",
-                "data" => $arr_output,
-                "size" => count($arr_output)
-  
-            );
-          }
+    function validarOcupado($datesAgenda)
+    {
+        $response = array();
+        if (count($datesAgenda) > 0) {
+            $arr_output = array_filter(json_decode($datesAgenda, true), function ($item) {
+                if ($item['ocupado'] != 1) {
+                    return $item;
+                }
+            });
+            if (count($arr_output)) {
+                $response = array(
+                    'status' => 'errorocupado',
+                    "msg" => "Las horas elegidas no son validas, algunas horas se encuentran ocupadas",
+                    "data" => $arr_output,
+                    "size" => count($arr_output)
 
-          return $response;
-      }
+                );
+            }
 
-      return $response;
-  }
+            return $response;
+        }
 
-  /*
+        return $response;
+    }
+
+    /*
   * @function getMinimoAndMaxId
   * obtiene el minimo y el maximo id de citas para actualizar
    */
-  public function getMinimoAndMaxId($datesAgenda){
-      $minimo = 0;
-      $maximo = 0;
-      for($i= 0; $i < count($datesAgenda); $i++){
-        if($i == 0) {
-            $minimo = $datesAgenda[$i]->id; 
-            $maximo = $datesAgenda[$i]->id; 
-         }
-         $minimo = $minimo > $datesAgenda[$i]->id ? $datesAgenda[$i]->id : $minimo;
-         $maximo = $maximo < $datesAgenda[$i]->id ? $datesAgenda[$i]->id : $maximo;
-              
-      
-  } 
-  //echo("el minimo es ".$minimo. ' y el maximo = '.$maximo);
-  return array('minimo' => $minimo,  'maximo' => $maximo);
-}
+    public function getMinimoAndMaxId($datesAgenda)
+    {
+        $minimo = 0;
+        $maximo = 0;
+        for ($i = 0; $i < count($datesAgenda); $i++) {
+            if ($i == 0) {
+                $minimo = $datesAgenda[$i]->id;
+                $maximo = $datesAgenda[$i]->id;
+            }
+            $minimo = $minimo > $datesAgenda[$i]->id ? $datesAgenda[$i]->id : $minimo;
+            $maximo = $maximo < $datesAgenda[$i]->id ? $datesAgenda[$i]->id : $maximo;
+        }
+        //echo("el minimo es ".$minimo. ' y el maximo = '.$maximo);
+        return array('minimo' => $minimo,  'maximo' => $maximo);
+    }
 
 
-    public function guardarBloqueoAndInforme($obj, $tipo, $razonBloqueo){
+    public function guardarBloqueoAndInforme($obj, $tipo, $razonBloqueo)
+    {
         $response = array(
             'status' => 'ok',
             'code' => 200,
             'data'   => $obj,
             'msg'    =>  $tipo == 2 ? 'Bloqueo guardado' : 'Informe Guardado'
-        );  
+        );
         //echo("function guardarBloqueoAndInforme() el minimo es ".$obj['minimo']. ' el maximo es  = '.$obj['maximo']);
         DB::table('citas')
-        ->where('id', '>=', $obj['minimo'])
-        ->where('id', '<=', $obj['maximo'])
-        ->update(['ocupado' => $tipo, 'razon_bloqueo' => $razonBloqueo]);
+            ->where('id', '>=', $obj['minimo'])
+            ->where('id', '<=', $obj['maximo'])
+            ->update(['ocupado' => $tipo, 'razon_bloqueo' => $razonBloqueo]);
 
         return $response;
-
     }
 
-    public function getCitasAgenda($dateStart, $newDateEnd, $agendaId){
+    public function getCitasAgenda($dateStart, $newDateEnd, $agendaId)
+    {
         $datesAgenda = DB::table('citas')
-        ->where('citas.agenda_id', '=', $agendaId)
-        ->whereBetween('start', [$dateStart, $newDateEnd])
-        ->get();  
-        return $datesAgenda;      
+            ->where('citas.agenda_id', '=', $agendaId)
+            ->whereBetween('start', [$dateStart, $newDateEnd])
+            ->get();
+        return $datesAgenda;
     }
 
 
@@ -435,11 +436,11 @@ class AgendaController extends Controller
             * validar que no permita seleccionar varios dias en rango en fullcalendar
              */
 
-             $validarUnicoDay = $this->validarUniqueDayselectable($dateStart->format('Y-m-d'), $dateEnd->format('Y-m-d'));
-             if (count($validarUnicoDay) > 0) {
+            $validarUnicoDay = $this->validarUniqueDayselectable($dateStart->format('Y-m-d'), $dateEnd->format('Y-m-d'));
+            if (count($validarUnicoDay) > 0) {
                 return response()->json($validarUnicoDay);
             }
-            
+
             /*
             * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
              */
@@ -456,7 +457,7 @@ class AgendaController extends Controller
             $validarMax = $this->validarFechaFinPermitida($dateStart, $dateEnd);
             if (count($validarMax) > 0) {
                 return response()->json($validarMax);
-            }             
+            }
 
             /*
             *  Validar que solo permita guardar fechas mayores a hoy
@@ -475,45 +476,45 @@ class AgendaController extends Controller
             $getDateStart = $dateStart->format('Y-m-d');
             $agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart, $id, 1);
 
-                switch($request->post('tipo')) {
+            switch ($request->post('tipo')) {
 
-                    case 1:                    
-                        //$agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart[0], $id, $request->post('tipo'));  
-                        if (count($agendaByDayValidateStart) > 0) {
-                            $response = array(
-                                'status' => 'errortime',
-                                'code' => 200,
-                                'data'   => -1,
-                                'msg'    => 'ya existe una agenda programada para el profesional seleccionado en la fecha '.$getDateStart[0]
-                            );                
-                            return response()->json($response);
-                        }        
-                    break;
-                    
-                    case 2:                    
-                        if (count($agendaByDayValidateStart) == 0) {
-                            $response = array(
-                                'status' => 'errortime',
-                                'code' => 200,
-                                'data'   => -1,
-                                'msg'    => 'Para almacenar un tiempo de bloqueo primero debe tener una agenda programada y sobre esta bloquear el tiempo'
-                            );                
-                            return response()->json($response);                        
-                        }                   
-                    break;                    
-                    case 3:                    
-                        if (count($agendaByDayValidateStart) == 0) {
-                            $response = array(
-                                'status' => 'errortime',
-                                'code' => 200,
-                                'data'   => -1,
-                                'msg'    => 'Para almacenar un tiempo de informe primero debe tener una agenda programada y sobre esta agregar el tiempo'
-                            );                
-                            return response()->json($response);                        
-                        }                     
-                    break;                    
-                    default:                    
+                case 1:
+                    //$agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart[0], $id, $request->post('tipo'));  
+                    if (count($agendaByDayValidateStart) > 0) {
+                        $response = array(
+                            'status' => 'errortime',
+                            'code' => 200,
+                            'data'   => -1,
+                            'msg'    => 'ya existe una agenda programada para el profesional seleccionado en la fecha ' . $getDateStart[0]
+                        );
+                        return response()->json($response);
                     }
+                    break;
+
+                case 2:
+                    if (count($agendaByDayValidateStart) == 0) {
+                        $response = array(
+                            'status' => 'errortime',
+                            'code' => 200,
+                            'data'   => -1,
+                            'msg'    => 'Para almacenar un tiempo de bloqueo primero debe tener una agenda programada y sobre esta bloquear el tiempo'
+                        );
+                        return response()->json($response);
+                    }
+                    break;
+                case 3:
+                    if (count($agendaByDayValidateStart) == 0) {
+                        $response = array(
+                            'status' => 'errortime',
+                            'code' => 200,
+                            'data'   => -1,
+                            'msg'    => 'Para almacenar un tiempo de informe primero debe tener una agenda programada y sobre esta agregar el tiempo'
+                        );
+                        return response()->json($response);
+                    }
+                    break;
+                default:
+            }
             /*
             if($request->post('tipo') == 2 || $request->post('tipo') == 3 && ($diffOnDays == 0)){
                 //echo json_encode($agendaByDayValidateStart);
@@ -581,7 +582,7 @@ class AgendaController extends Controller
             }
             $indexAgenda = 0;
             foreach ($datesArray as $item) {
-                    if($request->post('tipo') == '1'){
+                if ($request->post('tipo') == '1') {
                     $modelo = new Agenda();
                     $modelo->profesional_id = $id;
                     $modelo->tipo    = $request->post('tipo');
@@ -609,7 +610,7 @@ class AgendaController extends Controller
                             $newRecord->save();
                         }
                     }
-                }else{
+                } else {
                     $agendaByDay = $this->validarOnlyEnableAgendaByDay($item['onlyDate'], $id, $request->post('tipo'));
                     if (count($agendaByDay) > 0) {
                         //echo("antessS?");
@@ -630,22 +631,18 @@ class AgendaController extends Controller
                             //echo("ingresa ".json_encode($datesAgenda));
                             $minimoAndMaxId = $this->getMinimoAndMaxId($datesAgenda);
                             //echo(json_encode($minimoAndMaxId).' (??)');
-                            if($minimoAndMaxId['minimo'] == 0 || $minimoAndMaxId['maximo'] == 0){
-                                
-                            }else{
-                                $guardarBloqueo = $this->guardarBloqueoAndInforme($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo')); 
+                            if ($minimoAndMaxId['minimo'] == 0 || $minimoAndMaxId['maximo'] == 0) {
+                            } else {
+                                $guardarBloqueo = $this->guardarBloqueoAndInforme($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo'));
                             }
+                        }
 
-                            
-                            
-                        }  
-                        
                         //echo(json_encode($datesAgenda));
                     }
                 }
                 $indexAgenda++;
             }
-       
+
 
 
             $response = array(
@@ -750,7 +747,7 @@ class AgendaController extends Controller
                     ->get(); */
 
                 //$totalCitas = count($citas);
-               $citas = DB::select("SELECT 
+                $citas = DB::select("SELECT 
                                     citas.agenda_id as agenda_id,
                                     citas.id,
                                     citas.profesional_id,
@@ -773,10 +770,10 @@ class AgendaController extends Controller
                                 FROM citas
                                 inner join productos on citas.producto_id = productos.id
                                 inner join lista_items on productos.estado_id = lista_items.id
-                                WHERE citas.profesional_id = 10
+                                WHERE citas.profesional_id = '" . $id . "'
                                 AND citas.ocupado = 2
-                                AND date_format(start, '%Y-%m-%d') >= '".$startDateView."'
-                                AND date_format(end, '%Y-%m-%d') <= '".$endDateView."'
+                                AND date_format(start, '%Y-%m-%d') >= '" . $startDateView . "'
+                                AND date_format(end, '%Y-%m-%d') <= '" . $endDateView . "'
                                 AND citas.producto_id IS NOT NULL
                                 GROUP BY citas.producto_id
                                 UNION
@@ -796,10 +793,10 @@ class AgendaController extends Controller
                                 start, citas.end AS end
                                 FROM citas
                                 INNER JOIN lista_items ON citas.ocupado = lista_items.id
-                                WHERE profesional_id =  '".$id."'
+                                WHERE profesional_id =  '" . $id . "'
                                 AND citas.ocupado in (2, 3)
-                                AND date_format(start, '%Y-%m-%d') >=  '".$startDateView."'
-                                AND date_format(end, '%Y-%m-%d') <=  '".$endDateView."'
+                                AND date_format(start, '%Y-%m-%d') >=  '" . $startDateView . "'
+                                AND date_format(end, '%Y-%m-%d') <=  '" . $endDateView . "'
                                 AND citas.producto_id IS NULL
                                 UNION
                                 
@@ -819,9 +816,9 @@ class AgendaController extends Controller
                                 start, agendas.end AS end
                                 FROM agendas
                                 INNER JOIN lista_items ON agendas.tipo = lista_items.id
-                                WHERE profesional_id =  '".$id."'
-                                AND date_format(start, '%Y-%m-%d') >=  '".$startDateView."'
-                                AND date_format(end, '%Y-%m-%d') <=  '".$endDateView."'");
+                                WHERE profesional_id =  '" . $id . "'
+                                AND date_format(start, '%Y-%m-%d') >=  '" . $startDateView . "'
+                                AND date_format(end, '%Y-%m-%d') <=  '" . $endDateView . "'");
 
                 $totalCitas = count($citas);
 
@@ -868,8 +865,19 @@ class AgendaController extends Controller
     public function update(Request $request, $id)
     {
 
+        /*$datesArray = array();
+        $timeStart = $this->obtenerHoraFecha($request->post('start'));
+        $timeEnd = $this->obtenerHoraFecha($request->post('end'));
+        $dateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('start'));
+        $dateEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('end'));
+        $newDateEnd = $dateEnd->subMinute($this->minutesToAdd, 'minute');
+        $dateRepeat = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('repeat_end') . ' ' . $timeStart);
+        $diffOnDays = $dateStart->diffInDays($dateRepeat);
+        $diffOnMinutes = $dateStart->diffInMinutes($dateEnd);*/
+
+
         $validator = Validator::make($request->all(), Cita::rules($request));
-        
+
         $extendedProps = $request->post('extendedprops');
         /*
         echo(' el profesional '.$request->post('profesional_id'));
@@ -878,11 +886,10 @@ class AgendaController extends Controller
         echo(' el tipo=='.$request->post('tipo'));*/
 
         $tipo = $request->post('tipo');
-        if(is_array($extendedProps)){
-            
+        if (is_array($extendedProps)) {
         }
-        
-        
+
+
         $cita = cita::find($id);
         if (!($validator->fails())) {
             $cita->ocupado = $tipo == 1 ? $tipo : $tipo;

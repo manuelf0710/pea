@@ -78,7 +78,7 @@ export class SolicitudComponent implements OnInit {
           Validators.min(2022),
         ],
       ],
-      descripcion: [descripcion, [Validators.required]],
+      descripcion: [descripcion],
       cantidad: [
         cantidad,
         [

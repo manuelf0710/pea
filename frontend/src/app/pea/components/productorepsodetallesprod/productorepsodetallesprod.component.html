@@ -629,19 +629,7 @@
                     <div class="input-group-append">
                       <i class="fa fa-calendar" (click)="d.toggle()"></i>
                     </div>
-                  </div>
-                  <div
-                    *ngIf="
-                      formulario.get('fecha_seguimiento').errors &&
-                      formulario.get('fecha_seguimiento').touched
-                    "
-                  >
-                    <small
-                      *ngIf="formulario.get('fecha_seguimiento').hasError('required')"
-                      class="form-text text-danger"
-                      >el campo fecha seguimiento no debe estar vacío.</small
-                    >
-                  </div>                  
+                  </div>                 
                 </div>
               </div>
 
@@ -706,21 +694,6 @@
                       <option value="1">Si</option>
                       <option value="2">No</option>
                     </select>
-                  </div>
-
-                  <div
-                    *ngIf="
-                      formulario.get('pyp_ergonomia').errors &&
-                      formulario.get('pyp_ergonomia').touched
-                    "
-                  >
-                    <small
-                      *ngIf="
-                        formulario.get('pyp_ergonomia').hasError('required')
-                      "
-                      class="form-text text-danger"
-                      >el campo pyp ergonomia no debe estar vacío.</small
-                    >
                   </div>
                 </div>
               </div>

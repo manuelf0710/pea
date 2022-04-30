@@ -191,18 +191,6 @@
                   formControlName="descripcion"
                 />
               </div>
-              <div
-                *ngIf="
-                  formulario.get('descripcion').errors &&
-                  formulario.get('descripcion').touched
-                "
-              >
-                <small
-                  *ngIf="formulario.get('descripcion').hasError('required')"
-                  class="form-text text-danger"
-                  >el campo descripción no debe estar vacío.</small
-                >
-              </div>
             </div>
           </div>
           <div class="col-md-6 col-lg-6 col-xs-12">

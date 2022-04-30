@@ -111,10 +111,10 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       modalidad: ["", [Validators.required]],
       descripcion: ["", [Validators.required]],
       numero_citas: [null],
-      fecha_seguimiento: ["", [Validators.required]],
+      fecha_seguimiento: [null],
       estado_programacion: [null],
       comentarios: [null],
-      pyp_ergonomia: ["", [Validators.required]],
+      pyp_ergonomia: [""],
       profesionalsearch: [""],
       fechadisponiblesearch: [""],
     });
@@ -156,7 +156,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     //this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
 
     console.log("registropersona ", this.personaGestion);
-    if (item.estado_id == 9) {
+    if (item.estado_id == 9 && this.mostrarRegistro) {
       this.agendaDisponibleProfesionales();
     } else {
       this.agendasDisponibles = null;
@@ -306,12 +306,15 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this._ToastService.info("esta persona ya ha sido programada");
       return;
     }
+
     if (this.formulario.valid) {
       const modalRef = this.modalService.open(NuevacitaComponent, {
         backdrop: "static",
         size: "xs",
         keyboard: false,
-      });
+      });      
+      this.formulario.get("fecha_seguimiento").value == undefined ? this.formulario.get('fecha_seguimiento').setValue(null) : this.formulario.get("fecha_seguimiento").value;
+      
 
       modalRef.componentInstance.data = {
         cita: cita,
