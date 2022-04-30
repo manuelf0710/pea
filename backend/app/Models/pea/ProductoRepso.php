@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ProductoRepso extends Model
 {
@@ -60,11 +61,26 @@ class ProductoRepso extends Model
 	public function profesional()
 	{
 		return $this->hasOne('App\User',  'id', 'profesional_id');
-	}	
+	}
 
 	public function scopeDescripcion($query, $des)
 	{
 		if ($des)
 			return $query->where('descripcion', 'like', "%$des$%");
+	}
+
+	public function scopeProgramadorProfesional($query, $perfil_id, $user_id)
+	{
+		if ($perfil_id == 2) {
+			return $query->where('profesional_id', '=', "$user_id");
+		}
+		if ($perfil_id == 3) {
+			return $query->whereRaw(DB::raw(
+				"(select productos.id 
+					from productos
+				 where productos_repso.id = productos.producto_repso_id
+				 and productos.profesional_id ='" . $user_id . "' limit 1) > 0"
+			));
+		}
 	}
 }

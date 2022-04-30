@@ -79,4 +79,10 @@ class User extends Authenticatable implements JWTSubject
         if ($profile != '')
             return $query->where('users.perfil_id', '=', "$profile");
     }
+
+    public function scopeNombre($query, $cat)
+    {
+        if ($cat)
+            return $query->where('users.name', 'like', "%$cat%");
+    }
 }

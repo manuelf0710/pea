@@ -223,6 +223,7 @@ class ProductoController extends Controller
                 ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
                 ->withoutTrashed()->orderBy('productos.id', 'desc')
                 ->where('producto_repso_id', '=', $id)
+                ->profesionalAsignado(auth()->user()->perfil_id, auth()->user()->id)
                 ->paginate($pageSize);
         }
 
@@ -287,11 +288,11 @@ class ProductoController extends Controller
                 if ($validacion == 0) {
                     foreach ($importClientes->clientesImportar as $item) {
                         $getClient = DB::table('productos')
-                                    ->where('producto_repso_id', '=', $id)
-                                    ->where('cedula', '=', $item['cedula'])
-                                    ->first();
-                        if(!$getClient) {
-                            if($item['cedula']>100000){
+                            ->where('producto_repso_id', '=', $id)
+                            ->where('cedula', '=', $item['cedula'])
+                            ->first();
+                        if (!$getClient) {
+                            if ($item['cedula'] > 100000) {
                                 $producto = new Producto();
                                 $producto->producto_repso_id = $id;
                                 $producto->estado_id = 9;
@@ -301,7 +302,6 @@ class ProductoController extends Controller
                                 $producto->save();
                             }
                         }
-
                     }
                 } else {
                     //return response()->json($importClientes->clientesImportar);

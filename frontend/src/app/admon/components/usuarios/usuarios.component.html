@@ -1,1 +1,9 @@
-<p>usuarios works!</p>
+<app-loading *ngIf="loading"></app-loading>
+<app-bgtable
+  [tableConfig]="tableConfig"
+  [customFilters]="customFilters"
+  (editarAction)="editarUsuario($event)"
+  (nuevoAction)="agregarUsuario($event)"
+  (eliminarAction)="eliminar($event)"
+  *ngIf="!loading"
+></app-bgtable>

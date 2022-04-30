@@ -60,6 +60,12 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 	});
 
 	Route::group([
+		'prefix' => 'admon',
+	], function () {
+		Route::post('userslist', 'UserController@listado')->name('users.listado');
+	});		
+
+	Route::group([
 		'prefix' => 'pea',
 	], function () {
 		//Route::post('productoslist/{id}', 'pos\ProductoController@listado')->name('productos_listado');

@@ -45,6 +45,9 @@ export const environment = {
     postAgendaDisponibleAllProfesional: "pea/agenda/agendadisponible/",
     postCita: "pea/cita",
   },
+  admon:{
+    postUsersList : 'admon/userslist',
+  }
 };
 
 /*

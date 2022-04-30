@@ -51,7 +51,8 @@ class ProductoRepsoController extends Controller
                 ->globalSearch($globalSearch)
                 ->paginate($pageSize);
         } else {
-            $response = ProductoRepso::with('regional', 'contrato', 'tipoproducto','profesional')->withoutTrashed()->orderBy('productos_repso.id', 'desc')
+            $response = ProductoRepso::with('regional', 'contrato', 'tipoproducto', 'profesional')->withoutTrashed()->orderBy('productos_repso.id', 'desc')
+                ->programadorProfesional(auth()->user()->perfil_id, auth()->user()->id)
                 ->paginate($pageSize);
         }
 
@@ -115,11 +116,11 @@ class ProductoRepsoController extends Controller
      */
     public function show($id)
     {
-       /*$response = ProductoRepso::with('regional', 'contrato', 'tipoProducto')->withoutTrashed()
+        /*$response = ProductoRepso::with('regional', 'contrato', 'tipoProducto')->withoutTrashed()
                     ->where('id','=', $id)
                     ->orderBy('productos_repso.id', 'desc')->get();*/
-        $response = ProductoRepso::with('regional', 'contrato', 'tipoProducto')->find( $id ) ;                  
-       return response()->json($response);
+        $response = ProductoRepso::with('regional', 'contrato', 'tipoProducto')->find($id);
+        return response()->json($response);
     }
 
     /**

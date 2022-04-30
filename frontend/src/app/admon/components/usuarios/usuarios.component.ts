@@ -23,11 +23,6 @@ export class UsuariosComponent implements OnInit {
     acciones: {
       edit: true,
       delete: true,
-      copy: {
-        label: "programar",
-        icon: "fa fa-tasks",
-        class: "btn btn-success btn-sm",
-      },
       new: true,
     },
     exports: [],
@@ -42,43 +37,36 @@ export class UsuariosComponent implements OnInit {
       type: "text",
     },
     {
-      title: "Tipo Producto",
-      data: "tipoproducto.name",
+      title: "Nombre",
+      data: "name",
+      orderable: false,
+      searchable: true,
+      type: "text",
+    },
+    {
+      title: "Email",
+      data: "email",
       orderable: false,
       searchable: false,
       type: "text",
     },
     {
-      title: "cantidad",
-      data: "cantidad",
+      title: "perfil",
+      data: "perfil",
       orderable: false,
       searchable: false,
       type: "text",
     },
     {
-      title: "regional",
-      data: "regional.nombre",
+      title: "Cédula",
+      data: "cedula",
       orderable: false,
       searchable: false,
       type: "text",
     },
     {
-      title: "Contrato",
-      data: "contrato.nombre",
-      orderable: false,
-      searchable: false,
-      type: "text",
-    },
-    {
-      title: "Programador",
-      data: "profesional.name",
-      orderable: false,
-      searchable: false,
-      type: "text",
-    },
-    {
-      title: "Descripción",
-      data: "descripcion",
+      title: "Estado",
+      data: "status_des",
       orderable: false,
       searchable: false,
       type: "text",
@@ -89,23 +77,20 @@ export class UsuariosComponent implements OnInit {
     buttons: this.buttons,
     listado_seleccion: true,
     columns: this.columns,
-    url: environment.apiUrl + environment.solicitud.getAll,
+    url: environment.apiUrl + environment.admon.postUsersList,
     globalSearch: false,
     rowSearch: false,
     advancedSearch: true,
-    paginatorPosition: "bottom",
+    paginatorPosition: "both",
     customFilters: [],
   };
+
+  customFilters: any = []; 
   constructor(private route: ActivatedRoute, private router: Router) {}
 
   ngOnInit(): void {}
 
-  agregarSolicitud(ev) {}
-  editarSolicitud(ev) {}
+  agregarUsuario(ev) {}
+  editarUsuario(ev) {}
   eliminar(ev) {}
-  programar(ev) {
-    this.router.navigate(["/pea/solicitudproductos"], {
-      queryParams: { id: ev.id },
-    });
-  }
 }

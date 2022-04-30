@@ -65,4 +65,11 @@ class Producto extends Model
 		if ($des)
 			return $query->where('descripcion', 'like', "%$des$%");
 	}
+
+	public function scopeProfesionalAsignado($query, $perfil_id, $user_id)
+	{
+		if ($perfil_id == 3) {
+			return $query->where('productos.profesional_id', '=', "$user_id");
+		}
+	}
 }

@@ -20,7 +20,7 @@ class UserController extends Controller
 	 */
 	public function __construct()
 	{
-		$this->middleware('auth');
+		//$this->middleware('auth');
 	}
 	/**
 	 * Show the application dashboard.
@@ -28,7 +28,8 @@ class UserController extends Controller
 	 * @return \Illuminate\Contracts\Support\Renderable
 	 */
 
-	 public function listarAll(Request $request){
+	public function listarAll(Request $request)
+	{
 		$profile = $request->post('profile');
 
 		$productos = User::withoutTrashed()
@@ -37,7 +38,38 @@ class UserController extends Controller
 			->profile($profile)
 			->get();
 		return response()->json($productos);
-	 }
+	}
+
+	public function listado(Request $request)
+	{
+		$pageSize = $request->get('pageSize');
+		$pageSize == '' ? $pageSize = 20 : $pageSize;
+
+		$nombre = $request->get('name');
+		$perfil_id = $request->get('perfil_id');
+		$cedula = $request->get('cedula');
+		$globalSearch = $request->get('globalsearch');
+
+		if ($globalSearch != '') {
+			$users = DB::table('users')
+				->join('perfiles', 'users.perfil_id', '=', 'perfiles.id')
+				->select('users.id', 'users.name', 'users.email', 'users.perfil_id', 'users.cedula', 'users.status', 'perfiles.nombre as perfil')
+				->addSelect(DB::raw('case users.status when 1 then "Activo" else "Inactivo" end status_des'))
+				->where('users.status', '=', 1)
+				->whereNull('users.deleted_at')
+				->paginate($pageSize);
+		} else {
+			$users = DB::table('users')
+				->join('perfiles', 'users.perfil_id', '=', 'perfiles.id')
+				->select('users.id', 'users.name', 'users.email', 'users.perfil_id', 'users.cedula', 'users.status', 'perfiles.nombre as perfil')
+				->addSelect(DB::raw('case users.status when 1 then "Activo" else "Inactivo" end status_des'))
+				->where('users.status', '=', 1)
+				->whereNull('users.deleted_at')
+				//->Nombre($nombre)
+				->paginate($pageSize);
+		}
+		return response()->json($users);
+	}
 
 
 	public function buscarUser(Request $request)
