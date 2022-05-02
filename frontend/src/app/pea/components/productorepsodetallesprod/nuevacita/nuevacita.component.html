@@ -142,6 +142,39 @@
           </div>
         </div>
       </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Bloquear 15 minutos siguientes</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"
+                ><i class="fa fa-clock-o"></i
+              ></span>
+            </div>
+            <select
+            name="block_cita"
+            id="block_cita"
+            class="form form-control-sm"
+            formControlName="block_cita"
+          >
+            <option value="1">Si</option>
+            <option value="2">No</option>
+          </select>
+          </div>
+          <div
+            *ngIf="
+              formulario.get('block_cita').errors &&
+              formulario.get('block_cita').touched
+            "
+          >
+            <small
+              *ngIf="formulario.get('block_cita').hasError('required')"
+              class="form-text text-danger"
+              >el campo hora fin no debe estar vacío.</small
+            >
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

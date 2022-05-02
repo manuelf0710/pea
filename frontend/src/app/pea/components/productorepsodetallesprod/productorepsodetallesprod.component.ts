@@ -156,12 +156,15 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     //this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
 
     console.log("registropersona ", this.personaGestion);
+    console.log("valor de mostrar registro ", this.mostrarRegistro);
+    console.log("item estado_id ", item.estado_id);
     if (item.estado_id == 9 && this.mostrarRegistro) {
       this.agendaDisponibleProfesionales();
     } else {
+      console.log("entra en agendasdisponibles null");
       this.agendasDisponibles = null;
     }
-
+    console.log("agendas dipooonibles ", this.agendasDisponibles);
     this.setvaluesFormulario();
   }
 
@@ -312,9 +315,10 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         backdrop: "static",
         size: "xs",
         keyboard: false,
-      });      
-      this.formulario.get("fecha_seguimiento").value == undefined ? this.formulario.get('fecha_seguimiento').setValue(null) : this.formulario.get("fecha_seguimiento").value;
-      
+      });
+      this.formulario.get("fecha_seguimiento").value == undefined
+        ? this.formulario.get("fecha_seguimiento").setValue(null)
+        : this.formulario.get("fecha_seguimiento").value;
 
       modalRef.componentInstance.data = {
         cita: cita,

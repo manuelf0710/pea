@@ -44,6 +44,7 @@ export class NuevacitaComponent implements OnInit {
     let start = null;
     let start_time = null;
     let end = null;
+    let blockCita = 1;
     if (this.data) {
       console.log("la data ", this.data);
 
@@ -80,6 +81,7 @@ export class NuevacitaComponent implements OnInit {
       start_time: [start_time],
       end: [end, [Validators.required]],
       end_time: [null, [Validators.required]],
+      block_cita : [blockCita, [Validators.required]]
     });
   }
 

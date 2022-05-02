@@ -30,6 +30,17 @@ class AgendaController extends Controller
     public $today;
     private $hasError = false;
 
+
+    public $timeStart;
+    public $timeEnd;
+    public $dateStart;
+    public $dateEnd;
+    public $newDateEnd;
+    public $dateRepeat;
+    public $diffOnDays;
+    public $diffOnMinutes;
+    public $tipoProductoData;
+
     public function __construct()
     {
         $this->today = date('Y-m-d');
@@ -125,13 +136,20 @@ class AgendaController extends Controller
                 "dateformat_name" => $arreglo[0]['dateformat_name'],
                 "minutes" => $size * $this->rango,
             );
-            array_push($this->tiempos, $arr);
+            if ($size * $this->rango >= $this->tipoProductoData->tiempo) {
+                array_push($this->tiempos, $arr);
+            }
         }
     }
 
     public function enableAgenda(Request $request)
     {
         $tipoproducto_id = $request->post('tipo_producto');
+
+        $this->tipoProductoData = DB::table('tipo_productos')
+            ->where('id', '=', $tipoproducto_id)
+            ->first();
+
         $citas = DB::table('agendas')
             ->join('citas', 'agendas.id', '=', 'citas.agenda_id')
             ->join('users', 'citas.profesional_id', '=', 'users.id')
@@ -174,7 +192,7 @@ class AgendaController extends Controller
                         //echo ('<br>' . $citas[$siguiente - 1]['start']);
                         $dateFormatNameData = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $cita['start']);
                         $dateFormatName = $dateFormatNameData->locale('es')->isoFormat('dddd DD, MMMM');;
-                        if ($siguiente < count($citas) && $this->minutosInterval($cita['start'], $citas[$siguiente]['start']) == 15) {
+                        if ($siguiente < count($citas) && $this->minutosInterval($cita['start'], $citas[$siguiente]['start']) == $this->minutesToAdd) {
                             array_push($recolector, array(
                                 "profesional" => $cita['profesional'],
                                 "profesional_id" => $cita['profesional_id'],
@@ -387,22 +405,30 @@ class AgendaController extends Controller
             $maximo = $maximo < $datesAgenda[$i]->id ? $datesAgenda[$i]->id : $maximo;
         }
         //echo("el minimo es ".$minimo. ' y el maximo = '.$maximo);
+        if ($minimo > $maximo) {
+            $minimo = 0;
+            $maximo = 0;
+        }
+
         return array('minimo' => $minimo,  'maximo' => $maximo);
     }
 
 
-    public function guardarBloqueoAndInforme($obj, $tipo, $razonBloqueo)
+    public function actualizarRangosCitas($obj, $tipo, $razonBloqueo, $agenda_id)
     {
+        $razonBloqueo = $tipo == 1 ? null : $razonBloqueo;
+
         $response = array(
             'status' => 'ok',
             'code' => 200,
             'data'   => $obj,
             'msg'    =>  $tipo == 2 ? 'Bloqueo guardado' : 'Informe Guardado'
         );
-        //echo("function guardarBloqueoAndInforme() el minimo es ".$obj['minimo']. ' el maximo es  = '.$obj['maximo']);
         DB::table('citas')
             ->where('id', '>=', $obj['minimo'])
             ->where('id', '<=', $obj['maximo'])
+            ->where('citas.agenda_id', '=', $agenda_id)
+            ->whereNull('citas.producto_id')
             ->update(['ocupado' => $tipo, 'razon_bloqueo' => $razonBloqueo]);
 
         return $response;
@@ -417,26 +443,33 @@ class AgendaController extends Controller
         return $datesAgenda;
     }
 
+    private function setVarsTime($request)
+    {
+
+        $this->timeStart = $this->obtenerHoraFecha($request->post('start'));
+        $this->timeEnd = $this->obtenerHoraFecha($request->post('end'));
+        $this->dateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('start'));
+        $this->dateEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('end'));
+        $this->newDateEnd = $this->dateEnd->subMinute($this->minutesToAdd, 'minute');
+        $this->dateRepeat = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('repeat_end') . ' ' . $this->timeStart);
+        $this->diffOnDays = $this->dateStart->diffInDays($this->dateRepeat);
+        $this->diffOnMinutes = $this->dateStart->diffInMinutes($this->dateEnd);
+    }
+
 
     public function store(Request $request, $id)
     {
         $validator = Validator::make($request->all(), Agenda::rules($request));
         if (!($validator->fails())) {
+            $this->setVarsTime($request);
+
             $datesArray = array();
-            $timeStart = $this->obtenerHoraFecha($request->post('start'));
-            $timeEnd = $this->obtenerHoraFecha($request->post('end'));
-            $dateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('start'));
-            $dateEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('end'));
-            $newDateEnd = $dateEnd->subMinute($this->minutesToAdd, 'minute');
-            $dateRepeat = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('repeat_end') . ' ' . $timeStart);
-            $diffOnDays = $dateStart->diffInDays($dateRepeat);
-            $diffOnMinutes = $dateStart->diffInMinutes($dateEnd);
 
             /*
             * validar que no permita seleccionar varios dias en rango en fullcalendar
              */
 
-            $validarUnicoDay = $this->validarUniqueDayselectable($dateStart->format('Y-m-d'), $dateEnd->format('Y-m-d'));
+            $validarUnicoDay = $this->validarUniqueDayselectable($this->dateStart->format('Y-m-d'), $this->dateEnd->format('Y-m-d'));
             if (count($validarUnicoDay) > 0) {
                 return response()->json($validarUnicoDay);
             }
@@ -444,7 +477,7 @@ class AgendaController extends Controller
             /*
             * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
              */
-            $validarMax = $this->validarFechaFinPermitida($dateStart, $dateRepeat);
+            $validarMax = $this->validarFechaFinPermitida($this->dateStart, $this->dateRepeat);
             if (count($validarMax) > 0) {
                 return response()->json($validarMax);
             }
@@ -454,7 +487,7 @@ class AgendaController extends Controller
             * validar que fecha hora inicio no sea mayuor que fecha hhora fina
              */
 
-            $validarMax = $this->validarFechaFinPermitida($dateStart, $dateEnd);
+            $validarMax = $this->validarFechaFinPermitida($this->dateStart, $this->dateEnd);
             if (count($validarMax) > 0) {
                 return response()->json($validarMax);
             }
@@ -463,7 +496,7 @@ class AgendaController extends Controller
             *  Validar que solo permita guardar fechas mayores a hoy
             */
 
-            $validateDataMayorToToday = $this->validateDataMayorToToday($dateStart);
+            $validateDataMayorToToday = $this->validateDataMayorToToday($this->dateStart);
 
             if (count($validateDataMayorToToday) > 0) {
                 return response()->json($validateDataMayorToToday);
@@ -473,7 +506,7 @@ class AgendaController extends Controller
             * $request->post('tipo'); 1 = disponible, 2, bloqueo, 3 informe.
             */
             //$getDateStart = explode(" ", $dateStart);           
-            $getDateStart = $dateStart->format('Y-m-d');
+            $getDateStart = $this->dateStart->format('Y-m-d');
             $agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart, $id, 1);
 
             switch ($request->post('tipo')) {
@@ -537,16 +570,16 @@ class AgendaController extends Controller
                     return response()->json($response);
                 }
 
-                $guardarBloqueo = $this->guardarBloqueoAndInforme($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo'));
+                $guardarBloqueo = $this->actualizarRangosCitas($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo'));
                 return response()->json($guardarBloqueo);
             } */
 
             //return 'el tipo = '.$request->post('tipo');
             //echo ' otherfield'. $agendaByDayValidateStart[0]->id;
 
-            if ($diffOnDays >= 0) {
-                for ($i = 0; $i <= $diffOnDays; $i++) {
-                    $newDate = $dateStart;
+            if ($this->diffOnDays >= 0) {
+                for ($i = 0; $i <= $this->diffOnDays; $i++) {
+                    $newDate = $this->dateStart;
                     $newDate = $newDate->addDays($i, 'day');
                     //$newDate2 = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $newDate->toDateTimeString());
                     $startTime  = $newDate->format('H:i:s');
@@ -559,20 +592,20 @@ class AgendaController extends Controller
                     */
                     if ($dayNumber != 6 && $dayNumber != 7) {
 
-                        $datesList = $this->addMinutesToDate($timeStart, $timeEnd, $id, $dateStart, $dateRepeat, $dateEnd, $diffOnMinutes, $newDate);
+                        $datesList = $this->addMinutesToDate($this->timeStart, $this->timeEnd, $id, $this->dateStart, $this->dateRepeat, $this->dateEnd, $this->diffOnMinutes, $newDate);
                         //$datesList = array();
 
                         array_push($datesArray, array(
-                            "dateStart" => $dateStart,
+                            "dateStart" => $this->dateStart,
                             "newDate" => $newDate,
                             "startTime" => $startTime,
                             "onlyDate" => $onlyDate,
                             "dayName" => $dayName,
                             "dateToMysql" => $dateToMysql,
                             "dayNumber" => $dayNumber,
-                            "diffOnMinutes" => $diffOnMinutes,
-                            "timeStart" => $timeStart,
-                            "timeEnd" => $timeEnd,
+                            "diffOnMinutes" => $this->diffOnMinutes,
+                            "timeStart" => $this->timeStart,
+                            "timeEnd" => $this->timeEnd,
                             "index" => $i,
                             "id" => '',
                             "datesList" => $datesList
@@ -633,7 +666,7 @@ class AgendaController extends Controller
                             //echo(json_encode($minimoAndMaxId).' (??)');
                             if ($minimoAndMaxId['minimo'] == 0 || $minimoAndMaxId['maximo'] == 0) {
                             } else {
-                                $guardarBloqueo = $this->guardarBloqueoAndInforme($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo'));
+                                $guardarBloqueo = $this->actualizarRangosCitas($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo'), $agendaByDay[0]->id);
                             }
                         }
 
@@ -855,6 +888,21 @@ class AgendaController extends Controller
         //
     }
 
+    public function getAgendas($dateStart, $newDateEnd, $profesional_id)
+    {
+        $datesAgenda = DB::table('agendas')
+            ->select('agendas.id', 'agendas.profesional_id', 'agendas.tipo', 'agendas.start', 'agendas.end')
+            ->addSelect(DB::raw(
+                "date_format(agendas.start, '%Y-%m-%d') onlydate"
+            ))
+            ->where('agendas.profesional_id', '=', $profesional_id)
+            //->whereBetween('agendas.start', [$dateStart, $newDateEnd])
+            ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$dateStart'")
+            ->whereRaw("date_format(agendas.start, '%Y-%m-%d') <=  " . "'$newDateEnd'")
+            ->get();
+        return $datesAgenda;
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -864,54 +912,149 @@ class AgendaController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $cita_id = $id;
+        $id = $request->post('profesional_id');
+        $this->setVarsTime($request);
 
-        /*$datesArray = array();
-        $timeStart = $this->obtenerHoraFecha($request->post('start'));
-        $timeEnd = $this->obtenerHoraFecha($request->post('end'));
-        $dateStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('start'));
-        $dateEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('end'));
-        $newDateEnd = $dateEnd->subMinute($this->minutesToAdd, 'minute');
-        $dateRepeat = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $request->post('repeat_end') . ' ' . $timeStart);
-        $diffOnDays = $dateStart->diffInDays($dateRepeat);
-        $diffOnMinutes = $dateStart->diffInMinutes($dateEnd);*/
+        $datesArray = array();
+        /*
+            * validar que no permita seleccionar varios dias en rango en fullcalendar
+             */
+
+        $validarUnicoDay = $this->validarUniqueDayselectable($this->dateStart->format('Y-m-d'), $this->dateEnd->format('Y-m-d'));
+        if (count($validarUnicoDay) > 0) {
+            return response()->json($validarUnicoDay);
+        }
+        /*
+            * Validar que la fecha hora fin no sea mayor que la fecha fin hora permitida
+             */
+        $validarMax = $this->validarFechaFinPermitida($this->dateStart, $this->dateRepeat);
+        if (count($validarMax) > 0) {
+            return response()->json($validarMax);
+        }
 
 
-        $validator = Validator::make($request->all(), Cita::rules($request));
+        /*
+            * validar que fecha hora inicio no sea mayuor que fecha hhora fina
+             */
+
+        $validarMax = $this->validarFechaFinPermitida($this->dateStart, $this->dateEnd);
+        if (count($validarMax) > 0) {
+            return response()->json($validarMax);
+        }
+
+        /*
+            *  Validar que solo permita guardar fechas mayores a hoy
+            */
+
+        $validateDataMayorToToday = $this->validateDataMayorToToday($this->dateStart);
+
+        if (count($validateDataMayorToToday) > 0) {
+            return response()->json($validateDataMayorToToday);
+        }
+
+        $getDateStart = $this->dateStart->format('Y-m-d');
+        $agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart, $id, 1);
+
+
+        switch ($request->post('tipo')) {
+
+            case 1:
+                //$agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart[0], $id, $request->post('tipo'));  
+                if (count($agendaByDayValidateStart) == 0) {
+                    $response = array(
+                        'status' => 'errortime',
+                        'code' => 200,
+                        'data'   => -1,
+                        'msg'    => 'debe haber una agenda programada para el profesional seleccionado en la fecha ' . $getDateStart[0]
+                    );
+                    return response()->json($response);
+                }
+                break;
+
+            case 2:
+                if (count($agendaByDayValidateStart) == 0) {
+                    $response = array(
+                        'status' => 'errortime',
+                        'code' => 200,
+                        'data'   => -1,
+                        'msg'    => 'Para actualizar un tiempo de bloqueo primero debe tener una agenda programada y sobre esta liberar el tiempo'
+                    );
+                    return response()->json($response);
+                }
+                break;
+            case 3:
+                if (count($agendaByDayValidateStart) == 0) {
+                    $response = array(
+                        'status' => 'errortime',
+                        'code' => 200,
+                        'data'   => -1,
+                        'msg'    => 'Para actualizar un tiempo de informe primero debe tener una agenda programada y sobre esta agregar el tiempo'
+                    );
+                    return response()->json($response);
+                }
+                break;
+            default:
+        }
+
+        $datesArray = $this->getAgendas($this->dateStart->format('Y-m-d'), $this->dateRepeat->format('Y-m-d'), $id);
+        //echo (json_encode($datesArray));
+
+        //echo (json_encode($datesArray));
+        $indexAgenda = 0;
+        $citas = array();
+
+        foreach ($datesArray as $item) {
+            $newDateToEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s',  $item->onlydate . ' ' . $this->timeEnd);
+            $newDateEndValidator = $newDateToEnd->subMinute($this->minutesToAdd, 'minute');
+            $citasByAgenda = $this->getCitasAgenda($item->onlydate . ' ' . $this->timeStart, $newDateEndValidator->format('Y-m-d H:i:s'), $item->id);
+
+
+            $minimoAndMaxId = $this->getMinimoAndMaxId($citasByAgenda);
+            if ($minimoAndMaxId['minimo'] > 0 && $minimoAndMaxId['maximo'] > 0) {
+                $guardarBloqueo = $this->actualizarRangosCitas($minimoAndMaxId, $request->post('tipo'), $request->post('razon_bloqueo'), $item->id);
+            }
+        }
+
+        /*$newDateToEnd = CarbonImmutable::createFromFormat('Y-m-d H:i:s',  $datesArray[0]->onlydate . ' ' . $this->timeEnd);
+        $newDateEndValidator = $newDateToEnd->subMinute($this->minutesToAdd, 'minute');
+        $citasByAgenda = $this->getCitasAgenda($datesArray[0]->onlydate . ' ' . $this->timeStart, $newDateEndValidator->format('Y-m-d H:i:s'), $datesArray[0]->id);*/
+
+
+
+
+
+
+
 
         $extendedProps = $request->post('extendedprops');
-        /*
-        echo(' el profesional '.$request->post('profesional_id'));
-        echo json_encode($extendedProps);
-        echo(' la agenda es ='.$extendedProps['agenda_id']);
-        echo(' el tipo=='.$request->post('tipo'));*/
 
         $tipo = $request->post('tipo');
         if (is_array($extendedProps)) {
         }
 
 
-        $cita = cita::find($id);
-        if (!($validator->fails())) {
-            $cita->ocupado = $tipo == 1 ? $tipo : $tipo;
-            $cita->razon_bloqueo =  $tipo == 1 ? null : $request->post('razon_bloqueo');
-            $cita->save();
+        if (count($datesArray) > 0) {
+
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => $cita,
+                'data'   => $datesArray,
                 'msg'    => 'Actualizado',
             );
         } else {
             $response = array(
-                'status' => 'error',
-                'msg' => $validator->errors(),
-                'validator' => $validator
+                'status' => 'errorocupado',
+                'code' => 200,
+                'data' => -1,
+                'msg' => 'Se presento un error al actualizar',
+                "size" => count($datesArray)
+
+
             );
         }
         return response()->json($response);
     }
-
-
 
     /**
      * Remove the specified resource from storage.

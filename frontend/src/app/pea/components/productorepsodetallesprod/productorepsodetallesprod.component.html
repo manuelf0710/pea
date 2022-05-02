@@ -629,7 +629,7 @@
                     <div class="input-group-append">
                       <i class="fa fa-calendar" (click)="d.toggle()"></i>
                     </div>
-                  </div>                 
+                  </div>
                 </div>
               </div>
 
@@ -733,20 +733,7 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container
-                  *ngFor="
-                    let item of agendasDisponibles
-                      | filterfor
-                        : {
-                            profesional:
-                              formulario.get('profesionalsearch').value,
-                            dateformat_name: formulario.get(
-                              'fechadisponiblesearch'
-                            ).value
-                          }
-                        : true
-                  "
-                >
+                <ng-container *ngFor="let item of agendasDisponibles">
                   <tr *ngIf="item.minutes >= odsDetalles.tipo_producto.tiempo">
                     <td>{{ item.profesional }}</td>
                     <td>{{ item.dateformat_name }}</td>

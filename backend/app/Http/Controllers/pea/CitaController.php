@@ -245,7 +245,26 @@ class CitaController extends Controller
             foreach ($datesAgenda as $item) {
                 DB::table('citas')
                     ->where('id',  $item->id)
-                    ->update(['producto_id' => $producto_id, 'start' => $item->start, 'end' => $item->end, 'ocupado' => 2]);
+                    ->update(['producto_id' => $producto_id, 'ocupado' => 2]);
+            }
+
+
+            if ($request->post('block_cita') == '1') {
+                $dateBloqueo = DB::table('citas')
+                    ->where('citas.agenda_id', '=', $agenda_id)
+                    ->whereBetween('start', [$dateEnd->format('Y-m-d H:i:s'), $dateEnd->format('Y-m-d H:i:s')])
+                    ->get();
+                $iterator = 0;
+
+                foreach ($dateBloqueo as $item) {
+                    if ($iterator == 0) {
+                        DB::table('citas')
+                            ->where('id',  $item->id)
+                            ->whereNull('citas.producto_id')
+                            ->update(['ocupado' => 2, 'razon_bloqueo' => 'tiempo espera']);
+                    }
+                    $iterator++;
+                }
             }
 
 
