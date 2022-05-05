@@ -21,8 +21,8 @@
                   <option [ngValue]="null" disabled>
                     Seleccione tipo de producto
                   </option>
-                  <option [value]="item.id" *ngFor="let item of tipoProductos">
-                    {{ item.name }}
+                  <option [value]="item.value" *ngFor="let item of tipoProductos">
+                    {{ item.label }}
                   </option>
                 </select>
               </div>
@@ -58,8 +58,8 @@
                   <option [ngValue]="null" disabled>
                     Seleccione la regional
                   </option>
-                  <option [value]="item.id" *ngFor="let item of regionales">
-                    {{ item.nombre }}
+                  <option [value]="item.value" *ngFor="let item of regionales">
+                    {{ item.label }}
                   </option>
                 </select>
               </div>

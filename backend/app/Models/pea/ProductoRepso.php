@@ -66,7 +66,7 @@ class ProductoRepso extends Model
 	public function scopeDescripcion($query, $des)
 	{
 		if ($des)
-			return $query->where('descripcion', 'like', "%$des$%");
+			return $query->where('descripcion', 'like', "%$des%");
 	}
 
 	public function scopeProgramadorProfesional($query, $perfil_id, $user_id)
@@ -82,5 +82,17 @@ class ProductoRepso extends Model
 				 and productos.profesional_id ='" . $user_id . "' limit 1) > 0"
 			));
 		}
+	}
+
+	public function scopeRegional($query, $des)
+	{
+		if ($des)
+			return $query->where('regional_id', '=', "$des");
+	}
+
+	public function scopeTipoProducto($query, $des)
+	{
+		if ($des)
+			return $query->where('tipoproducto_id', '=', "$des");
 	}
 }

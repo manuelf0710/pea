@@ -44,6 +44,9 @@ class ProductoRepsoController extends Controller
         $pageSize = $request->get('pageSize');
         $pageSize == '' ? $pageSize = 20 : $pageSize;
 
+        $regional = $request->get('regional');
+        $tipoProducto = $request->get('tipoproducto');
+        $descripcion = $request->get('descripcion');
         $globalSearch = $request->get('globalsearch');
 
         if ($globalSearch != '') {
@@ -51,8 +54,31 @@ class ProductoRepsoController extends Controller
                 ->globalSearch($globalSearch)
                 ->paginate($pageSize);
         } else {
-            $response = ProductoRepso::with('regional', 'contrato', 'tipoproducto', 'profesional')->withoutTrashed()->orderBy('productos_repso.id', 'desc')
+            $response = //ProductoRepso::with('regional', 'contrato', 'tipoproducto', 'profesional')->withoutTrashed()
+                ProductoRepso::withoutTrashed()
+                ->select(
+                    'productos_repso.id',
+                    'productos_repso.tipoproducto_id',
+                    'productos_repso.regional_id',
+                    'productos_repso.contrato_id',
+                    'productos_repso.anio',
+                    'productos_repso.descripcion',
+                    'productos_repso.cantidad',
+                    'productos_repso.user_id',
+                    'productos_repso.profesional_id',
+                    'contratos.nombre as contrato',
+                    'users.name as profesional',
+                    'tipo_productos.name as tipoproducto',
+                    'regionales.nombre as regional'
+                )
+                ->join('regionales', 'productos_repso.regional_id', '=', 'regionales.id')
+                ->join('contratos', 'productos_repso.contrato_id', '=', 'contratos.id')
+                ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
+                ->join('users', 'productos_repso.profesional_id', '=', 'users.id')
+                ->orderBy('productos_repso.id', 'desc')
                 ->programadorProfesional(auth()->user()->perfil_id, auth()->user()->id)
+                ->regional($regional)
+                ->tipoProducto($tipoProducto)
                 ->paginate($pageSize);
         }
 

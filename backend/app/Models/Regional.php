@@ -8,28 +8,29 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Regional extends Model
 {
-	use Notifiable;
+    use Notifiable;
 
     protected $table = 'regionales';
     public $timestamps = true;
 
     use SoftDeletes;
-	
+
     protected $fillable = [
         'nombre'
-    ];	
+    ];
 
     protected $dates = ['deleted_at'];
-    protected $hidden = ['created_at','updated_at','deleted_at'];
-    public static $directionOrder = ['ASC','ASC'];
+    protected $hidden = ['created_at', 'updated_at', 'deleted_at'];
+    public static $directionOrder = ['ASC', 'ASC'];
 
     public static $rules = [
         'nombre' => 'required',
         'regional_salud_id' => 'required|integer',
     ];
 
-	public function scopeNombre($query, $des){
-		if($des)
-			return $query->where('nombre', 'like', "%$des$%");
-	}    
+    public function scopeNombre($query, $des)
+    {
+        if ($des)
+            return $query->where('nombre', 'like', "%$des%");
+    }
 }

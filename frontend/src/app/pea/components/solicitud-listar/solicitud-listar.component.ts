@@ -6,8 +6,13 @@ import {
   ViewEncapsulation,
 } from "@angular/core";
 import { Router, ActivatedRoute } from "@angular/router";
+import { forkJoin} from "rxjs";
 import { BgtableComponent } from "src/app/shared/components/bgtable/bgtable.component";
 import { environment } from "src/environments/environment";
+import { regional } from './../../../models/regional';
+import { tipoProducto } from './../../models/tipoproducto';
+import { TipoproductosService } from "./../../../services/tipoproductos.service";
+import { ComunService } from "src/app/services/comun.service";
 
 @Component({
   selector: "app-solicitud-listar",
@@ -18,6 +23,10 @@ import { environment } from "src/environments/environment";
 export class SolicitudListarComponent implements OnInit {
   @ViewChild(BgtableComponent) dataTableReload: BgtableComponent;
   public loading: boolean = false;
+  public renderDataTable:  boolean = false;
+
+  public regionales: regional[];
+  public tipoProductos: tipoProducto[];
 
   buttons = {
     acciones: {
@@ -43,7 +52,7 @@ export class SolicitudListarComponent implements OnInit {
     },
     {
       title: "Tipo Producto",
-      data: "tipoproducto.name",
+      data: "tipoproducto",
       orderable: false,
       searchable: false,
       type: "text",
@@ -64,42 +73,73 @@ export class SolicitudListarComponent implements OnInit {
     },
     {
       title: "Contrato",
-      data: "contrato.nombre",
+      data: "contrato",
       orderable: false,
       searchable: false,
       type: "text",
     },
     {
       title: "Programador",
-      data: "profesional.name",
-      orderable: false,
-      searchable: false,
-      type: "text",
-    },    
-    {
-      title: "Descripción",
-      data: "descripcion",
+      data: "profesional",
       orderable: false,
       searchable: false,
       type: "text",
     },
+    {
+      title: "Descripción",
+      data: "descripcion",
+      orderable: false,
+      searchable: true,
+      type: "text",
+    },
   ];
 
-  tableConfig = {
-    buttons: this.buttons,
-    listado_seleccion: true,
-    columns: this.columns,
-    url: environment.apiUrl + environment.solicitud.getAll,
-    globalSearch: false,
-    rowSearch: false,
-    advancedSearch: true,
-    paginatorPosition: "bottom",
-    customFilters: [],
-  };
+  tableConfig;
 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  constructor(private route: ActivatedRoute, private router: Router,     private _TipoproductosService: TipoproductosService,
+    private _ComunService: ComunService,) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    forkJoin([
+      this._TipoproductosService.getLista(),
+      this._ComunService.getRegionales(),
+    ]).subscribe(([tipoProductos, regionales]) => {
+      this.regionales = regionales;
+      this.tipoProductos = tipoProductos;
+      this.loading = false;
+      this.initializeDataTable();
+    });
+
+  }
+
+  initializeDataTable(){
+    this.tableConfig = {
+      buttons: this.buttons,
+      listado_seleccion: true,
+      columns: this.columns,
+      url: environment.apiUrl + environment.solicitud.getAll,
+      globalSearch: false,
+      rowSearch: false,
+      advancedSearch: true,
+      paginatorPosition: "bottom",
+      customFilters: [
+        {
+          title: "regional",
+          value: "",
+          key: "regional",
+          type: "select",
+          options:this.regionales
+        },
+        {
+          title: "Tipo Producto",
+          value: "",
+          key: "tipoproducto",
+          type: "select",
+          options:this.tipoProductos
+        },
+      ],
+    };    
+  }
 
   agregarSolicitud(ev) {}
   editarSolicitud(ev) {}

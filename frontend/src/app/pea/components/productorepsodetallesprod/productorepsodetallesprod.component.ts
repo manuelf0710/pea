@@ -67,6 +67,13 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   active: number = 1;
   personaGestion!: gestionPersona;
   agendasDisponibles!: agendasDisponiblesProfesionales;
+  
+  public pageSize: number;
+  public currentPage: number;
+  public totalRecords: number;
+  public from: number;
+  public to: number;
+  public pageLength = [10, 20, 50, 100];
 
   constructor(
     private _ToastService: ToastService,
@@ -77,7 +84,11 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     private _AgendaService: AgendaService,
     private modalService: NgbModal,
     private readonly route: ActivatedRoute
-  ) {}
+  ) {
+
+    this.pageSize = 50;
+    this.currentPage = 1;
+  }
 
   ngOnInit(): void {
     this.buildForm();
@@ -134,7 +145,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     });
   }
 
-  loadProductosBySolicitud(id: number, data: any) {
+  loadProductosBySolicitud(id: any, data: any) {
     this.loading = true;
     this._ProductoService
       .getProductosBySolicitud(id, {
@@ -159,9 +170,23 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this.productosLista = productosLista.data;
       console.log("holmanuelf", this.productosLista);
 
+      this.totalRecords = productosLista.total;
+      this.from = productosLista.from;
+      this.to = productosLista.to;
+
       this.loading = false;
     });
   }
+
+  pageChange(pag) {
+    this.loadProductosBySolicitud(this.id +"?page=" + pag + "&pageSize=" + this.pageSize, { ...this.formularioFiltro.value });
+  }
+  public onChangePaginationSize() {
+    this.currentPage = 1;
+    this.loadProductosBySolicitud(this.id + "?page=1&pageSize="  + this.pageSize, { ...this.formularioFiltro.value });
+  
+  }
+
   agregarRegistro() {
     //this.mostrarRegistro = true
     this.mostrarRegistro = !this.mostrarRegistro;

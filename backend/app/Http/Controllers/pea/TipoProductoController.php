@@ -2,6 +2,7 @@
 
 //namespace App\Http\Controllers;
 namespace App\Http\Controllers\pea;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -24,26 +25,26 @@ class TipoProductoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-	 
+
     public function listado(Request $request)
-    { 
+    {
         $pageSize = $request->get('pageSize');
-		$pageSize == '' ? $pageSize = 20 : $pageSize;
-		
+        $pageSize == '' ? $pageSize = 20 : $pageSize;
+
 
         $globalSearch = $request->get('globalsearch');
-		
-		if($globalSearch != ''){
-			$response = TipoProducto::withoutTrashed()->orderBy('tipoproductos.name', 'desc')
-			->globalSearch($globalSearch)
-			->paginate($pageSize);		
-		}else{
-			$response = TipoProducto::withoutTrashed()->orderBy('tipoproductos.name', 'desc')
-			->paginate($pageSize);
-		}
-						
-		return response()->json($response); 
-	}		
+
+        if ($globalSearch != '') {
+            $response = TipoProducto::withoutTrashed()->orderBy('tipoproductos.name', 'desc')
+                ->globalSearch($globalSearch)
+                ->paginate($pageSize);
+        } else {
+            $response = TipoProducto::withoutTrashed()->orderBy('tipoproductos.name', 'desc')
+                ->paginate($pageSize);
+        }
+
+        return response()->json($response);
+    }
     public function create()
     {
         //
@@ -90,15 +91,15 @@ class TipoProductoController extends Controller
      */
     public function update(Request $request, $id)
     {
-
     }
-	
-	public function buscarTipoProducto(Request $request){
-		$productos = TipoProducto::withoutTrashed()
-							->select('id','name','tiempo')
-							->get();
-		return response()->json($productos); 
-	}
+
+    public function buscarTipoProducto(Request $request)
+    {
+        $productos = TipoProducto::withoutTrashed()
+            ->select('id as value', 'name as label', 'tiempo')
+            ->get();
+        return response()->json($productos);
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -109,21 +110,20 @@ class TipoProductoController extends Controller
     public function destroy($id)
     {
         $find = TipoProducto::find($id);
-		if (! empty($find)) {
+        if (!empty($find)) {
             $find->delete();
             $response = [
                 'status' => 'success',
                 'code' => 200,
                 'data' => $find,
-				'msg'  => 'Registro eliminado'
-            ];			
-		}else{
-		    $response = [
+                'msg'  => 'Registro eliminado'
+            ];
+        } else {
+            $response = [
                 'status' => 'error',
                 'msg' => "Se ha presentado un error",
             ];
-		}
-		return response()->json($response);	
-    }    
-
+        }
+        return response()->json($response);
+    }
 }

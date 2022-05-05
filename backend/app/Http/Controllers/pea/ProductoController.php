@@ -201,7 +201,7 @@ class ProductoController extends Controller
                 ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
                 ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
                 ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
-                ->leftJoin('users','productos.profesional_id', '=', 'users.id')
+                ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
                 ->select(
                     'productos.id',
                     'productos.modalidad',

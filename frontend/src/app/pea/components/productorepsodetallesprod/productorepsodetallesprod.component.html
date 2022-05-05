@@ -220,7 +220,45 @@
       </form>
     </div>
   </div>
+  <div class="row">
+  <ngb-pagination
+  [(page)]="currentPage"
+  [pageSize]="pageSize"
+  [collectionSize]="totalRecords"
+  [boundaryLinks]="true"
+  [directionLinks]="true"
+  [ellipses]="true"
+  [maxSize]="6"
+  [rotate]="true"
+  (pageChange)="pageChange($event)"
+  size="sm"
+></ngb-pagination>
+</div>
 
+<div class="row">
+
+<div class="col-10 col-lg-10">
+  <em *ngIf="totalRecords > 0" class="fz-12"
+    >{{ from }}-{{ to }} - {{ totalRecords }}</em
+  >
+  <em *ngIf="totalRecords == 0" class="fz-12">Sin Resultados</em>
+</div>
+<div class="col-2 col-lg-2">
+  <div class="float-right">
+    <span class="fz-12">Mostrar</span>
+    <select
+      (change)="onChangePaginationSize()"
+      name=""
+      id=""
+      [(ngModel)]="pageSize"
+      class="mb-1 ml-1"
+      style="width: 60px"
+    >
+      <option [value]="le" *ngFor="let le of pageLength">{{ le }}</option>
+    </select>
+  </div>
+</div>
+</div>
   <div class="row">
     <table class="table table-sm table-hover table-bordered table-striped">
       <thead>
