@@ -314,6 +314,7 @@ class CitaController extends Controller
             ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
             ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
             ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
+            ->leftJoin('users','productos.profesional_id', '=', 'users.id')
             ->select(
                 'productos.id',
                 'productos.modalidad',
@@ -332,6 +333,8 @@ class CitaController extends Controller
                 'clientes.direccion',
                 'ciudades.nombre as ciudad',
                 'clientes.barrio',
+                'productos.profesional_id',
+                'users.name as profesional_des'                
             )
             //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
             ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")

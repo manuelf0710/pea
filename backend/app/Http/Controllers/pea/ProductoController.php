@@ -182,9 +182,12 @@ class ProductoController extends Controller
         $pageSize = $request->get('pageSize');
         $pageSize == '' ? $pageSize = 20 : $pageSize;
 
-        $codigo = $request->get('codigo');
-        $descripcion = $request->get('descripcion');
-        $categoria = $request->get('categoria');
+        $cedula = $request->post('cedula');
+        $dependencia = $request->post('dependencia');
+        $estado = $request->post('estado');
+        $modalidad = $request->post('modalidad');
+        $nombre = $request->post('nombre');
+
         $globalSearch = $request->get('globalsearch');
 
         if ($globalSearch != '') {
@@ -198,6 +201,7 @@ class ProductoController extends Controller
                 ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
                 ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
                 ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
+                ->leftJoin('users','productos.profesional_id', '=', 'users.id')
                 ->select(
                     'productos.id',
                     'productos.modalidad',
@@ -217,6 +221,8 @@ class ProductoController extends Controller
                     'clientes.direccion',
                     'ciudades.nombre as ciudad',
                     'clientes.barrio',
+                    'productos.profesional_id',
+                    'users.name as profesional_des'
                 )
                 //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
                 ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
@@ -224,6 +230,11 @@ class ProductoController extends Controller
                 ->withoutTrashed()->orderBy('productos.id', 'desc')
                 ->where('producto_repso_id', '=', $id)
                 ->profesionalAsignado(auth()->user()->perfil_id, auth()->user()->id)
+                ->cedula($cedula)
+                ->dependencia($dependencia)
+                ->estado($estado)
+                ->modalidad($modalidad)
+                ->nombre($nombre)
                 ->paginate($pageSize);
         }
 

@@ -63,7 +63,7 @@ class Producto extends Model
 	public function scopeDescripcion($query, $des)
 	{
 		if ($des)
-			return $query->where('descripcion', 'like', "%$des$%");
+			return $query->where('descripcion', 'like', "%$des%");
 	}
 
 	public function scopeProfesionalAsignado($query, $perfil_id, $user_id)
@@ -72,4 +72,30 @@ class Producto extends Model
 			return $query->where('productos.profesional_id', '=', "$user_id");
 		}
 	}
+
+	public function scopeCedula($query, $des)
+	{
+		if ($des)
+			return $query->where('clientes.cedula', '=', "$des");
+	}	
+	public function scopeDependencia($query, $des)
+	{
+		if ($des)
+			return $query->where('dependencias.codigo', '=', "$des%");
+	}	
+	public function scopeEstado($query, $des)
+	{
+		if ($des)
+			return $query->where('productos.estado_id', '=', "$des%");
+	}	
+	public function scopeModalidad($query, $des)
+	{
+		if ($des)
+			return $query->where('dependencias.modalidad', '=', "$des%");
+	}	
+	public function scopeNombre($query, $des)
+	{
+		if ($des)
+			return $query->where('clientes.nombre', 'like', "%$des%");
+	}	
 }

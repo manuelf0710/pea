@@ -61,6 +61,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   mostrarFiltros: boolean = true;
   formulario: FormGroup;
   formularioArchivo: FormGroup;
+  formularioFiltro: FormGroup;
   public archivoscargados: any[] = [];
   urlSubidaArchivo!: String;
   active: number = 1;
@@ -123,13 +124,36 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       id: [this.id],
       archivo: ["", [Validators.required]],
     });
+
+    this.formularioFiltro = this.FormBuilder.group({
+      dependencia: [""],
+      cedula: [""],
+      nombre: [""],
+      estado: [""],
+      modalidad: [""],
+    });
+  }
+
+  loadProductosBySolicitud(id: number, data: any) {
+    this.loading = true;
+    this._ProductoService
+      .getProductosBySolicitud(id, {
+        ...data,
+      })
+      .subscribe((data) => {
+        this.productosLista = data.data;
+        this.loading = false;
+      });
   }
 
   initLoadData() {
     this.loading = true;
+
     forkJoin([
       this._ProductosrepsoService.getSolicitudById(this.id),
-      this._ProductoService.getProductosBySolicitud(this.id, {}),
+      this._ProductoService.getProductosBySolicitud(this.id, {
+        ...this.formularioFiltro.value,
+      }),
     ]).subscribe(([odsDetalles, productosLista]) => {
       this.odsDetalles = odsDetalles;
       this.productosLista = productosLista.data;
@@ -290,6 +314,15 @@ export class ProductorepsodetallesprodComponent implements OnInit {
 
   guardar(ev) {}
 
+  filtrarResultados(ev) {
+    console.log("asdf");
+    this.loadProductosBySolicitud(this.id, { ...this.formularioFiltro.value });
+  }
+  limpiarFiltrosForm() {
+    this.formularioFiltro.reset();
+    this.loadProductosBySolicitud(this.id, { ...this.formularioFiltro.value });
+  }
+
   actualizarProducto(product) {
     console.log("en function actualziarProducto ", product);
     let index: any;
@@ -339,7 +372,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     } else {
       this.formulario.markAllAsTouched();
       this._ToastService.info(
-        "debe ingresar los datos del formulariio, sección gestionar programación"
+        "debe ingresar los datos del formulario, sección gestionar programación"
       );
     }
   }

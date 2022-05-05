@@ -90,106 +90,134 @@
           </div>
         </div>
       </div>
-      <div class="row" *ngIf="mostrarFiltros">
-        <div class="col-md-6 col-lg-4 col-xs-12">
-          <div class="form-group">
-            <label for="regional">Dependencia</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-map"></i></span>
+      <form
+        [formGroup]="formularioFiltro"
+        novalidate
+        (ngSubmit)="filtrarResultados($event)"
+      >
+        <div class="row" *ngIf="mostrarFiltros">
+          <div class="col-md-6 col-lg-4 col-xs-12">
+            <div class="form-group">
+              <label for="regional">Dependencia</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"
+                    ><i class="fa fa-map"></i
+                  ></span>
+                </div>
+                <input
+                  type="number"
+                  name="fdependencia_id"
+                  id="fdependencia_id"
+                  class="form-control form-control-sm"
+                  formControlName="dependencia"
+                />
               </div>
-              <input
-                type="number"
-                name="fdependencia_id"
-                id="fdependencia_id"
-                class="form-control form-control-sm"
-              />
             </div>
           </div>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xs-12">
-          <div class="form-group">
-            <label for="regional">Cédula</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-map"></i></span>
+          <div class="col-md-6 col-lg-4 col-xs-12">
+            <div class="form-group">
+              <label for="regional">Cédula</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"
+                    ><i class="fa fa-map"></i
+                  ></span>
+                </div>
+                <input
+                  type="number"
+                  name="fcedula"
+                  id="fcedula"
+                  class="form-control form-control-sm"
+                  formControlName="cedula"
+                />
               </div>
-              <input
-                type="number"
-                name="fcedula"
-                id="fcedula"
-                class="form-control form-control-sm"
-              />
             </div>
           </div>
-        </div>
 
-        <div class="col-md-6 col-lg-4 col-xs-12">
-          <div class="form-group">
-            <label for="regional">Nombre</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-map"></i></span>
+          <div class="col-md-6 col-lg-4 col-xs-12">
+            <div class="form-group">
+              <label for="regional">Nombre</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"
+                    ><i class="fa fa-map"></i
+                  ></span>
+                </div>
+                <input
+                  type="text"
+                  name="fnombre"
+                  id="fnombre"
+                  class="form-control form-control-sm"
+                  formControlName="nombre"
+                />
               </div>
-              <input
-                type="number"
-                name="fnombre"
-                id="fnombre"
-                class="form-control form-control-sm"
-              />
             </div>
           </div>
-        </div>
 
-        <div class="col-md-6 col-lg-4 col-xs-12">
-          <div class="form-group">
-            <label for="regional">Estado</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-map"></i></span>
+          <div class="col-md-6 col-lg-4 col-xs-12">
+            <div class="form-group">
+              <label for="regional">Estado</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"
+                    ><i class="fa fa-map"></i
+                  ></span>
+                </div>
+                <input
+                  type="number"
+                  name="festado"
+                  id="festado"
+                  class="form-control form-control-sm"
+                  formControlName="estado"
+                />
               </div>
-              <input
-                type="number"
-                name="festado"
-                id="festado"
-                class="form-control form-control-sm"
-              />
             </div>
           </div>
-        </div>
-        <div class="col-md-6 col-lg-4 col-xs-12">
-          <div class="form-group">
-            <label for="regional">Modalidad</label>
-            <div class="input-group">
-              <div class="input-group-prepend">
-                <span class="input-group-text"><i class="fa fa-map"></i></span>
+          <div class="col-md-6 col-lg-4 col-xs-12">
+            <div class="form-group">
+              <label for="regional">Modalidad</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"
+                    ><i class="fa fa-map"></i
+                  ></span>
+                </div>
+                <select
+                  type="number"
+                  name="fmodalidad"
+                  id="fmodalidad"
+                  class="form-control form-control-sm"
+                  formControlName="modalidad"
+                >
+                  <option value="1">Presencial</option>
+                  <option value="2">Virtual</option>
+                </select>
               </div>
-              <select
-                type="number"
-                name="fmodalidad"
-                id="fmodalidad"
-                class="form-control form-control-sm"
-              >
-                <option value="1">Presencial</option>
-                <option value="2">Virtual</option>
-              </select>
             </div>
           </div>
-        </div>
 
-        <div class="col-md-12">
-          <div class="row">
-            <div class="col-md-12 mb-3">
-              <button
-                type="button"
-                class="btn btn-outline-secondary btn-sm pull-right"
-              >
-                <i class="fa fa-search"></i> Buscar
-              </button>
+          <div class="col-md-12">
+            <div class="row">
+              <div class="col-md-12 mb-3">
+                <button
+                  type="submit"
+                  class="btn btn-outline-secondary btn-sm pull-right"
+                >
+                  <i class="fa fa-search"></i> Buscar
+                </button>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary btn-sm pull-right mr-2 ml-2"
+                  (click)="limpiarFiltrosForm()"
+                >
+                  Limpiar Filtros
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -199,6 +227,7 @@
         <tr>
           <th></th>
           <th>Fecha Prog (d/m/Y)</th>
+          <th>Profesional</th>
           <th>Cédula</th>
           <th>Nombre</th>
           <th>Estado</th>
@@ -225,6 +254,7 @@
               </div>
             </td>
             <td>{{ item.fecha_programacion }}</td>
+            <td>{{ item.profesional_des }}</td>
             <td>{{ item.cedula }}</td>
             <td>{{ item.nombre }}</td>
             <td>{{ item.estado }}</td>
