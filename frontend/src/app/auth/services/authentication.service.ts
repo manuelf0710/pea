@@ -48,20 +48,19 @@ export class AuthenticationService {
       .pipe(
         map((user) => {
           // store user details and jwt token in local storage to keep user logged in between page refreshes
-          localStorage.setItem(
-            "currentUser",
-            JSON.stringify(user.token.original.user)
-          );
-          localStorage.setItem("modulos", JSON.stringify(user.data.modulos));
-          localStorage.setItem("token", user.token.original.access_token);
-          //this.currentUserSubject.next(user);
-          this.currentUserSubject.next(user.token.original.user);
-          //this.currentMenuSubject.next(user.data.modulos);
-          //this.menu_page$ = user.data.modulos;
-          // console.log("observable service ", this.menu_page$);
+          this.setDataToLocalStorage(user)
           return user.token.original.user;
         })
       );
+  }
+  setDataToLocalStorage(user){
+    localStorage.setItem(
+      "currentUser",
+      JSON.stringify(user.token.original.user)
+    );
+    localStorage.setItem("modulos", JSON.stringify(user.data.modulos));
+    localStorage.setItem("token", user.token.original.access_token);
+    this.currentUserSubject.next(user.token.original.user);
   }
 
   refreshToken(params) {
@@ -70,7 +69,8 @@ export class AuthenticationService {
       .pipe(
         map((user) => {
           console.log("el token dentro del servicio authenticate ",user);
-          localStorage.setItem("token", user.token);
+          //localStorage.setItem("token", user.token);
+          this.setDataToLocalStorage(user)
           return user.token;
         })
       );

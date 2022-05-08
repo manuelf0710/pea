@@ -36,8 +36,8 @@ export class ErrorInterceptor implements HttpInterceptor {
             err.error.message ==
             "Token has expired and can no longer be refreshed"
           ) {
-            /*this.authenticationService.logout();
-            location.reload(true);*/
+            this.authenticationService.logout();
+            location.reload();
           }
         }
         if (err.status === 401) {
