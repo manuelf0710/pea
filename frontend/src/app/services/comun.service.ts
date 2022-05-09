@@ -36,4 +36,33 @@ export class ComunService {
         })
       );
   }
+
+  getEstadosAll(): Observable<any> {
+    return this._http
+      .get<any>(
+        environment.apiUrl +
+          environment.comun.getEstados
+      )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
+
+  getListasAllById(id: number): Observable<any> {
+    return this._http
+      .get<any>(
+        environment.apiUrl +
+          environment.comun.getListaAllItemsById +
+          id
+      )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }  
 }

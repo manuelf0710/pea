@@ -22,7 +22,7 @@
         >
           <i class="fa fa-filter"></i> Filtrar
         </button>
-        <button
+        <button *ngIf="permisoCargueExcel"
           class="btn btn-outline-success btn-sm pull-right"
           (click)="openCargaExcel()"
         >
@@ -164,13 +164,17 @@
                     ><i class="fa fa-map"></i
                   ></span>
                 </div>
-                <input
-                  type="number"
-                  name="festado"
-                  id="festado"
-                  class="form-control form-control-sm"
-                  formControlName="estado"
-                />
+                <select name="festado"
+                id="festado"
+                class="form-control form-control-sm"
+                formControlName="estado">
+                <option [ngValue]="null" disabled>
+                  Seleccione Estado
+                </option>
+                <option [value]="item.id" *ngFor="let item of estadosLista">
+                  {{ item.nombre }}
+                </option>
+                </select>
               </div>
             </div>
           </div>
@@ -710,14 +714,20 @@
                         ><i class="fa fa-map"></i
                       ></span>
                     </div>
-                    <input
-                      type="text"
-                      name="estado_programacion"
-                      id="estado_programacion"
-                      class="form-control form-control-sm"
-                      formControlName="estado_programacion"
-                      readonly
-                    />
+
+                    <select name="estado_programacion"
+                    id="estado_programacion"
+                    class="form-control form-control-sm"
+                    formControlName="estado_programacion">
+                    <option [ngValue]="null" disabled>
+                      Seleccione Estado
+                    </option>
+                    <option [value]="item.id" *ngFor="let item of estadosLista">
+                      {{ item.nombre }}
+                    </option>
+                    </select>
+
+
                   </div>
                 </div>
               </div>

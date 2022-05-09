@@ -1,5 +1,5 @@
 export interface regional {
   id?: number;
-  nombre: number;
+  nombre: String;
   regionalsalud_id: number;
 }

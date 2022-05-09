@@ -23,6 +23,8 @@ export class AppComponent implements OnInit, AfterViewInit {
      this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
      const d = new Date();
      this.currentYear = d.getFullYear();
+
+     console.log("el current Usermanuelf", this.currentUser)
   }  
 
   ngOnInit() {

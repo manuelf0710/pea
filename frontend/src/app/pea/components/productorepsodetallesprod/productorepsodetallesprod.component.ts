@@ -9,8 +9,15 @@ import { ProductoService } from "../../services/producto.service";
 import { ClienteService } from "src/app/services/cliente.service";
 import { AgendaService } from "./../../../services/agenda.service";
 import { ToastService } from "src/app/shared/services/toast.service";
+import { AuthenticationService } from './../../../auth/services/authentication.service';
+import { ComunService } from './../../../services/comun.service';
+
+
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NuevacitaComponent } from "./nuevacita/nuevacita.component";
+import { User } from "src/app/auth/models/user";
+import { listaItems } from './../../../models/listaItems';
+
 
 export interface gestionPersona {
   id: number;
@@ -55,6 +62,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   id!: number;
   odsDetalles: productoRepso;
   productosLista: any[];
+  estadosLista: listaItems[];
   loading: boolean = true;
   mostrarRegistro: boolean = false;
   mostrarCargaExcel: boolean = false;
@@ -67,6 +75,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   active: number = 1;
   personaGestion!: gestionPersona;
   agendasDisponibles!: agendasDisponiblesProfesionales;
+  currentUser: User;
   
   public pageSize: number;
   public currentPage: number;
@@ -74,20 +83,31 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   public from: number;
   public to: number;
   public pageLength = [10, 20, 50, 100];
+  /*
+  * Perfiles con permiso para cargar excel
+   */
+  public arrayPermisoCargueExcel = [1,2];
+  public permisoCargueExcel: boolean = false;
 
   constructor(
     private _ToastService: ToastService,
     private FormBuilder: FormBuilder,
+    private _ComunService : ComunService,
     private _ProductosrepsoService: ProductosrepsoService,
     private _ProductoService: ProductoService,
     private _ClienteService: ClienteService,
     private _AgendaService: AgendaService,
     private modalService: NgbModal,
-    private readonly route: ActivatedRoute
+    private readonly route: ActivatedRoute,
+    private authenticationService: AuthenticationService,
   ) {
 
     this.pageSize = 50;
     this.currentPage = 1;
+    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    /*console.log("productorepsodetallescomponent ",this.currentUser);
+    console.log("productorepsodetallescomponent profileId ",this.currentUser.perfil.id);*/
+    this.permisoCargueExcel = this.arrayPermisoCargueExcel.includes(this.currentUser.perfil.id);
   }
 
   ngOnInit(): void {
@@ -165,10 +185,12 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this._ProductoService.getProductosBySolicitud(this.id, {
         ...this.formularioFiltro.value,
       }),
-    ]).subscribe(([odsDetalles, productosLista]) => {
+      this._ComunService.getListasAllById(2)
+    ]).subscribe(([odsDetalles, productosLista, estadosLista]) => {
       this.odsDetalles = odsDetalles;
       this.productosLista = productosLista.data;
-      console.log("holmanuelf", this.productosLista);
+      this.estadosLista = estadosLista;
+      console.log("los estados lista ", this.estadosLista);
 
       this.totalRecords = productosLista.total;
       this.from = productosLista.from;
