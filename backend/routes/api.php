@@ -49,6 +49,8 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::post('buscarcontrato', 'comun\ContratoController@buscarContrato')->name('contratos.buscar');
 		Route::post('buscarusers', 'UserController@buscarUser')->name('users.buscar');
 		Route::get('listarusuarios', 'UserController@listarAll')->name('users.listar.all');
+		Route::get('listaallitems/{id}', 'ListasController@listarAllItemsById')->name('listaritems.listar.allById');
+		Route::get('listaestados', 'ListasController@estadosAll')->name('listar.estados.all');
 
 		Route::get('getcliente/{id}', 'comun\ClienteController@show')->name('cliente.show');
 	});
@@ -63,7 +65,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		'prefix' => 'admon',
 	], function () {
 		Route::post('userslist', 'UserController@listado')->name('users.listado');
-	});		
+	});
 
 	Route::group([
 		'prefix' => 'pea',
@@ -89,8 +91,8 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::post('agenda/profesional/{id}', 'pea\AgendaController@store')->name('agenda.store');
 		Route::put('agenda/cita/{id}', 'pea\AgendaController@update')->name('agenda.update');
 		Route::post('agenda/agendadisponible', 'pea\AgendaController@enableAgenda')->name('agenda.enable');
-		
-		
+
+
 		Route::post('cita', 'pea\CitaController@store')->name('cita.store');
 	});
 });
