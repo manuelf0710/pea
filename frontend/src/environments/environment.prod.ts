@@ -29,6 +29,8 @@ export const environment = {
     getClienteByCedula: "comun/getcliente/",
     buscarUsers: "comun/buscarusers",
     getlistarAllUsers: "comun/listarusuarios/",
+    getListaAllItemsById: "comun/listaallitems/",
+    getEstados : "comun/listaestados"
   },
   imports: {
     uploadExcelToProductRepso: "files/uploads/",
@@ -41,9 +43,9 @@ export const environment = {
     postAgendaDisponibleAllProfesional: "pea/agenda/agendadisponible/",
     postCita: "pea/cita",
   },
-  admon: {
-    postUsersList: "admon/userslist",
-  },
+  admon:{
+    postUsersList : 'admon/userslist',
+  }
 };
 
 /*
