@@ -77,25 +77,30 @@ class Producto extends Model
 	{
 		if ($des)
 			return $query->where('clientes.cedula', '=', "$des");
-	}	
+	}
 	public function scopeDependencia($query, $des)
 	{
 		if ($des)
-			return $query->where('dependencias.codigo', '=', "$des%");
-	}	
+			return $query->where('dependencias.codigo', '=', "$des");
+	}
 	public function scopeEstado($query, $des)
 	{
 		if ($des)
-			return $query->where('productos.estado_id', '=', "$des%");
-	}	
+			return $query->where('productos.estado_id', '=', "$des");
+	}
+	public function scopeEstadoSeguimiento($query, $des)
+	{
+		if ($des)
+			return $query->where('productos.estadoseguimiento_id', '=', "$des");
+	}
 	public function scopeModalidad($query, $des)
 	{
 		if ($des)
-			return $query->where('dependencias.modalidad', '=', "$des%");
-	}	
+			return $query->where('productos.modalidad', '=', "$des");
+	}
 	public function scopeNombre($query, $des)
 	{
 		if ($des)
 			return $query->where('clientes.nombre', 'like', "%$des%");
-	}	
+	}
 }

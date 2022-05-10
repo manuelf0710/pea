@@ -157,7 +157,7 @@
 
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="form-group">
-              <label for="regional">Estado</label>
+              <label for="regional">Estado Programación</label>
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text"
@@ -178,6 +178,30 @@
               </div>
             </div>
           </div>
+
+          <div class="col-md-6 col-lg-4 col-xs-12">
+            <div class="form-group">
+              <label for="regional">Estado Seguimiento</label>
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <span class="input-group-text"
+                    ><i class="fa fa-map"></i
+                  ></span>
+                </div>
+                <select name="festado_seguimiento"
+                id="festado_seguimiento"
+                class="form-control form-control-sm"
+                formControlName="estado_seguimiento">
+                <option [ngValue]="null" disabled>
+                  Seleccione Estado
+                </option>
+                <option [value]="item.id" *ngFor="let item of estadosListaSeguimiento">
+                  {{ item.nombre }}
+                </option>
+                </select>
+              </div>
+            </div>
+          </div>          
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="form-group">
               <label for="regional">Modalidad</label>
@@ -698,31 +722,32 @@
                       formControlName="fecha_seguimiento"
                       readonly
                     />
-                    <div class="input-group-append">
-                      <i class="fa fa-calendar" (click)="d.toggle()"></i>
-                    </div>
+                    <ng-container *ngIf="currentUser.perfil.id != 3" >
+                      <div class="input-group-append">
+                        <i class="fa fa-calendar" (click)="d.toggle()"></i>
+                      </div>
+                    </ng-container>
                   </div>
                 </div>
               </div>
 
               <div class="col-md-4 col-lg-4 col-xs-12">
                 <div class="form-group">
-                  <label for="regional">Estado Programación</label>
+                  <label for="regional">Estado Seguimiento</label>
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text"
                         ><i class="fa fa-map"></i
                       ></span>
                     </div>
-
-                    <select name="estado_programacion"
-                    id="estado_programacion"
+                    <select name="estado_seguimiento" [attr.disabled]="currentUser.perfil.id != 3 ? null : 'disabled'"
+                    id="estado_seguimiento"
                     class="form-control form-control-sm"
-                    formControlName="estado_programacion">
+                    formControlName="estado_seguimiento">
                     <option [ngValue]="null" disabled>
                       Seleccione Estado
                     </option>
-                    <option [value]="item.id" *ngFor="let item of estadosLista">
+                    <option [value]="item.id" *ngFor="let item of estadosListaSeguimiento">
                       {{ item.nombre }}
                     </option>
                     </select>
@@ -775,9 +800,84 @@
                   </div>
                 </div>
               </div>
+
+              <div class="col-md-4 col-lg-4 col-xs-12">
+                <div class="form-group">
+                  <label for="regional">Estado Programación</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"
+                        ><i class="fa fa-map"></i
+                      ></span>
+                    </div>
+
+                    <select name="estado_programacion"
+                    id="estado_programacion"
+                    class="form-control form-control-sm"
+                    formControlName="estado_programacion">
+                    <option [ngValue]="null" disabled>
+                      Seleccione Estado
+                    </option>
+                    <option [value]="item.id" *ngFor="let item of estadosLista">
+                      {{ item.nombre }}
+                    </option>
+                    </select>
+
+
+                  </div>
+                </div>
+              </div> 
+              
+              <div class="col-md-4 col-lg-4 col-xs-12" *ngIf="validarEstadoProgramacion()">
+                <div class="form-group">
+                  <label for="regional">Comentario Cancelación o Reprogramación</label>
+                  <div class="input-group">
+                    <div class="input-group-prepend">
+                      <span class="input-group-text"
+                        ><i class="fa fa-map"></i
+                      ></span>
+                    </div>
+                    <textarea
+                      type="text"
+                      name="comentario_cancelacion"
+                      id="comentario_cancelacion"
+                      class="form-control form-control-sm"
+                      formControlName="comentario_cancelacion"
+                    ></textarea> 
+
+                   
+                  </div>
+                  <div
+                  *ngIf="
+                    formulario.get('comentario_cancelacion').errors &&
+                    formulario.get('comentario_cancelacion').touched
+                  "
+                >
+                  <small
+                    *ngIf="formulario.get('comentario_cancelacion').hasError('required')"
+                    class="form-text text-danger"
+                    >el campo comentario bloqueo no debe estar vacío.</small
+                  >
+                  <small
+                    *ngIf="formulario.get('comentario_cancelacion').hasError('minlength')"
+                    class="form-text text-danger"
+                    >el campo comentario debe ser mayor a 5 caracteres.</small
+                  >
+                </div>                   
+                </div>
+              </div>               
+              <div class="col-md-12 col-lg-12 col-xs-12">
+                <div class="container">
+                  <div class="row">
+                    <div class="col-md-6 offset-md-3">
+                      <button type="button" class="btn btn-block btn-outline-secondary btn-lg mb-5" (click)="guardarInformacionProgramacion()"> Guardar <i class="fa fa-save"></i></button>
+                    </div>
+                  </div>
+                </div>
+              </div>           
             </div>
 
-            <table class="table table-sm table-bordered">
+            <table class="table table-sm table-bordered" *ngIf="agendasDisponibles">
               <thead class="thead-light">
                 <tr>
                   <th>Profesional</th>

@@ -185,9 +185,9 @@ class ProductoController extends Controller
         $cedula = $request->post('cedula');
         $dependencia = $request->post('dependencia');
         $estado = $request->post('estado');
+        $estadoSeguimiento = $request->post('estado_seguimiento');
         $modalidad = $request->post('modalidad');
         $nombre = $request->post('nombre');
-
         $globalSearch = $request->get('globalsearch');
 
         if ($globalSearch != '') {
@@ -200,7 +200,8 @@ class ProductoController extends Controller
             $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
                 ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
                 ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
-                ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
+                ->join('lista_items', 'productos.estado_id', '=', 'lista_items.id')
+                ->leftJoin('estadoseguimientos', 'productos.estadoseguimiento_id', '=', 'estadoseguimientos.id')
                 ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
                 ->select(
                     'productos.id',
@@ -211,7 +212,9 @@ class ProductoController extends Controller
                     'clientes.cedula',
                     'clientes.nombre',
                     'productos.estado_id',
-                    'estadoprogramaciones.nombre as estado',
+                    'lista_items.nombre as estado',
+                    'productos.estadoseguimiento_id',
+                    'estadoseguimientos.nombre as estado_seguimiento',
                     'dependencias.nombre as dependencia',
                     'clientes.email',
                     'clientes.telefono',
@@ -233,6 +236,7 @@ class ProductoController extends Controller
                 ->cedula($cedula)
                 ->dependencia($dependencia)
                 ->estado($estado)
+                ->estadoSeguimiento($estadoSeguimiento)
                 ->modalidad($modalidad)
                 ->nombre($nombre)
                 ->paginate($pageSize);
@@ -306,7 +310,7 @@ class ProductoController extends Controller
                             if ($item['cedula'] > 100000) {
                                 $producto = new Producto();
                                 $producto->producto_repso_id = $id;
-                                $producto->estado_id = 9;
+                                $producto->estado_id = 12;
                                 $producto->cedula = $item['cedula'];
                                 $producto->dependencia_id = $item['dependencia_id'];
                                 $producto->user_id = auth()->user()->id;

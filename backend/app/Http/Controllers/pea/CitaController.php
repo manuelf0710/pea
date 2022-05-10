@@ -313,17 +313,21 @@ class CitaController extends Controller
         $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
             ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
             ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
-            ->join('estadoprogramaciones', 'productos.estado_id', '=', 'estadoprogramaciones.id')
-            ->leftJoin('users','productos.profesional_id', '=', 'users.id')
+            ->join('lista_items', 'productos.estado_id', '=', 'lista_items.id')
+            ->leftJoin('estadoseguimientos', 'productos.estadoseguimiento_id', '=', 'estadoseguimientos.id')
+            ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
             ->select(
                 'productos.id',
                 'productos.modalidad',
                 'productos.descripcion',
                 'productos.comentarios',
+                'productos.pyp_ergonomia',
                 'clientes.cedula',
                 'clientes.nombre',
                 'productos.estado_id',
-                'estadoprogramaciones.nombre as estado',
+                'lista_items.nombre as estado',
+                'productos.estadoseguimiento_id',
+                'estadoseguimientos.nombre as estado_seguimiento',
                 'dependencias.nombre as dependencia',
                 'clientes.email',
                 'clientes.telefono',
@@ -334,7 +338,7 @@ class CitaController extends Controller
                 'ciudades.nombre as ciudad',
                 'clientes.barrio',
                 'productos.profesional_id',
-                'users.name as profesional_des'                
+                'users.name as profesional_des'
             )
             //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
             ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")

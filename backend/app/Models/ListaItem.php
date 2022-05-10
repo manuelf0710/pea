@@ -11,20 +11,20 @@ use Illuminate\Http\Request;
 class ListaItem extends Authenticatable
 {
     use Notifiable;
-	protected $table = 'lista_items';
-	protected $primaryKey = 'id';
-	public $timestamps = true;
-	use SoftDeletes; /*borrado suave de laravel*/
-	
+    protected $table = 'lista_items';
+    protected $primaryKey = 'id';
+    public $timestamps = true;
+    use SoftDeletes; /*borrado suave de laravel*/
+
     /**
      * The attributes that should be hidden for arrays.
      *
      * @var array
      */
     protected $hidden = [
-        'created_at','updated_at','deleted_at','estado'
+        'created_at', 'updated_at', 'deleted_at'
     ];
-	
+
     /**
      * The attributes that are mass assignable.
      *
@@ -35,15 +35,19 @@ class ListaItem extends Authenticatable
         'background',
         'color'
     ];
-	
-	public static function rules(Request $request, $id = null)
+
+    public static function rules(Request $request, $id = null)
     {
-		
-     	$rules = [
-        	'nombre' => 'required|string',
-    	];		
+
+        $rules = [
+            'nombre' => 'required|string',
+        ];
         return $rules;
     }
-	
-   
+
+    public function scopeByProfile($query, $userData)
+    {
+        if ($userData->perfil_id == 3)
+            return $query->whereNotIn('lista_items.id', [4, 5, 12]);
+    }
 }

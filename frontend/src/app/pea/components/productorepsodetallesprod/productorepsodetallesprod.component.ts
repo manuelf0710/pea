@@ -17,6 +17,7 @@ import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NuevacitaComponent } from "./nuevacita/nuevacita.component";
 import { User } from "src/app/auth/models/user";
 import { listaItems } from './../../../models/listaItems';
+import { estadoSeguimiento } from '../../../models/estadoSeguimiento';
 
 
 export interface gestionPersona {
@@ -38,6 +39,7 @@ export interface gestionPersona {
   descripcion: String;
   numero_citas: String;
   fecha_seguimiento: String;
+  estadoseguimiento_id: number;
   comentarios: String;
   ciudad: String;
   pyp_ergonomia: String;
@@ -63,6 +65,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   odsDetalles: productoRepso;
   productosLista: any[];
   estadosLista: listaItems[];
+  estadosListaSeguimiento: estadoSeguimiento[];
   loading: boolean = true;
   mostrarRegistro: boolean = false;
   mostrarCargaExcel: boolean = false;
@@ -120,6 +123,22 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         environment.imports.importExcelToProductRepso +
         this.id;
     });
+    this.setComentarioCancelacionValidators();
+  }
+
+  setComentarioCancelacionValidators(){
+    const comentarioCancelacion = this.formulario.get("comentario_cancelacion");
+    this.formulario.get("estado_programacion").valueChanges.subscribe((estado_programacion) => {
+      if (estado_programacion == 10 || estado_programacion == 11) {
+        comentarioCancelacion.setValidators([
+          Validators.required,
+          Validators.minLength(5),
+        ]);
+      } else {
+        comentarioCancelacion.setValidators(null);
+      }
+      comentarioCancelacion.updateValueAndValidity();
+    });    
   }
 
   private buildForm() {
@@ -144,7 +163,9 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       descripcion: ["", [Validators.required]],
       numero_citas: [null],
       fecha_seguimiento: [null],
+      estado_seguimiento: [null],
       estado_programacion: [null],
+      comentario_cancelacion: [null],
       comentarios: [null],
       pyp_ergonomia: [""],
       profesionalsearch: [""],
@@ -161,6 +182,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       cedula: [""],
       nombre: [""],
       estado: [""],
+      estado_seguimiento: [""],
       modalidad: [""],
     });
   }
@@ -185,11 +207,13 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this._ProductoService.getProductosBySolicitud(this.id, {
         ...this.formularioFiltro.value,
       }),
-      this._ComunService.getListasAllById(2)
-    ]).subscribe(([odsDetalles, productosLista, estadosLista]) => {
+      this._ComunService.getListasAllById(2),
+      this._ComunService.getEstadosAll(),
+    ]).subscribe(([odsDetalles, productosLista, estadosLista, estadosListaSeguimiento]) => {
       this.odsDetalles = odsDetalles;
       this.productosLista = productosLista.data;
       this.estadosLista = estadosLista;
+      this.estadosListaSeguimiento = estadosListaSeguimiento;
       console.log("los estados lista ", this.estadosLista);
 
       this.totalRecords = productosLista.total;
@@ -229,7 +253,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     console.log("registropersona ", this.personaGestion);
     console.log("valor de mostrar registro ", this.mostrarRegistro);
     console.log("item estado_id ", item.estado_id);
-    if (item.estado_id == 9 && this.mostrarRegistro) {
+    if (item.estado_id == 12 && this.mostrarRegistro) {
       this.agendaDisponibleProfesionales();
     } else {
       console.log("entra en agendasdisponibles null");
@@ -257,8 +281,9 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       descripcion: this.personaGestion.descripcion,
       numero_citas: this.personaGestion.numero_citas,
       fecha_seguimiento: this.personaGestion.fecha_seguimiento,
+      estado_seguimiento: this.personaGestion.estadoseguimiento_id,
       estado_id: this.personaGestion.estado_id,
-      estado_programacion: this.personaGestion.estado,
+      estado_programacion: this.personaGestion.estado_id,
       comentarios: this.personaGestion.comentarios,
       pyp_ergonomia: this.personaGestion.pyp_ergonomia,
     });
@@ -385,7 +410,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     console.log("el formulario ", this.formulario);
     console.log("el dato de la citaa ", cita);
     console.log("lapersonagetsion aid ", this.personaGestion);
-    if (this.personaGestion.estado_id != 9) {
+    if (this.personaGestion.estado_id != 12) {
       this._ToastService.info("esta persona ya ha sido programada");
       return;
     }
@@ -423,4 +448,30 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       );
     }
   }
+
+  validarEstadoProgramacion(){
+    return this.formulario.get("estado_programacion").value == 10 || this.formulario.get("estado_programacion").value == 11  ?  true :   false 
+  }
+
+
+  guardarInformacionProgramacion(){
+   if(this.formulario.valid){
+    let validarComentarioCancelacion = this.validarEstadoProgramacion();
+    console.log("es validoo");
+    /*console.log('una chica para mi ',this.formulario.get("comentario_cancelacion").value)
+    if(validarComentarioCancelacion && (this.formulario.get("comentario_cancelacion").value == '' || this.formulario.get("comentario_cancelacion").value == null)){
+      this._ToastService.info(
+        "debe ingresar un comentario de cancelación"
+      );  
+      return;       
+    }*/
+
+   }else{
+    this.formulario.markAllAsTouched();
+    this._ToastService.info(
+      "debe ingresar los datos del formulario a guardar, sección gestionar programación"
+    );     
+   }
+  }
+
 }

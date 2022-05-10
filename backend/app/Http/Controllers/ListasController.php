@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cita; /* entitie model */
 use Illuminate\Support\Facades\DB;
+use Auth;
+use App\Models\ListaItem; /* entitie model */
 
 class ListasController extends Controller
 {
@@ -17,27 +19,27 @@ class ListasController extends Controller
      */
     public function listarAllItemsById($id)
     {
-        $itemsList = DB::table("listas")
+        $userData = auth()->user();
+        $itemsList = ListaItem::withoutTrashed()
             ->select(
-                'lista_items.id',
-                'lista_items.lista_id',
-                'lista_items.nombre',
-                'lista_items.alias',
-                'lista_items.estado',
-                'lista_items.background',
-                'lista_items.color'
+                'id',
+                'lista_id',
+                'nombre',
+                'alias',
+                'estado',
+                'background',
+                'color'
             )
-            ->join('lista_items', 'listas.id', '=', 'lista_items.lista_id')
-            ->where('listas.id', '=', $id)
-            ->where('listas.estado', '=', 1)
-            ->where('lista_items.estado', '=', 1)
+            ->where('lista_id', '=', $id)
+            ->where('estado', '=', 1)
+            ->byProfile($userData)
             ->get();
         return response()->json($itemsList);
     }
 
     public function estadosAll()
     {
-        $estadosLista = DB::table("estadoprogramaciones")
+        $estadosLista = DB::table("estadoseguimientos")
             ->get();
 
         return response()->json($estadosLista);
