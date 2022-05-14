@@ -32,7 +32,7 @@ class ListasController extends Controller
             )
             ->where('lista_id', '=', $id)
             ->where('estado', '=', 1)
-            ->byProfile($userData)
+            ->byProfile($userData, $id)
             ->get();
         return response()->json($itemsList);
     }

@@ -25,6 +25,7 @@ export interface gestionPersona {
   cedula: number;
   estado: String;
   estado_id: number;
+  estadocopia_id: number;
   nombre: String;
   dependencia: String;
   email: String;
@@ -410,7 +411,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     console.log("el formulario ", this.formulario);
     console.log("el dato de la citaa ", cita);
     console.log("lapersonagetsion aid ", this.personaGestion);
-    if (this.personaGestion.estado_id != 12) {
+    if (this.personaGestion.estado_id != 12 && this.personaGestion.estado_id != 11) {
       this._ToastService.info("esta persona ya ha sido programada");
       return;
     }
@@ -453,11 +454,21 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     return this.formulario.get("estado_programacion").value == 10 || this.formulario.get("estado_programacion").value == 11  ?  true :   false 
   }
 
+  validarInformacionProgramacion(){
+    return this.formulario.get("estado_programacion").value == 10   ?  true :   false 
+  }
+
+  changeGenerarReprogramacionCita(value){
+    if(value == 11){
+      this.agendaDisponibleProfesionales()
+    }
+  }
+
 
   guardarInformacionProgramacion(){
    if(this.formulario.valid){
-    let validarComentarioCancelacion = this.validarEstadoProgramacion();
-    console.log("es validoo");
+    //let validarComentarioCancelacion = this.validarEstadoProgramacion();
+    console.log("es validoo en guardarinformacionprogramacion");
     /*console.log('una chica para mi ',this.formulario.get("comentario_cancelacion").value)
     if(validarComentarioCancelacion && (this.formulario.get("comentario_cancelacion").value == '' || this.formulario.get("comentario_cancelacion").value == null)){
       this._ToastService.info(
@@ -469,7 +480,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
    }else{
     this.formulario.markAllAsTouched();
     this._ToastService.info(
-      "debe ingresar los datos del formulario a guardar, sección gestionar programación"
+      "debe ingresar todos los datos obligatorios, sección gestionar programación"
     );     
    }
   }

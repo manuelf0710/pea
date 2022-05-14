@@ -45,9 +45,9 @@ class ListaItem extends Authenticatable
         return $rules;
     }
 
-    public function scopeByProfile($query, $userData)
+    public function scopeByProfile($query, $userData, $id)
     {
-        if ($userData->perfil_id == 3)
+        if ($userData->perfil_id == 3 && $id == 2)
             return $query->whereNotIn('lista_items.id', [4, 5, 12]);
     }
 }

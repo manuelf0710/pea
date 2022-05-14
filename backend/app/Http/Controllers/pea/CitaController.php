@@ -325,6 +325,7 @@ class CitaController extends Controller
                 'clientes.cedula',
                 'clientes.nombre',
                 'productos.estado_id',
+                'productos.numero_citas',
                 'lista_items.nombre as estado',
                 'productos.estadoseguimiento_id',
                 'estadoseguimientos.nombre as estado_seguimiento',

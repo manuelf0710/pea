@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\pea\Producto;
+use App\Models\pea\ProductoReprogramaciones;
 use App\Models\pea\ProductoRepso;
 use App\Models\Cliente;
 use App\Imports\ClientesImport;
@@ -91,6 +92,60 @@ class ProductoController extends Controller
     public function edit($id)
     {
         //
+    }
+
+    public function resetearProductoTiemposCita($producto_id)
+    {
+        DB::table('citas')
+            ->where('producto_id',  $producto_id)
+            ->update(['producto_id' => null, 'ocupado' => 1]);
+    }
+
+    public function productoUpdateGestion(Request $request, $id)
+    {
+        $validator = Validator::make($request->all(), [
+            'id' => 'required',
+            'estado_id' => 'required',
+            'comentario_cancelacion' => 'required_if:estado_id, 10,11',
+        ], Producto::$customMessages);
+        if (!($validator->fails())) {
+            $updateProducto = Producto::find($id);
+
+            if ($request->post('estado_id') == 10 || $request->post('estado_id') == 11) {
+                $productoReprogramacion = new ProductoReprogramaciones();
+                $productoReprogramacion->producto_id = $id;
+                $productoReprogramacion->user_id        = auth()->user()->id;
+                $productoReprogramacion->profesional_id = $updateProducto->profesional_id;
+                $productoReprogramacion->profesional_id = $updateProducto->profesional_id;
+                $productoReprogramacion->comentario     = $request->post('comentario_cancelacion');
+                $productoReprogramacion->inicio         = $updateProducto->fecha_inicio;
+                $productoReprogramacion->end            = $updateProducto->fecha_fin;
+                $productoReprogramacion->estado_id      = $request->post('estado_id');
+                $productoReprogramacion->save();
+
+                if ($request->post('estado_id') == 11) {
+                    $updateProducto->numero_citas =  $updateProducto->numero_citas + 1;
+                    $this->resetearProductoTiemposCita($id);
+                }
+
+                $updateProducto->save();
+            }
+
+            $response = array(
+                'status' => 'ok',
+                'code' => 200,
+                'data'   => $updateProducto,
+                'msg'    => 'Actualizado',
+            );
+        } else {
+            $response = array(
+                'status' => 'error',
+                'msg' => $validator->errors(),
+                'validator' => $validator
+            );
+        }
+
+        return response()->json($response);
     }
 
     /**
@@ -212,6 +267,7 @@ class ProductoController extends Controller
                     'clientes.cedula',
                     'clientes.nombre',
                     'productos.estado_id',
+                    'productos.numero_citas',
                     'lista_items.nombre as estado',
                     'productos.estadoseguimiento_id',
                     'estadoseguimientos.nombre as estado_seguimiento',

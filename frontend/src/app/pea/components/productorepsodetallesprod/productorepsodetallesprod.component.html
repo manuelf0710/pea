@@ -695,6 +695,7 @@
                       name="numero_citas"
                       id="numero_citas"
                       class="form-control form-control-sm"
+                      formControlName="numero_citas"
                       readonly
                     />
                   </div>
@@ -814,7 +815,9 @@
                     <select name="estado_programacion"
                     id="estado_programacion"
                     class="form-control form-control-sm"
-                    formControlName="estado_programacion">
+                    formControlName="estado_programacion"
+                    (change)="changeGenerarReprogramacionCita($event.target.value)"
+                    >
                     <option [ngValue]="null" disabled>
                       Seleccione Estado
                     </option>
@@ -856,7 +859,7 @@
                   <small
                     *ngIf="formulario.get('comentario_cancelacion').hasError('required')"
                     class="form-text text-danger"
-                    >el campo comentario bloqueo no debe estar vacío.</small
+                    >el campo comentario cancelación no debe estar vacío.</small
                   >
                   <small
                     *ngIf="formulario.get('comentario_cancelacion').hasError('minlength')"
@@ -866,7 +869,7 @@
                 </div>                   
                 </div>
               </div>               
-              <div class="col-md-12 col-lg-12 col-xs-12">
+              <div class="col-md-12 col-lg-12 col-xs-12" *ngIf="validarInformacionProgramacion()">
                 <div class="container">
                   <div class="row">
                     <div class="col-md-6 offset-md-3">
