@@ -22,7 +22,7 @@
   <div class="modal-body" style="min-height: 380px">
     <div class="row">
       <div class="card">
-        <!--{{ data | json }}-->
+        {{ data | json }}
         <div class="card-header">
           realizado a: {{ data.persona.nombre }} Cédula
           {{ data.persona.cedula }}
@@ -152,14 +152,14 @@
               ></span>
             </div>
             <select
-            name="block_cita"
-            id="block_cita"
-            class="form form-control-sm"
-            formControlName="block_cita"
-          >
-            <option value="1">Si</option>
-            <option value="2">No</option>
-          </select>
+              name="block_cita"
+              id="block_cita"
+              class="form form-control-sm"
+              formControlName="block_cita"
+            >
+              <option value="1">Si</option>
+              <option value="2">No</option>
+            </select>
           </div>
           <div
             *ngIf="

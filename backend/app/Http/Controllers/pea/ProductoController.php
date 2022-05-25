@@ -94,6 +94,48 @@ class ProductoController extends Controller
         //
     }
 
+
+    function getProductoData($id)
+    {
+        $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+            ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
+            ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
+            ->join('lista_items', 'productos.estado_id', '=', 'lista_items.id')
+            ->leftJoin('estadoseguimientos', 'productos.estadoseguimiento_id', '=', 'estadoseguimientos.id')
+            ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
+            ->select(
+                'productos.id',
+                'productos.modalidad',
+                'productos.descripcion',
+                'productos.comentarios',
+                'productos.pyp_ergonomia',
+                'clientes.cedula',
+                'clientes.nombre',
+                'productos.estado_id',
+                'productos.numero_citas',
+                'lista_items.nombre as estado',
+                'productos.estadoseguimiento_id',
+                'estadoseguimientos.nombre as estado_seguimiento',
+                'dependencias.nombre as dependencia',
+                'clientes.email',
+                'clientes.telefono',
+                'clientes.division',
+                'clientes.subdivision',
+                'clientes.cargo',
+                'clientes.direccion',
+                'ciudades.nombre as ciudad',
+                'clientes.barrio',
+                'productos.profesional_id',
+                'users.name as profesional_des'
+            )
+            //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
+            ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+            ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
+            ->where('productos.id', '=', $id)
+            ->first();
+        return $response;
+    }
+
     public function resetearProductoTiemposCita($producto_id)
     {
         DB::table('citas')
@@ -111,7 +153,7 @@ class ProductoController extends Controller
         if (!($validator->fails())) {
             $updateProducto = Producto::find($id);
 
-            if ($request->post('estado_id') == 10 || $request->post('estado_id') == 11) {
+            if ($request->post('estado_programacion') == 10 || $request->post('estado_programacion') == 11) {
                 $productoReprogramacion = new ProductoReprogramaciones();
                 $productoReprogramacion->producto_id = $id;
                 $productoReprogramacion->user_id        = auth()->user()->id;
@@ -120,21 +162,25 @@ class ProductoController extends Controller
                 $productoReprogramacion->comentario     = $request->post('comentario_cancelacion');
                 $productoReprogramacion->inicio         = $updateProducto->fecha_inicio;
                 $productoReprogramacion->end            = $updateProducto->fecha_fin;
-                $productoReprogramacion->estado_id      = $request->post('estado_id');
+                $productoReprogramacion->estado_id      = $request->post('estado_programacion');
                 $productoReprogramacion->save();
 
-                if ($request->post('estado_id') == 11) {
+                if ($request->post('estado_programacion') == 11) {
                     $updateProducto->numero_citas =  $updateProducto->numero_citas + 1;
                     $this->resetearProductoTiemposCita($id);
                 }
 
+                $updateProducto->save();
+            }else{
+                
+                $updateProducto->estado_id = $request->post('estado_programacion');
                 $updateProducto->save();
             }
 
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => $updateProducto,
+                'data'   => array('producto' => $this->getProductoData($updateProducto->id),  'productoinfo' => $updateProducto, 'data' => $request->post()), 
                 'msg'    => 'Actualizado',
             );
         } else {

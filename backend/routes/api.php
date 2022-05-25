@@ -88,7 +88,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 
 
 
-		Route::post('productoupdategestion/{id}', 'pea\ProductoController@productoUpdateGestion')->name('producto.gestion.update');
+		Route::put('productoupdategestion/{id}', 'pea\ProductoController@productoUpdateGestion')->name('producto.gestion.update');
 
 		/*rutyas de agenda */
 		Route::post('agenda/profesionalagenda/{id}', 'pea\AgendaController@show')->name('agenda.show');

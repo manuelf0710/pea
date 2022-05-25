@@ -13,6 +13,7 @@ use App\Models\pea\ProductoRepso;
 use App\Models\Agenda;
 use App\Models\Cita;
 use App\User;
+use App\Models\pea\ProductoReprogramaciones;
 use App\Imports\ClientesImport;
 use Auth;
 use Illuminate\Support\Facades\Storage;
@@ -118,7 +119,12 @@ class CitaController extends Controller
     }
 
 
-
+    public function resetearProductoTiemposCita($producto_id)
+    {
+        DB::table('citas')
+            ->where('producto_id',  $producto_id)
+            ->update(['producto_id' => null, 'ocupado' => 1]);
+    }
     /**
      * Store a newly created resource in storage.
      *
@@ -178,6 +184,10 @@ class CitaController extends Controller
             /*echo('la cita end pérmitida = '.$dataCita['end']);
             echo('la cita end ingresada ='.$dateStart);            
             return; */
+
+            if($info['estado_programacion'] == 11){
+                    $this->resetearProductoTiemposCita($producto_id);                              
+            }
 
             /*
             * Validar que la fecha fin no sea mayo
@@ -274,6 +284,21 @@ class CitaController extends Controller
 
             $productoToUpdate = Producto::find($producto_id);
 
+            if($info['estado_programacion'] == 11){
+               
+                    $productoReprogramacion = new ProductoReprogramaciones();
+                    $productoReprogramacion->producto_id = $producto_id;
+                    $productoReprogramacion->user_id        = auth()->user()->id;
+                    $productoReprogramacion->profesional_id = $productoToUpdate->profesional_id;
+                    $productoReprogramacion->profesional_id = $productoToUpdate->profesional_id;
+                    $productoReprogramacion->comentario     = $info['comentario_cancelacion'];
+                    $productoReprogramacion->inicio         = $productoToUpdate->fecha_inicio;
+                    $productoReprogramacion->end            = $productoToUpdate->fecha_fin;
+                    $productoReprogramacion->estado_id      = $info['estado_id'];
+                    $productoReprogramacion->save();
+                              
+            }            
+
 
             if (!empty($productoToUpdate)) {
                 $productoToUpdate->descripcion = $info['descripcion'];
@@ -282,7 +307,9 @@ class CitaController extends Controller
                 $productoToUpdate->fecha_programacion = $productoInfo->ahora;
                 $productoToUpdate->fecha_inicio = $request->post('start');
                 $productoToUpdate->fecha_fin = $request->post('end');
-                $productoToUpdate->estado_id = 7;
+                $productoToUpdate->numero_citas =  $info['estado_programacion'] == 11 ? $productoToUpdate->numero_citas + 1 : $productoToUpdate->numero_citas;
+                
+                $productoToUpdate->estado_id = $info['estado_programacion'] == 11 ?  11 : 7;
                 $productoToUpdate->pyp_ergonomia = $info['pyp_ergonomia'];
                 $productoToUpdate->comentarios = $info['comentarios'];
                 $productoToUpdate->fecha_seguimiento = $info['fecha_seguimiento'];

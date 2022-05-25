@@ -38,4 +38,13 @@ export class ProductosrepsoService {
         })
       );
   }
+
+  public guardarinformacionProducto(data) {
+    return this._http.put<any>(
+      environment.apiUrl +
+        environment.productos.putProductoGestionById +
+        data.id,
+      data
+    );
+  }
 }

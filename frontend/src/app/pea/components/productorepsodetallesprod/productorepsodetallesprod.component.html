@@ -22,7 +22,8 @@
         >
           <i class="fa fa-filter"></i> Filtrar
         </button>
-        <button *ngIf="permisoCargueExcel"
+        <button
+          *ngIf="permisoCargueExcel"
           class="btn btn-outline-success btn-sm pull-right"
           (click)="openCargaExcel()"
         >
@@ -164,16 +165,16 @@
                     ><i class="fa fa-map"></i
                   ></span>
                 </div>
-                <select name="festado"
-                id="festado"
-                class="form-control form-control-sm"
-                formControlName="estado">
-                <option [ngValue]="null" disabled>
-                  Seleccione Estado
-                </option>
-                <option [value]="item.id" *ngFor="let item of estadosLista">
-                  {{ item.nombre }}
-                </option>
+                <select
+                  name="festado"
+                  id="festado"
+                  class="form-control form-control-sm"
+                  formControlName="estado"
+                >
+                  <option [ngValue]="null" disabled>Seleccione Estado</option>
+                  <option [value]="item.id" *ngFor="let item of estadosLista">
+                    {{ item.nombre }}
+                  </option>
                 </select>
               </div>
             </div>
@@ -188,20 +189,23 @@
                     ><i class="fa fa-map"></i
                   ></span>
                 </div>
-                <select name="festado_seguimiento"
-                id="festado_seguimiento"
-                class="form-control form-control-sm"
-                formControlName="estado_seguimiento">
-                <option [ngValue]="null" disabled>
-                  Seleccione Estado
-                </option>
-                <option [value]="item.id" *ngFor="let item of estadosListaSeguimiento">
-                  {{ item.nombre }}
-                </option>
+                <select
+                  name="festado_seguimiento"
+                  id="festado_seguimiento"
+                  class="form-control form-control-sm"
+                  formControlName="estado_seguimiento"
+                >
+                  <option [ngValue]="null" disabled>Seleccione Estado</option>
+                  <option
+                    [value]="item.id"
+                    *ngFor="let item of estadosListaSeguimiento"
+                  >
+                    {{ item.nombre }}
+                  </option>
                 </select>
               </div>
             </div>
-          </div>          
+          </div>
           <div class="col-md-6 col-lg-4 col-xs-12">
             <div class="form-group">
               <label for="regional">Modalidad</label>
@@ -249,44 +253,43 @@
     </div>
   </div>
   <div class="row">
-  <ngb-pagination
-  [(page)]="currentPage"
-  [pageSize]="pageSize"
-  [collectionSize]="totalRecords"
-  [boundaryLinks]="true"
-  [directionLinks]="true"
-  [ellipses]="true"
-  [maxSize]="6"
-  [rotate]="true"
-  (pageChange)="pageChange($event)"
-  size="sm"
-></ngb-pagination>
-</div>
-
-<div class="row">
-
-<div class="col-10 col-lg-10">
-  <em *ngIf="totalRecords > 0" class="fz-12"
-    >{{ from }}-{{ to }} - {{ totalRecords }}</em
-  >
-  <em *ngIf="totalRecords == 0" class="fz-12">Sin Resultados</em>
-</div>
-<div class="col-2 col-lg-2">
-  <div class="float-right">
-    <span class="fz-12">Mostrar</span>
-    <select
-      (change)="onChangePaginationSize()"
-      name=""
-      id=""
-      [(ngModel)]="pageSize"
-      class="mb-1 ml-1"
-      style="width: 60px"
-    >
-      <option [value]="le" *ngFor="let le of pageLength">{{ le }}</option>
-    </select>
+    <ngb-pagination
+      [(page)]="currentPage"
+      [pageSize]="pageSize"
+      [collectionSize]="totalRecords"
+      [boundaryLinks]="true"
+      [directionLinks]="true"
+      [ellipses]="true"
+      [maxSize]="6"
+      [rotate]="true"
+      (pageChange)="pageChange($event)"
+      size="sm"
+    ></ngb-pagination>
   </div>
-</div>
-</div>
+
+  <div class="row">
+    <div class="col-10 col-lg-10">
+      <em *ngIf="totalRecords > 0" class="fz-12"
+        >{{ from }}-{{ to }} - {{ totalRecords }}</em
+      >
+      <em *ngIf="totalRecords == 0" class="fz-12">Sin Resultados</em>
+    </div>
+    <div class="col-2 col-lg-2">
+      <div class="float-right">
+        <span class="fz-12">Mostrar</span>
+        <select
+          (change)="onChangePaginationSize()"
+          name=""
+          id=""
+          [(ngModel)]="pageSize"
+          class="mb-1 ml-1"
+          style="width: 60px"
+        >
+          <option [value]="le" *ngFor="let le of pageLength">{{ le }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
   <div class="row">
     <table class="table table-sm table-hover table-bordered table-striped">
       <thead>
@@ -723,7 +726,7 @@
                       formControlName="fecha_seguimiento"
                       readonly
                     />
-                    <ng-container *ngIf="currentUser.perfil.id != 3" >
+                    <ng-container *ngIf="currentUser.perfil.id != 3">
                       <div class="input-group-append">
                         <i class="fa fa-calendar" (click)="d.toggle()"></i>
                       </div>
@@ -741,19 +744,25 @@
                         ><i class="fa fa-map"></i
                       ></span>
                     </div>
-                    <select name="estado_seguimiento" [attr.disabled]="currentUser.perfil.id != 3 ? null : 'disabled'"
-                    id="estado_seguimiento"
-                    class="form-control form-control-sm"
-                    formControlName="estado_seguimiento">
-                    <option [ngValue]="null" disabled>
-                      Seleccione Estado
-                    </option>
-                    <option [value]="item.id" *ngFor="let item of estadosListaSeguimiento">
-                      {{ item.nombre }}
-                    </option>
+                    <select
+                      name="estado_seguimiento"
+                      [attr.disabled]="
+                        currentUser.perfil.id != 3 ? null : 'disabled'
+                      "
+                      id="estado_seguimiento"
+                      class="form-control form-control-sm"
+                      formControlName="estado_seguimiento"
+                    >
+                      <option [ngValue]="null" disabled>
+                        Seleccione Estado
+                      </option>
+                      <option
+                        [value]="item.id"
+                        *ngFor="let item of estadosListaSeguimiento"
+                      >
+                        {{ item.nombre }}
+                      </option>
                     </select>
-
-
                   </div>
                 </div>
               </div>
@@ -804,7 +813,9 @@
 
               <div class="col-md-4 col-lg-4 col-xs-12">
                 <div class="form-group">
-                  <label for="regional">Estado Programación</label>
+                  <label for="regional"
+                    >Estado Programación : {{ personaGestion.estado }}</label
+                  >
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text"
@@ -812,28 +823,37 @@
                       ></span>
                     </div>
 
-                    <select name="estado_programacion"
-                    id="estado_programacion"
-                    class="form-control form-control-sm"
-                    formControlName="estado_programacion"
-                    (change)="changeGenerarReprogramacionCita($event.target.value)"
+                    <select
+                      name="estado_programacion"
+                      id="estado_programacion"
+                      class="form-control form-control-sm"
+                      formControlName="estado_programacion"
+                      (change)="
+                        changeGenerarReprogramacionCita($event.target.value)
+                      "
                     >
-                    <option [ngValue]="null" disabled>
-                      Seleccione Estado
-                    </option>
-                    <option [value]="item.id" *ngFor="let item of estadosLista">
-                      {{ item.nombre }}
-                    </option>
+                      <option [ngValue]="null" disabled>
+                        Seleccione Estado
+                      </option>
+                      <option
+                        [value]="item.id"
+                        *ngFor="let item of estadosListaProceso"
+                      >
+                        {{ item.nombre }}
+                      </option>
                     </select>
-
-
                   </div>
                 </div>
-              </div> 
-              
-              <div class="col-md-4 col-lg-4 col-xs-12" *ngIf="validarEstadoProgramacion()">
+              </div>
+
+              <div
+                class="col-md-4 col-lg-4 col-xs-12"
+                *ngIf="validarEstadoProgramacion()"
+              >
                 <div class="form-group">
-                  <label for="regional">Comentario Cancelación o Reprogramación</label>
+                  <label for="regional"
+                    >Comentario Cancelación o Reprogramación</label
+                  >
                   <div class="input-group">
                     <div class="input-group-prepend">
                       <span class="input-group-text"
@@ -846,41 +866,60 @@
                       id="comentario_cancelacion"
                       class="form-control form-control-sm"
                       formControlName="comentario_cancelacion"
-                    ></textarea> 
-
-                   
+                    ></textarea>
                   </div>
                   <div
-                  *ngIf="
-                    formulario.get('comentario_cancelacion').errors &&
-                    formulario.get('comentario_cancelacion').touched
-                  "
-                >
-                  <small
-                    *ngIf="formulario.get('comentario_cancelacion').hasError('required')"
-                    class="form-text text-danger"
-                    >el campo comentario cancelación no debe estar vacío.</small
+                    *ngIf="
+                      formulario.get('comentario_cancelacion').errors &&
+                      formulario.get('comentario_cancelacion').touched
+                    "
                   >
-                  <small
-                    *ngIf="formulario.get('comentario_cancelacion').hasError('minlength')"
-                    class="form-text text-danger"
-                    >el campo comentario debe ser mayor a 5 caracteres.</small
-                  >
-                </div>                   
+                    <small
+                      *ngIf="
+                        formulario
+                          .get('comentario_cancelacion')
+                          .hasError('required')
+                      "
+                      class="form-text text-danger"
+                      >el campo comentario cancelación no debe estar
+                      vacío.</small
+                    >
+                    <small
+                      *ngIf="
+                        formulario
+                          .get('comentario_cancelacion')
+                          .hasError('minlength')
+                      "
+                      class="form-text text-danger"
+                      >el campo comentario debe ser mayor a 5 caracteres.</small
+                    >
+                  </div>
                 </div>
-              </div>               
-              <div class="col-md-12 col-lg-12 col-xs-12" *ngIf="validarInformacionProgramacion()">
+              </div>
+              <div
+                class="col-md-12 col-lg-12 col-xs-12"
+                *ngIf="showButtonInformacionProgramacion"
+              >
                 <div class="container">
                   <div class="row">
                     <div class="col-md-6 offset-md-3">
-                      <button type="button" class="btn btn-block btn-outline-secondary btn-lg mb-5" (click)="guardarInformacionProgramacion()"> Guardar <i class="fa fa-save"></i></button>
+                      <button
+                        type="button"
+                        class="btn btn-block btn-outline-secondary btn-lg mb-5"
+                        (click)="guardarInformacionProgramacion()"
+                      >
+                        Guardar <i class="fa fa-save"></i>
+                      </button>
                     </div>
                   </div>
                 </div>
-              </div>           
+              </div>
             </div>
 
-            <table class="table table-sm table-bordered" *ngIf="agendasDisponibles">
+            <table
+              class="table table-sm table-bordered"
+              *ngIf="agendasDisponibles"
+            >
               <thead class="thead-light">
                 <tr>
                   <th>Profesional</th>

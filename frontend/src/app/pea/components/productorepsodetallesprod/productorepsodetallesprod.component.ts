@@ -9,16 +9,16 @@ import { ProductoService } from "../../services/producto.service";
 import { ClienteService } from "src/app/services/cliente.service";
 import { AgendaService } from "./../../../services/agenda.service";
 import { ToastService } from "src/app/shared/services/toast.service";
-import { AuthenticationService } from './../../../auth/services/authentication.service';
-import { ComunService } from './../../../services/comun.service';
-
+import { AuthenticationService } from "./../../../auth/services/authentication.service";
+import { ComunService } from "./../../../services/comun.service";
 
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NuevacitaComponent } from "./nuevacita/nuevacita.component";
 import { User } from "src/app/auth/models/user";
-import { listaItems } from './../../../models/listaItems';
-import { estadoSeguimiento } from '../../../models/estadoSeguimiento';
+import { listaItems } from "./../../../models/listaItems";
+import { estadoSeguimiento } from "../../../models/estadoSeguimiento";
 
+import { UtilService } from "./../../../shared/services/util.service";
 
 export interface gestionPersona {
   id: number;
@@ -65,7 +65,14 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   id!: number;
   odsDetalles: productoRepso;
   productosLista: any[];
+  /*
+   * base que tiene todos los estados
+   */
   estadosLista: listaItems[];
+  /*
+   * controla los estados que son visibles de acuerdo a la manipulacion del estado que tiene el producto
+   */
+  estadosListaProceso: listaItems[] = [];
   estadosListaSeguimiento: estadoSeguimiento[];
   loading: boolean = true;
   mostrarRegistro: boolean = false;
@@ -80,7 +87,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   personaGestion!: gestionPersona;
   agendasDisponibles!: agendasDisponiblesProfesionales;
   currentUser: User;
-  
+
   public pageSize: number;
   public currentPage: number;
   public totalRecords: number;
@@ -88,30 +95,35 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   public to: number;
   public pageLength = [10, 20, 50, 100];
   /*
-  * Perfiles con permiso para cargar excel
+   * Perfiles con permiso para cargar excel
    */
-  public arrayPermisoCargueExcel = [1,2];
+  public arrayPermisoCargueExcel = [1, 2];
   public permisoCargueExcel: boolean = false;
+  public showButtonInformacionProgramacion: boolean = false;
 
   constructor(
     private _ToastService: ToastService,
     private FormBuilder: FormBuilder,
-    private _ComunService : ComunService,
+    private _ComunService: ComunService,
     private _ProductosrepsoService: ProductosrepsoService,
     private _ProductoService: ProductoService,
     private _ClienteService: ClienteService,
     private _AgendaService: AgendaService,
+    private _UtilService: UtilService,
     private modalService: NgbModal,
     private readonly route: ActivatedRoute,
-    private authenticationService: AuthenticationService,
+    private authenticationService: AuthenticationService
   ) {
-
     this.pageSize = 50;
     this.currentPage = 1;
-    this.authenticationService.currentUser.subscribe(x => this.currentUser = x);
+    this.authenticationService.currentUser.subscribe(
+      (x) => (this.currentUser = x)
+    );
     /*console.log("productorepsodetallescomponent ",this.currentUser);
     console.log("productorepsodetallescomponent profileId ",this.currentUser.perfil.id);*/
-    this.permisoCargueExcel = this.arrayPermisoCargueExcel.includes(this.currentUser.perfil.id);
+    this.permisoCargueExcel = this.arrayPermisoCargueExcel.includes(
+      this.currentUser.perfil.id
+    );
   }
 
   ngOnInit(): void {
@@ -127,23 +139,26 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.setComentarioCancelacionValidators();
   }
 
-  setComentarioCancelacionValidators(){
+  setComentarioCancelacionValidators() {
     const comentarioCancelacion = this.formulario.get("comentario_cancelacion");
-    this.formulario.get("estado_programacion").valueChanges.subscribe((estado_programacion) => {
-      if (estado_programacion == 10 || estado_programacion == 11) {
-        comentarioCancelacion.setValidators([
-          Validators.required,
-          Validators.minLength(5),
-        ]);
-      } else {
-        comentarioCancelacion.setValidators(null);
-      }
-      comentarioCancelacion.updateValueAndValidity();
-    });    
+    this.formulario
+      .get("estado_programacion")
+      .valueChanges.subscribe((estado_programacion) => {
+        if (estado_programacion == 10 || estado_programacion == 11) {
+          comentarioCancelacion.setValidators([
+            Validators.required,
+            Validators.minLength(5),
+          ]);
+        } else {
+          comentarioCancelacion.setValidators(null);
+        }
+        comentarioCancelacion.updateValueAndValidity();
+      });
   }
 
   private buildForm() {
     this.formulario = this.FormBuilder.group({
+      id: [null],
       cedula: ["", [Validators.required]],
       nombre: ["", [Validators.required]],
       dependencia: [null],
@@ -165,6 +180,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       numero_citas: [null],
       fecha_seguimiento: [null],
       estado_seguimiento: [null],
+      estado_id: [null],
       estado_programacion: [null],
       comentario_cancelacion: [null],
       comentarios: [null],
@@ -210,28 +226,40 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       }),
       this._ComunService.getListasAllById(2),
       this._ComunService.getEstadosAll(),
-    ]).subscribe(([odsDetalles, productosLista, estadosLista, estadosListaSeguimiento]) => {
-      this.odsDetalles = odsDetalles;
-      this.productosLista = productosLista.data;
-      this.estadosLista = estadosLista;
-      this.estadosListaSeguimiento = estadosListaSeguimiento;
-      console.log("los estados lista ", this.estadosLista);
+    ]).subscribe(
+      ([
+        odsDetalles,
+        productosLista,
+        estadosLista,
+        estadosListaSeguimiento,
+      ]) => {
+        this.odsDetalles = odsDetalles;
+        this.productosLista = productosLista.data;
+        this.estadosLista = estadosLista;
+        this.estadosListaSeguimiento = estadosListaSeguimiento;
+        console.log("los estados lista ", this.estadosLista);
 
-      this.totalRecords = productosLista.total;
-      this.from = productosLista.from;
-      this.to = productosLista.to;
+        this.totalRecords = productosLista.total;
+        this.from = productosLista.from;
+        this.to = productosLista.to;
 
-      this.loading = false;
-    });
+        this.loading = false;
+      }
+    );
   }
 
   pageChange(pag) {
-    this.loadProductosBySolicitud(this.id +"?page=" + pag + "&pageSize=" + this.pageSize, { ...this.formularioFiltro.value });
+    this.loadProductosBySolicitud(
+      this.id + "?page=" + pag + "&pageSize=" + this.pageSize,
+      { ...this.formularioFiltro.value }
+    );
   }
   public onChangePaginationSize() {
     this.currentPage = 1;
-    this.loadProductosBySolicitud(this.id + "?page=1&pageSize="  + this.pageSize, { ...this.formularioFiltro.value });
-  
+    this.loadProductosBySolicitud(
+      this.id + "?page=1&pageSize=" + this.pageSize,
+      { ...this.formularioFiltro.value }
+    );
   }
 
   agregarRegistro() {
@@ -239,7 +267,59 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.mostrarRegistro = !this.mostrarRegistro;
   }
 
+  manejadorOptionsSelect(arrayItems, arrayIncludes) {
+    console.log("aarrayitems ", arrayItems);
+    this.estadosListaProceso = [];
+    arrayItems.map((item) => {
+      if (arrayIncludes.includes(item.id)) {
+        this.estadosListaProceso.push(item);
+      }
+    });
+  }
+
+  manejadorFilterSelect(arregloPermitidos) {
+    let arrayItems;
+    arrayItems = this.estadosLista.filter((item) =>
+      arregloPermitidos.includes(item.id)
+    );
+
+    this.estadosListaProceso = [];
+    arrayItems.map((item) => {
+      if (arregloPermitidos.includes(item.id)) {
+        this.estadosListaProceso.push(item);
+      }
+    });
+  }
+
+  poblarDatosSelectEstado(value) {
+    /*
+     * si es estado ejecutado
+     */
+    let array_vacio;
+    if (value == 8) {
+      /**ejecutado */
+      let arregloPermitidos = [9];
+      array_vacio = this.manejadorFilterSelect(arregloPermitidos);
+    } else if (value == 7) {
+      /*citado */
+      let arregloPermitidosCita = [8, 10, 11];
+      array_vacio = this.manejadorFilterSelect(arregloPermitidosCita);
+    } else if (value == 9) {
+      let arregloPermitidosOther = [9]; /**informe */
+      array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
+    } else if (value == 10) {
+      /**cancelado */
+      let arregloPermitidosOther = [-1];
+      array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
+    } else if (value == 11) {
+      /**cancelado reprogramado */
+      let arregloPermitidosOther = [11, 8];
+      array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
+    }
+  }
+
   gestionProgramacion(item) {
+    console.log("elvalord e item select ", item);
     this.mostrarRegistro = !this.mostrarRegistro;
     if (this.personaGestion === undefined) {
       this.personaGestion = item;
@@ -249,12 +329,18 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this.mostrarRegistro = true;
     }
 
+    this.poblarDatosSelectEstado(item.estado_id);
+
     //this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
+    const estadosDisponiblesAgendamiento = [11, 12];
 
     console.log("registropersona ", this.personaGestion);
     console.log("valor de mostrar registro ", this.mostrarRegistro);
     console.log("item estado_id ", item.estado_id);
-    if (item.estado_id == 12 && this.mostrarRegistro) {
+    if (
+      estadosDisponiblesAgendamiento.includes(item.estado_id) &&
+      this.mostrarRegistro
+    ) {
       this.agendaDisponibleProfesionales();
     } else {
       console.log("entra en agendasdisponibles null");
@@ -266,6 +352,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
 
   setvaluesFormulario() {
     this.formulario.patchValue({
+      id: this.personaGestion.id,
       nombre: this.personaGestion.nombre,
       cedula: this.personaGestion.cedula,
       dependencia: this.personaGestion.dependencia,
@@ -411,7 +498,11 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     console.log("el formulario ", this.formulario);
     console.log("el dato de la citaa ", cita);
     console.log("lapersonagetsion aid ", this.personaGestion);
-    if (this.personaGestion.estado_id != 12 && this.personaGestion.estado_id != 11) {
+    if (
+      this.personaGestion.estado_id != 12 &&
+      this.personaGestion.estado_id != 11 &&
+      this.personaGestion.estado_id != 7
+    ) {
       this._ToastService.info("esta persona ya ha sido programada");
       return;
     }
@@ -450,39 +541,101 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     }
   }
 
-  validarEstadoProgramacion(){
-    return this.formulario.get("estado_programacion").value == 10 || this.formulario.get("estado_programacion").value == 11  ?  true :   false 
+  validarEstadoProgramacion() {
+    return this.formulario.get("estado_programacion").value == 10 ||
+      this.formulario.get("estado_programacion").value == 11
+      ? true
+      : false;
   }
 
-  validarInformacionProgramacion(){
-    return this.formulario.get("estado_programacion").value == 10   ?  true :   false 
+  validarInformacionProgramacion() {
+    const estadosDisponiblesShowButton = [10, 9, 8];
+    const estadosDisponiblesButton = [7, 8, 9, 11];
+    console.log("entrea aqui validarinformacionacionprogramaciones");
+    //return estadosDisponiblesShowButton.includes(this.formulario.get("estado_programacion").value)   ?  true :   false
+    alert(this.formulario.get("estado_programacion").value);
+    if (
+      estadosDisponiblesShowButton.includes(
+        this.formulario.get("estado_programacion").value
+      ) &&
+      estadosDisponiblesButton.includes(this.formulario.get("estado_id").value)
+    ) {
+      return true;
+    }
+    return false;
   }
 
-  changeGenerarReprogramacionCita(value){
-    if(value == 11){
-      this.agendaDisponibleProfesionales()
+  /*
+   * mostrar el boton de acuerdo al estado
+   */
+  showButtonActualizarInformacion(value) {
+    const estadosPermitidosActualizarInformacion = [7, 8, 9];
+    if (
+      estadosPermitidosActualizarInformacion.includes(
+        this.formulario.get("estado_id").value
+      ) &&
+      value != 11
+    ) {
+      this.showButtonInformacionProgramacion = true;
+    } else {
+      this.showButtonInformacionProgramacion = false;
     }
   }
 
+  changeGenerarReprogramacionCita(value) {
+    const estadosPermitidosCambio = [
+      7, 11,
+    ]; /** 7 citado, 11 cancelado reprogramado estaso permitido cambio de cita hora*/
 
-  guardarInformacionProgramacion(){
-   if(this.formulario.valid){
-    //let validarComentarioCancelacion = this.validarEstadoProgramacion();
-    console.log("es validoo en guardarinformacionprogramacion");
-    /*console.log('una chica para mi ',this.formulario.get("comentario_cancelacion").value)
-    if(validarComentarioCancelacion && (this.formulario.get("comentario_cancelacion").value == '' || this.formulario.get("comentario_cancelacion").value == null)){
-      this._ToastService.info(
-        "debe ingresar un comentario de cancelación"
-      );  
-      return;       
-    }*/
-
-   }else{
-    this.formulario.markAllAsTouched();
-    this._ToastService.info(
-      "debe ingresar todos los datos obligatorios, sección gestionar programación"
-    );     
-   }
+    if (
+      estadosPermitidosCambio.includes(
+        this.formulario.get("estado_id").value
+      ) &&
+      value == 11
+    ) {
+      this.agendaDisponibleProfesionales();
+    } else {
+      this.agendasDisponibles = null;
+    }
+    this.showButtonActualizarInformacion(value);
   }
 
+  guardarInformacionProgramacion() {
+    if (this.formulario.valid) {
+      this._UtilService
+        .confirm({
+          title: "Guardar Gestión",
+          message: "Seguro que desea guardar esta Información?",
+        })
+        .then(
+          () => {
+            this.loading = true;
+            let value = { ...this.formulario.value };
+            this._ProductosrepsoService
+              .guardarinformacionProducto(value)
+              .subscribe((res: any) => {
+                if (res.status == "ok") {
+                  this._ToastService.success(
+                    "Producto " + res.msg + " correctamente"
+                  );
+                  this.actualizarProducto(res.data.producto);
+                }
+                if (res.status == "error") {
+                  let messageError = this._ToastService.errorMessage(res.msg);
+                  this._ToastService.danger(messageError);
+                }
+                this.loading = false;
+              });
+          },
+          () => {
+            this.loading = false;
+          }
+        );
+    } else {
+      this.formulario.markAllAsTouched();
+      this._ToastService.info(
+        "debe ingresar todos los datos obligatorios, sección gestionar programación"
+      );
+    }
+  }
 }
