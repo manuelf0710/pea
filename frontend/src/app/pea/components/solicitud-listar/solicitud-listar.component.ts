@@ -5,14 +5,20 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ViewEncapsulation,
 } from "@angular/core";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Router, ActivatedRoute } from "@angular/router";
-import { forkJoin} from "rxjs";
+import { forkJoin } from "rxjs";
 import { BgtableComponent } from "src/app/shared/components/bgtable/bgtable.component";
 import { environment } from "src/environments/environment";
-import { regional } from './../../../models/regional';
-import { tipoProducto } from './../../models/tipoproducto';
+import { regional } from "./../../../models/regional";
+import { tipoProducto } from "./../../models/tipoproducto";
 import { TipoproductosService } from "./../../../services/tipoproductos.service";
 import { ComunService } from "src/app/services/comun.service";
+import { ToastService } from "./../../../shared/services/toast.service";
+
+import { EditarComponent } from "./editar/editar.component";
+import { UtilService } from "../../../shared/services/util.service";
+import { ProductosrepsoService } from "../../services/productosrepso.service";
 
 @Component({
   selector: "app-solicitud-listar",
@@ -23,15 +29,16 @@ import { ComunService } from "src/app/services/comun.service";
 export class SolicitudListarComponent implements OnInit {
   @ViewChild(BgtableComponent) dataTableReload: BgtableComponent;
   public loading: boolean = false;
-  public renderDataTable:  boolean = false;
+  public renderDataTable: boolean = false;
 
   public regionales: regional[];
   public tipoProductos: tipoProducto[];
+  public odsLista: any[];
 
   buttons = {
     acciones: {
       edit: true,
-      delete: true,
+      delete: false,
       copy: {
         label: "programar",
         icon: "fa fa-tasks",
@@ -96,23 +103,32 @@ export class SolicitudListarComponent implements OnInit {
 
   tableConfig;
 
-  constructor(private route: ActivatedRoute, private router: Router,     private _TipoproductosService: TipoproductosService,
-    private _ComunService: ComunService,) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private _TipoproductosService: TipoproductosService,
+    private _ComunService: ComunService,
+    private modalService: NgbModal,
+    private _ToastService: ToastService,
+    private _UtilService: UtilService,
+    private _ProductosrepsoService: ProductosrepsoService
+  ) {}
 
   ngOnInit(): void {
     forkJoin([
       this._TipoproductosService.getLista(),
       this._ComunService.getRegionales(),
-    ]).subscribe(([tipoProductos, regionales]) => {
+      this._ComunService.getOrdenesServicio(),
+    ]).subscribe(([tipoProductos, regionales, odsLista]) => {
       this.regionales = regionales;
       this.tipoProductos = tipoProductos;
+      this.odsLista = odsLista;
       this.loading = false;
       this.initializeDataTable();
     });
-
   }
 
-  initializeDataTable(){
+  initializeDataTable() {
     this.tableConfig = {
       buttons: this.buttons,
       listado_seleccion: true,
@@ -128,22 +144,71 @@ export class SolicitudListarComponent implements OnInit {
           value: "",
           key: "regional",
           type: "select",
-          options:this.regionales
+          options: this.regionales,
         },
         {
           title: "Tipo Producto",
           value: "",
           key: "tipoproducto",
           type: "select",
-          options:this.tipoProductos
+          options: this.tipoProductos,
+        },
+        {
+          title: "Ods",
+          value: "",
+          key: "ods",
+          type: "select",
+          options: this.odsLista,
         },
       ],
-    };    
+    };
   }
 
   agregarSolicitud(ev) {}
-  editarSolicitud(ev) {}
-  eliminar(ev) {}
+  editarSolicitud(solicitud) {
+    const modalRef = this.modalService.open(EditarComponent, {
+      //backdrop: 'static',
+      size: "lg",
+      keyboard: false,
+    });
+
+    modalRef.componentInstance.data = solicitud;
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+          this.dataTableReload.reload(result.data.data);
+          this._ToastService.success("Registro editado correctamente");
+        }
+      })
+      .catch((error) => {});
+  }
+  eliminar(data) {
+    this._UtilService
+      .confirm({
+        title: "Eliminar Registro",
+        message: "Seguro que desea eliminar este registro?",
+      })
+      .then(
+        () => {
+          //console.log('deleting...');
+          this._ProductosrepsoService.eliminar(data.id).subscribe(
+            (result: any) => {
+              if (result["code"] == 200) {
+                this.dataTableReload.reload(result.data);
+                this._ToastService.success(result.msg + " Correctamente");
+              }
+            },
+            (error) => {
+              console.log("el error fue ", error);
+            }
+          );
+        },
+        () => {
+          //console.log('not deleting...');
+        }
+      );
+  }
   programar(ev) {
     this.router.navigate(["/pea/solicitudproductos"], {
       queryParams: { id: ev.id },

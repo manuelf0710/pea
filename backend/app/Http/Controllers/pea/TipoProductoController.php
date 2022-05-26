@@ -97,6 +97,7 @@ class TipoProductoController extends Controller
     {
         $productos = TipoProducto::withoutTrashed()
             ->select('id as value', 'name as label', 'tiempo')
+            ->orderBy('name')
             ->get();
         return response()->json($productos);
     }

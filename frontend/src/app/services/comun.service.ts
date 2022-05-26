@@ -39,10 +39,7 @@ export class ComunService {
 
   getEstadosAll(): Observable<any> {
     return this._http
-      .get<any>(
-        environment.apiUrl +
-          environment.comun.getEstados
-      )
+      .get<any>(environment.apiUrl + environment.comun.getEstados)
       .pipe(
         map((lista) => {
           const retorno = lista;
@@ -54,9 +51,7 @@ export class ComunService {
   getListasAllById(id: number): Observable<any> {
     return this._http
       .get<any>(
-        environment.apiUrl +
-          environment.comun.getListaAllItemsById +
-          id
+        environment.apiUrl + environment.comun.getListaAllItemsById + id
       )
       .pipe(
         map((lista) => {
@@ -64,5 +59,16 @@ export class ComunService {
           return retorno;
         })
       );
-  }  
+  }
+
+  getOrdenesServicio(): Observable<any> {
+    return this._http
+      .get<any>(environment.apiUrl + environment.comun.getOrdenesServicio)
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
 }

@@ -41,7 +41,7 @@ class RegionalController extends Controller
         } else {
             $response = Regional::withoutTrashed()
                 ->select('id as value', 'nombre as label')
-                ->orderBy('regionales.id', 'desc')
+                ->orderBy('regionales.nombre', 'asc')
                 ->nombre($nombre)
                 ->paginate($pageSize);
         }

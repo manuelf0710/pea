@@ -51,6 +51,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::get('listarusuarios', 'UserController@listarAll')->name('users.listar.all');
 		Route::get('listaallitems/{id}', 'ListasController@listarAllItemsById')->name('listaritems.listar.allById');
 		Route::get('listaestados', 'ListasController@estadosAll')->name('listar.estados.all');
+		Route::get('odslista', 'ContratoController@contratosAll')->name('listar.contratos.all');
 
 		Route::get('getcliente/{id}', 'comun\ClienteController@show')->name('cliente.show');
 	});
@@ -79,6 +80,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::get('tipoproductoslist', 'pea\TipoProductoController@buscarTipoProducto')->name('tipoproductos.buscar');
 		Route::post('solicitudes', 'pea\ProductoRepsoController@listado')->name('productosrepso');
 		Route::post('solicitud', 'pea\ProductoRepsoController@store')->name('producto.solicitud');
+		Route::put('solicitud/{id}', 'pea\ProductoRepsoController@update')->name('productorepso.update');
 		Route::get('solicitud/{id}', 'pea\ProductoRepsoController@show')->name('productosolicitud.show');
 
 		// Rutas de Productos

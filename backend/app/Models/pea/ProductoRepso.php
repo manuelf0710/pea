@@ -89,6 +89,11 @@ class ProductoRepso extends Model
 		if ($des)
 			return $query->where('regional_id', '=', "$des");
 	}
+	public function scopeContrato($query, $des)
+	{
+		if ($des)
+			return $query->where('contrato_id', '=', "$des");
+	}
 
 	public function scopeTipoProducto($query, $des)
 	{

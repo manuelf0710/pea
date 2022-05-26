@@ -47,6 +47,7 @@ class ProductoRepsoController extends Controller
         $regional = $request->get('regional');
         $tipoProducto = $request->get('tipoproducto');
         $descripcion = $request->get('descripcion');
+        $contrato = $request->get('ods');
         $globalSearch = $request->get('globalsearch');
 
         if ($globalSearch != '') {
@@ -79,6 +80,7 @@ class ProductoRepsoController extends Controller
                 ->programadorProfesional(auth()->user()->perfil_id, auth()->user()->id)
                 ->regional($regional)
                 ->tipoProducto($tipoProducto)
+                ->contrato($contrato)
                 ->paginate($pageSize);
         }
 
@@ -160,6 +162,31 @@ class ProductoRepsoController extends Controller
         //
     }
 
+    public function getProductoRepsoById($id){
+        $productoRepso = ProductoRepso::withoutTrashed()
+        ->select(
+            'productos_repso.id',
+            'productos_repso.tipoproducto_id',
+            'productos_repso.regional_id',
+            'productos_repso.contrato_id',
+            'productos_repso.anio',
+            'productos_repso.descripcion',
+            'productos_repso.cantidad',
+            'productos_repso.user_id',
+            'productos_repso.profesional_id',
+            'contratos.nombre as contrato',
+            'users.name as profesional',
+            'tipo_productos.name as tipoproducto',
+            'regionales.nombre as regional'
+        )
+        ->join('regionales', 'productos_repso.regional_id', '=', 'regionales.id')
+        ->join('contratos', 'productos_repso.contrato_id', '=', 'contratos.id')
+        ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
+        ->join('users', 'productos_repso.profesional_id', '=', 'users.id')
+        ->find($id);
+        return $productoRepso;
+    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -169,6 +196,18 @@ class ProductoRepsoController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $productoRepso = $this->getProductoRepsoById($id);
+
+        if (!empty($productoRepso)) {
+            $productoRepso->cantidad = $request->post('cantidad');
+            $productoRepso->save();
+            $response = array(
+                'status' => 'ok',
+                'data'   => $this->getProductoRepsoById($id),
+              );
+              return response()->json($response);
+        }                   
+
     }
 
     public function buscarProductoRepso(Request $request)

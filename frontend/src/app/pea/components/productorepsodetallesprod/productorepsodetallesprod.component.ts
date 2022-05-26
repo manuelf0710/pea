@@ -315,6 +315,10 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       /**cancelado reprogramado */
       let arregloPermitidosOther = [11, 8];
       array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
+    } else if (value == 12) {
+      /**Registrado */
+      let arregloPermitidosOther = [7, 10];
+      array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
     }
   }
 

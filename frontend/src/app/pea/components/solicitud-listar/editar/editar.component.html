@@ -1,0 +1,63 @@
+<div *ngIf="loading">
+  <app-loading></app-loading>
+</div>
+<form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">
+      <span *ngIf="!formulario.get('id').value"> Nueva solicitud </span>
+      <span *ngIf="formulario.get('id').value"> Editar solicitud </span>
+    </h3>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <i class="fa fa-close"></i>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <input type="hidden" id="id" formControlName="id" />
+    <div class="form-group">
+      {{ data | json }}
+      <label for="exampleInputEmail1">Cantidad</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-th"></i></span>
+        </div>
+        <input
+          [readonly]="loading"
+          type="number"
+          class="form-control form-control-xs"
+          placeholder="Ingrese la cantidad"
+          formControlName="cantidad"
+        />
+      </div>
+      <div
+        *ngIf="
+          formulario.get('cantidad').errors &&
+          formulario.get('cantidad').touched
+        "
+      >
+        <small
+          *ngIf="formulario.get('cantidad').hasError('required')"
+          class="form-text text-danger"
+          >el campo cantidad no debe estar vacío.</small
+        >
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-dark" (click)="closeModal()">
+      Salir
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="formulario.invalid || loading"
+    >
+      Guardar
+    </button>
+  </div>
+</form>

@@ -20,7 +20,7 @@ export class ProductosrepsoService {
       );
     } else {
       return this._http.put<any>(
-        `${environment.apiUrl}/pos/categorias/` + data.id,
+        environment.apiUrl + environment.solicitud.put + data.id,
         data
       );
     }
@@ -46,5 +46,9 @@ export class ProductosrepsoService {
         data.id,
       data
     );
+  }
+
+  eliminar(id) {
+    return this._http.delete(`${environment.apiUrl}/pos/categorias/` + id);
   }
 }

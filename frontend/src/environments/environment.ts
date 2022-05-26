@@ -14,7 +14,7 @@ export const environment = {
     getByIdProductoRepso: "pea/productobyrepsoid/",
     posByIdProductoRepso: "pea/productobyrepsoid/",
     getProcesarCargue: "pea/productosprocesarcargue/",
-    putProductoGestionById : "pea/productoupdategestion/"
+    putProductoGestionById: "pea/productoupdategestion/",
   },
   tipoproductos: {
     getAll: "pea/tipoproductoslist",
@@ -27,6 +27,7 @@ export const environment = {
     getAll: "pea/solicitudes",
     getById: "pea/solicitud/",
     post: "pea/solicitud",
+    put: "pea/solicitud/",
   },
   comun: {
     getRegionales: "comun/regionaleslist",
@@ -35,7 +36,8 @@ export const environment = {
     buscarUsers: "comun/buscarusers",
     getlistarAllUsers: "comun/listarusuarios/",
     getListaAllItemsById: "comun/listaallitems/",
-    getEstados : "comun/listaestados"
+    getEstados: "comun/listaestados",
+    getOrdenesServicio: "comun/odslista",
   },
   imports: {
     uploadExcelToProductRepso: "files/uploads/",
@@ -48,9 +50,9 @@ export const environment = {
     postAgendaDisponibleAllProfesional: "pea/agenda/agendadisponible/",
     postCita: "pea/cita",
   },
-  admon:{
-    postUsersList : 'admon/userslist',
-  }
+  admon: {
+    postUsersList: "admon/userslist",
+  },
 };
 
 /*
