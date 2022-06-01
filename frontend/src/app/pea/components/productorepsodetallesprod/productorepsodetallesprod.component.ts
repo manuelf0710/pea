@@ -224,7 +224,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this._ProductoService.getProductosBySolicitud(this.id, {
         ...this.formularioFiltro.value,
       }),
-      this._ComunService.getListasAllById(2),
+      this._ComunService.getListasEstadosByPerfil(2),
       this._ComunService.getEstadosAll(),
     ]).subscribe(
       ([

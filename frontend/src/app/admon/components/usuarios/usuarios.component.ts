@@ -5,9 +5,12 @@ import {
   CUSTOM_ELEMENTS_SCHEMA,
   ViewEncapsulation,
 } from "@angular/core";
+import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { Router, ActivatedRoute } from "@angular/router";
 import { BgtableComponent } from "src/app/shared/components/bgtable/bgtable.component";
+import { ToastService } from "src/app/shared/services/toast.service";
 import { environment } from "src/environments/environment";
+import { CrearusuarioComponent } from "./crear/crearusuario/crearusuario.component";
 
 @Component({
   selector: "app-usuarios",
@@ -18,6 +21,7 @@ import { environment } from "src/environments/environment";
 export class UsuariosComponent implements OnInit {
   @ViewChild(BgtableComponent) dataTableReload: BgtableComponent;
   public loading: boolean = false;
+  public renderDataTable: boolean = false;
 
   buttons = {
     acciones: {
@@ -85,12 +89,34 @@ export class UsuariosComponent implements OnInit {
     customFilters: [],
   };
 
-  customFilters: any = []; 
-  constructor(private route: ActivatedRoute, private router: Router) {}
+  customFilters: any = [];
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private _ToastService: ToastService,
+    private modalService: NgbModal
+  ) {}
 
   ngOnInit(): void {}
 
   agregarUsuario(ev) {}
-  editarUsuario(ev) {}
+  editarUsuario(solicitud) {
+    const modalRef = this.modalService.open(CrearusuarioComponent, {
+      //backdrop: 'static',
+      size: "lg",
+      keyboard: false,
+    });
+
+    modalRef.componentInstance.data = solicitud;
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+          this.dataTableReload.reload(result.data.data);
+          this._ToastService.success("Registro editado correctamente");
+        }
+      })
+      .catch((error) => {});
+  }
   eliminar(ev) {}
 }

@@ -48,11 +48,22 @@ export class ComunService {
       );
   }
 
-  getListasAllById(id: number): Observable<any> {
+  getListasEstadosByPerfil(id: number): Observable<any> {
     return this._http
       .get<any>(
-        environment.apiUrl + environment.comun.getListaAllItemsById + id
+        environment.apiUrl + environment.comun.getListaEstadosByIdByUser + id
       )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
+
+  getListasById(id: number): Observable<any> {
+    return this._http
+      .get<any>(environment.apiUrl + environment.comun.getListaById + id)
       .pipe(
         map((lista) => {
           const retorno = lista;

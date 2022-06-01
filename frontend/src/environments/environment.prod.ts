@@ -31,7 +31,7 @@ export const environment = {
     getClienteByCedula: "comun/getcliente/",
     buscarUsers: "comun/buscarusers",
     getlistarAllUsers: "comun/listarusuarios/",
-    getListaAllItemsById: "comun/listaallitems/",
+    getListaEstadosByIdByUser: "comun/listaestadosbyprofile/",
     getEstados: "comun/listaestados",
     getOrdenesServicio: "comun/odslista",
   },

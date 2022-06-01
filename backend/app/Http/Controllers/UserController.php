@@ -63,7 +63,7 @@ class UserController extends Controller
 				->join('perfiles', 'users.perfil_id', '=', 'perfiles.id')
 				->select('users.id', 'users.name', 'users.email', 'users.perfil_id', 'users.cedula', 'users.status', 'perfiles.nombre as perfil')
 				->addSelect(DB::raw('case users.status when 1 then "Activo" else "Inactivo" end status_des'))
-				->where('users.status', '=', 1)
+				//->where('users.status', '=', 1)
 				->whereNull('users.deleted_at')
 				//->Nombre($nombre)
 				->paginate($pageSize);
@@ -100,6 +100,37 @@ class UserController extends Controller
 
 	public function store(Request $request)
 	{
+		$name = $request->post('name');
+		$email = $request->post('email');
+		$password = $request->post('password');
+		$password_confirmation = $request->post('password_confirmation');
+		$perfil_id = $request->post('perfil_id');
+		$cedula = $request->post('cedula');
+
+		$validator = Validator::make($request->all(), User::rules($request));
+		if (!($validator->fails())) {
+			$user = new User();
+			$user->name = $name;
+			$user->email = $email;
+			$user->password = $password;
+			$user->perfil_id = $perfil_id;
+			$user->cedula = $cedula;
+			$user->save();
+			$response = array(
+				'status' => 'ok',
+				'code' => 200,
+				'data'   => $request->all(),
+				'msg'    => 'Guardado'
+			);
+		} else {
+			$response = array(
+				'status' => 'error',
+				'msg' => $validator->errors(),
+				'validator' => $validator
+			);
+		}
+
+		return response()->json($response);
 	}
 
 	public function editForAdmin($id)
@@ -159,28 +190,21 @@ class UserController extends Controller
 
 	public function update(Request $request, $id)
 	{
-
 		/*
 		* Reglas iniciales de validación
 		*/
 		$reglas = [
 			'name' => 'required | min:6 | max: 191',
-			'fecha_nacimiento' => 'required|date',
-			'tipo_identificacion' => 'required|numeric',
-			'celular' => 'required|numeric',
-			'identificacion' => 'required|numeric',
-			'ingreso' => 'required|numeric',
-			'genero' => 'required'
-			//'email' => 'required | min:6 | max: 191',
+			'cedula' => 'required|numeric',
+			'perfil_id' => 'required|numeric',
 		];
+
 
 		/*
 		* Buscar el registro
 		*/
 
 		$modelo = User::find($id);
-		//echo(json_encode($modelo));
-		//exit("ingresa");
 		/*
 		*
 		* Verificar que el campo contraseña tenga valor en los datos post
@@ -197,70 +221,37 @@ class UserController extends Controller
 				'password_confirmation' => 'required| min:6'
 			]);
 
-			/*
-			* Validar la data si no es valida redirecciona automaticamente
-			*/
-
-			$inputs = request()->validate($reglas);
-
-			/*
-			* Agregar la contraseña si pasa las reglas de validación.
-			*/
 
 			$modelo->password = Hash::make($request->post('password'));
-		} else {
-			/*
-			* Actualizar datos sin contraseña
-			*
-			*/
-
-			/*
-			* Validar la data si no es valida redirecciona automaticamente
-			*/
-
-			$inputs = request()->validate($reglas);
 		}
+
+		$validator = Validator::make($request->all(), $reglas);
 		/*
 			* Verificar que se haya encontrado data, a este punto llega solo si paso validaciones
 			*/
-		if (!empty($modelo)) {
 
-			/*
-				* almacenar modelo cuando viene la contaseña
-				*
-				*/
-			if ($request->hasFile('avatar')) {
-				$file = $request->file('avatar');
-				$modelo->avatar = $this->uploadAvatar($file);
-			}
-
+		if (!($validator->fails())) {
 			$modelo->name = $request->post('name');
-			$modelo->fecha_nacimiento = $request->post('fecha_nacimiento');
-			if ($modelo->identificacion == NULL) {
-				$modelo->identificacion = $request->post('identificacion');
-			}
-			$modelo->celular = $request->post('celular');
-			$modelo->genero = $request->post('genero');
-			$modelo->tipo_identificacion = $request->post('tipo_identificacion');
-			$modelo->ingreso = $request->post('ingreso');
-			$modelo->deudas = $request->post('deudas') == '' ? NULL : $request->post('deudas');
-			$modelo->empresa = $request->post('empresa') == '' ? NULL : $request->post('empresa');
+			$modelo->perfil_id = $request->post('perfil_id');
+			$modelo->cedula = $request->post('cedula');
 
-			$fissy_generado = false;
-
-			if ($modelo->codigo == NULL) {
-				$data = $this->generarCodigoFissy($modelo);
-				$modelo->codigo = $data['codigo'];
-				$modelo->fissy_id = $data['fissy_id'];
-				$fissy_generado = true;
-			}
-			$extra_msg = $fissy_generado == true ? 'se ha creado su codigo fissy' : '';
 			$modelo->save();
-			/*
-				* redirect to tag list View route name
-				*/
+
+			$response = array(
+				'status' => 'ok',
+				'code' => 200,
+				'data'   => $request->all(),
+				'msg'    => 'Actualizado'
+			);
 		} else {
+			$response = array(
+				'status' => 'error',
+				'msg' => $validator->errors(),
+				'validator' => $validator
+			);
 		}
+
+		return response()->json($response);
 	}
 
 

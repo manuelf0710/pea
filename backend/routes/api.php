@@ -49,7 +49,8 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::post('buscarcontrato', 'comun\ContratoController@buscarContrato')->name('contratos.buscar');
 		Route::post('buscarusers', 'UserController@buscarUser')->name('users.buscar');
 		Route::get('listarusuarios', 'UserController@listarAll')->name('users.listar.all');
-		Route::get('listaallitems/{id}', 'ListasController@listarAllItemsById')->name('listaritems.listar.allById');
+		Route::get('listaestadosbyprofile/{id}', 'ListasController@listarEstadosByPerfil')->name('listaritems.listar.estadosbyperfil');
+		Route::get('listaById/{id}', 'ListasController@listaById')->name('listaritems.lista.ById');
 		Route::get('listaestados', 'ListasController@estadosAll')->name('listar.estados.all');
 		Route::get('odslista', 'ContratoController@contratosAll')->name('listar.contratos.all');
 
@@ -66,7 +67,10 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		'prefix' => 'admon',
 	], function () {
 		Route::post('userslist', 'UserController@listado')->name('users.listado');
+		Route::post('usuario', 'UserController@store')->name('users.store');
+		Route::put('usuario/{id}', 'UserController@update')->name('users.update');
 	});
+
 
 	Route::group([
 		'prefix' => 'pea',

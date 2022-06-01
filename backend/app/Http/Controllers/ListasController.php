@@ -17,7 +17,7 @@ class ListasController extends Controller
      *
      * @return \Illuminate\Contracts\Support\Renderable
      */
-    public function listarAllItemsById($id)
+    public function listarEstadosByPerfil($id)
     {
         $userData = auth()->user();
         $itemsList = ListaItem::withoutTrashed()
@@ -33,6 +33,24 @@ class ListasController extends Controller
             ->where('lista_id', '=', $id)
             ->where('estado', '=', 1)
             ->byProfile($userData, $id)
+            ->get();
+        return response()->json($itemsList);
+    }
+
+    public function listaById($id)
+    {
+        $itemsList = ListaItem::withoutTrashed()
+            ->select(
+                'id',
+                'lista_id',
+                'nombre',
+                'alias',
+                'estado',
+                'background',
+                'color'
+            )
+            ->where('lista_id', '=', $id)
+            ->where('estado', '=', 1)
             ->get();
         return response()->json($itemsList);
     }

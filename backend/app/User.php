@@ -7,6 +7,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Tymon\JWTAuth\Contracts\JWTSubject;
+use Illuminate\Http\Request;
 
 class User extends Authenticatable implements JWTSubject
 {
@@ -42,6 +43,30 @@ class User extends Authenticatable implements JWTSubject
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+
+    public static function rules(Request $request, $id = null)
+    {
+		
+     	$rules = [
+        	'name' => 'required | min:6 | max: 191',
+            'cedula' => 'required|numeric',
+            'perfil_id' => 'required|numeric',
+        	'email' => 'required | min:6 | max: 191',
+    	];		
+        switch( $request->method() )
+        {
+            case 'POST':
+            {
+ 				return array_merge( $rules, ['password' => 'required|string|confirmed', 'password_confirmation' => 'required| min:6', 'email' => 'required|min:6|max:191|unique:users', ] );
+            }
+            case 'PUT':
+            {
+				return array_merge( $rules, ['email' => 'required|min:6|max:191|string|unique:users,email,'. $id, ] );
+            }
+            default:break;
+        }
+    }
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
