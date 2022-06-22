@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Perfil;
 use App\User;
+use App\Models\pea\TipoProducto;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Auth;
@@ -136,6 +137,19 @@ class UserController extends Controller
 	public function editForAdmin($id)
 	{
 	}
+
+	public function usersTipoProducto(Request $request)
+	{
+		$user_id = $request->post('user_id');
+
+        $productos = TipoProducto::withoutTrashed()
+			->join('tipoproducto_users','tipo_productos.id', '=', 'tipoproducto_users.tipoproducto_id')
+            ->select('tipo_productos.id as id', 'tipo_productos.name as name', 'tipoproducto_users.id as consecutivo')
+            ->where('tipoproducto_users.user_id','=', $user_id)
+            ->get();
+        return response()->json($productos);		
+	}
+
 
 	public function edit($id)
 	{

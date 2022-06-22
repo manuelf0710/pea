@@ -55,6 +55,7 @@ export const environment = {
     postUsersList: "admon/userslist",
     postUsuario: "admon/usuario/",
     putUsuario: "admon/usuario/",
+    getProductosByUser: "admon/usuario",
   },
 };
 

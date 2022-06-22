@@ -147,6 +147,22 @@
         </select>
       </div>
     </div>
+
+    <div class="form-group">
+      <label for="regional">Productos que Realiza</label>
+      <table class="table table-sm table-stripped">
+        <thead>
+          <tr>
+            <th>Producto</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of tipoProductosUsuarioLista">
+            <td>{{ item.name }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
   <div class="modal-footer">
     <button type="button" class="btn btn-dark" (click)="closeModal()">

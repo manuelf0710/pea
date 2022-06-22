@@ -32,6 +32,7 @@ export const environment = {
     buscarUsers: "comun/buscarusers",
     getlistarAllUsers: "comun/listarusuarios/",
     getListaEstadosByIdByUser: "comun/listaestadosbyprofile/",
+    getListaById: "comun/listaById/",
     getEstados: "comun/listaestados",
     getOrdenesServicio: "comun/odslista",
   },
@@ -48,6 +49,9 @@ export const environment = {
   },
   admon: {
     postUsersList: "admon/userslist",
+    postUsuario: "admon/usuario/",
+    putUsuario: "admon/usuario/",
+    getProductosByUser: "admon/usuario",
   },
 };
 

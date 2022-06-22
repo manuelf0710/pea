@@ -22,6 +22,8 @@ export class CrearusuarioComponent implements OnInit {
   };
   public loading: boolean = false;
 
+  public tipoProductosUsuarioLista: any[];
+
   constructor(
     private FormBuilder: FormBuilder,
     public _activeModal: NgbActiveModal,
@@ -55,6 +57,23 @@ export class CrearusuarioComponent implements OnInit {
       cedula: [cedula, [Validators.required]],
       status: [status, [Validators.required]],
     });
+    this.cargarUsuario(id);
+  }
+
+  cargarUsuario(id) {
+    this.loading = true;
+    this._UsuarioService.getProductosUsuario(id).subscribe(
+      (res: any) => {
+        this.tipoProductosUsuarioLista = res;
+        this.loading = false;
+      },
+      (error: any) => {
+        this.loading = false;
+      },
+      () => {
+        this.loading = false;
+      }
+    );
   }
 
   guardar(event: Event) {
