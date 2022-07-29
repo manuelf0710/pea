@@ -16,6 +16,13 @@ class ClientesImport implements ToCollection, WithChunkReading, WithCustomCsvSet
     /**
      * @param Collection $collection
      */
+
+    public function obtenerModalidad($StringToSearch){
+        if($StringToSearch == null) return null;
+        if(str_contains($StringToSearch, 'vi')) return '2'; /**si contiene la palaba vi es virtual */
+        if(str_contains($StringToSearch, 'pr')) return '1'; /** si contiene pr es presencial */
+        return null; 
+    }
     public function collection(Collection $collection)
     {
         $i = 0;
@@ -53,25 +60,31 @@ class ClientesImport implements ToCollection, WithChunkReading, WithCustomCsvSet
                     $find->ciudad_id =  $row[9];
                     $find->barrio =  $row[10];
                     $find->otrosi =  $row[11] == 'SI' ? 1 : 2;
+
+                    $find->modalidad = $this->obtenerModalidad($row[13]); 
                     $find->save();
+                    array_push($this->clientesImportar, $find);
                 } else {
-                    $find = new Cliente();
-                    $find->cedula =  $row[0];
-                    $find->nombre =  $row[1];
-                    $find->dependencia_id = $row[2];
-                    $find->email = $row[3];
-                    $find->telefono = $row[4];
-                    $find->division = $row[5];
-                    $find->subdivision = $row[6];
-                    $find->cargo = $row[7];
-                    $find->direccion =  $row[8];
-                    $find->ciudad_id =  $row[9];
-                    $find->barrio =  $row[10];
-                    $find->otrosi =  $row[11] == 'SI' ? 1 : 2;
-                    $find->save();
+                    $find2 = new Cliente();
+                    $find2->cedula =  $row[0];
+                    $find2->nombre =  $row[1];
+                    $find2->dependencia_id = $row[2];
+                    $find2->email = $row[3];
+                    $find2->telefono = $row[4];
+                    $find2->division = $row[5];
+                    $find2->subdivision = $row[6];
+                    $find2->cargo = $row[7];
+                    $find2->direccion =  $row[8];
+                    $find2->ciudad_id =  $row[9];
+                    $find2->barrio =  $row[10];
+                    $find2->otrosi =  $row[11] == 'SI' ? 1 : 2;
+                    $find2->modalidad = $this->obtenerModalidad($row[13]);
+                    $find2->save();
+                    $find2->cedula =  $row[0];
+                    array_push($this->clientesImportar, $find2);
                 }
 
-                $found = 0;
+                /*$found = 0;
                 foreach ($this->clientesImportar as $item) {
                     if ($item['cedula'] === $row[0] && $found == 0) {
                         $found = 1;
@@ -79,11 +92,11 @@ class ClientesImport implements ToCollection, WithChunkReading, WithCustomCsvSet
                 }
                 if ($found == 0) {
                     array_push($this->clientesImportar, $find);
-                }
+                }*/
             }
             $i++;
         }
-        ///echo(json_encode($this->clientesImportar));                           
+        //echo(json_encode($this->clientesImportar));                           
     }
     /**
      * @param array $row

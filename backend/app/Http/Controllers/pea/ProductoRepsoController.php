@@ -112,13 +112,13 @@ class ProductoRepsoController extends Controller
             $modelo->user_id = auth()->user()->id;
             $modelo->save();
 
-            for ($i = 0; $i < $modelo->cantidad; $i++) {
+            /*for ($i = 0; $i < $modelo->cantidad; $i++) {
                 $producto = new Producto();
                 $producto->producto_repso_id = $modelo->id;
                 $producto->estado_id = 9;
                 $producto->user_id = auth()->user()->id;
                 $producto->save();
-            }
+            } */
 
             $response = array(
                 'status' => 'ok',
