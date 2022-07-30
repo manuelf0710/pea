@@ -338,8 +338,8 @@ class CitaController extends Controller
     function getProductoData($id)
     {
         $response = Producto::join('clientes', 'productos.cedula', '=', 'clientes.cedula')
-            ->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
-            ->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
+            //->join('dependencias', 'clientes.dependencia_id', '=', 'dependencias.codigo')
+            //->join('ciudades', 'clientes.ciudad_id', '=', 'ciudades.id')
             ->join('lista_items', 'productos.estado_id', '=', 'lista_items.id')
             ->leftJoin('estadoseguimientos', 'productos.estadoseguimiento_id', '=', 'estadoseguimientos.id')
             ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
@@ -356,14 +356,14 @@ class CitaController extends Controller
                 'lista_items.nombre as estado',
                 'productos.estadoseguimiento_id',
                 'estadoseguimientos.nombre as estado_seguimiento',
-                'dependencias.nombre as dependencia',
+                'clientes.dependencia_id as dependencia',
                 'clientes.email',
                 'clientes.telefono',
                 'clientes.division',
                 'clientes.subdivision',
                 'clientes.cargo',
                 'clientes.direccion',
-                'ciudades.nombre as ciudad',
+                'clientes.ciudad_id as ciudad',
                 'clientes.barrio',
                 'productos.profesional_id',
                 'users.name as profesional_des'

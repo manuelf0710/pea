@@ -100,6 +100,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   public arrayPermisoCargueExcel = [1, 2];
   public permisoCargueExcel: boolean = false;
   public showButtonInformacionProgramacion: boolean = false;
+  public statsProductoRepso = { totalProductos: 0, totalEjecutados: 0 };
 
   constructor(
     private _ToastService: ToastService,
@@ -176,7 +177,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
 
       fecha_ingreso: [null],
       modalidad: ["", [Validators.required]],
-      descripcion: ["", [Validators.required]],
+      descripcion: [""],
       numero_citas: [null],
       fecha_seguimiento: [null],
       estado_seguimiento: [null],
@@ -226,12 +227,14 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       }),
       this._ComunService.getListasEstadosByPerfil(2),
       this._ComunService.getEstadosAll(),
+      this._ProductosrepsoService.getSolicitudStatsById(this.id),
     ]).subscribe(
       ([
         odsDetalles,
         productosLista,
         estadosLista,
         estadosListaSeguimiento,
+        statsSolicitud,
       ]) => {
         this.odsDetalles = odsDetalles;
         this.productosLista = productosLista.data;
@@ -242,6 +245,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         this.totalRecords = productosLista.total;
         this.from = productosLista.from;
         this.to = productosLista.to;
+        this.statsProductoRepso = statsSolicitud;
 
         this.loading = false;
       }
@@ -323,6 +327,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   }
 
   gestionProgramacion(item) {
+    this.formulario.reset();
     console.log("elvalord e item select ", item);
     this.mostrarRegistro = !this.mostrarRegistro;
     if (this.personaGestion === undefined) {
@@ -374,8 +379,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       numero_citas: this.personaGestion.numero_citas,
       fecha_seguimiento: this.personaGestion.fecha_seguimiento,
       estado_seguimiento: this.personaGestion.estadoseguimiento_id,
-      estado_id: this.personaGestion.estado_id,
-      estado_programacion: this.personaGestion.estado_id,
+      //estado_id: this.personaGestion.estado_id,
+      //estado_programacion: this.personaGestion.estado_id,
       comentarios: this.personaGestion.comentarios,
       pyp_ergonomia: this.personaGestion.pyp_ergonomia,
     });

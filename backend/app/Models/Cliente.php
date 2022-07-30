@@ -28,7 +28,8 @@ class Cliente extends Model
         'direccion',
         'ciudad_id',
         'barrio',
-        'otrosi'
+        'otrosi',
+        'modalidad'
     ];	
 
     protected $dates = ['deleted_at'];
@@ -48,7 +49,8 @@ class Cliente extends Model
         'direccion' => 'required',
         'ciudad_id' => 'required',
         'barrio'  => 'required' ,     
-        'otrosi'  => 'required'      
+        'otrosi'  => 'required' ,    
+        'modalidad'  => 'required'     
     ];
 
 	public function scopeCedula($query, $des){

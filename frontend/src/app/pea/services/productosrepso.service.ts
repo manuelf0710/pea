@@ -39,6 +39,17 @@ export class ProductosrepsoService {
       );
   }
 
+  public getSolicitudStatsById(id) {
+    return this._http
+      .get<any>(environment.apiUrl + environment.solicitud.getStatsById + id)
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
+
   public guardarinformacionProducto(data) {
     return this._http.put<any>(
       environment.apiUrl +

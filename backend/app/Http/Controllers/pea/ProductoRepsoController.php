@@ -151,6 +151,15 @@ class ProductoRepsoController extends Controller
         return response()->json($response);
     }
 
+    public function statsById($id){
+        $response = ProductoRepso::withoutTrashed()
+        ->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as totalProductos")        
+        ->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "' and estado_id = 8) as totalEjecutados")
+        ->find($id);
+        
+        return response()->json($response);     
+    }
+
     /**
      * Show the form for editing the specified resource.
      *
