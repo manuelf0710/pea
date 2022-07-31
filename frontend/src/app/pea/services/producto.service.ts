@@ -48,4 +48,10 @@ export class ProductoService {
         })
       );
   }
+
+  eliminar(id) {
+    return this._http.delete<any>(
+      environment.apiUrl + environment.productos.deleteProductoBYId + id
+    );
+  }
 }

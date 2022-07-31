@@ -326,6 +326,42 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     }
   }
 
+  eliminarProductoFromArray() {}
+
+  eliminarProgramacion(data) {
+    this._UtilService
+      .confirm({
+        title: "Eliminar Registro",
+        message: "Seguro que desea eliminar este registro?",
+      })
+      .then(
+        () => {
+          //console.log('deleting...');
+          this._ProductoService.eliminar(data.id).subscribe(
+            (result: any) => {
+              if (result["code"] == 200) {
+                this._ToastService.success(result.msg + " Correctamente");
+                let arrayItems;
+                arrayItems = this.productosLista.filter((item) => {
+                  return item.id !== data.id;
+                });
+                this.productosLista = arrayItems;
+              }
+            },
+            (error) => {
+              console.log("el error fue ", error);
+              this._ToastService.errorMessage(
+                "se ha presentado un error " + error
+              );
+            }
+          );
+        },
+        () => {
+          //console.log('not deleting...');
+        }
+      );
+  }
+
   gestionProgramacion(item) {
     this.formulario.reset();
     console.log("elvalord e item select ", item);
