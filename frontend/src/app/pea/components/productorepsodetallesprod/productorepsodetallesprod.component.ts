@@ -364,35 +364,39 @@ export class ProductorepsodetallesprodComponent implements OnInit {
 
   gestionProgramacion(item) {
     this.formulario.reset();
-    console.log("elvalord e item select ", item);
-    this.mostrarRegistro = !this.mostrarRegistro;
-    if (this.personaGestion === undefined) {
-      this.personaGestion = item;
-    }
-    if (this.personaGestion.cedula != item.cedula) {
-      this.personaGestion = item;
-      this.mostrarRegistro = true;
-    }
+    this.showButtonInformacionProgramacion = false;
+    this.estadosListaProceso = [];
+    setTimeout(() => {
+      console.log("elvalord e item select ", item);
+      this.mostrarRegistro = !this.mostrarRegistro;
+      if (this.personaGestion === undefined) {
+        this.personaGestion = item;
+      }
+      if (this.personaGestion.cedula != item.cedula) {
+        this.personaGestion = item;
+        this.mostrarRegistro = true;
+      }
 
-    this.poblarDatosSelectEstado(item.estado_id);
+      this.poblarDatosSelectEstado(item.estado_id);
 
-    //this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
-    const estadosDisponiblesAgendamiento = [11, 12];
+      //this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
+      const estadosDisponiblesAgendamiento = [11, 12];
 
-    console.log("registropersona ", this.personaGestion);
-    console.log("valor de mostrar registro ", this.mostrarRegistro);
-    console.log("item estado_id ", item.estado_id);
-    if (
-      estadosDisponiblesAgendamiento.includes(item.estado_id) &&
-      this.mostrarRegistro
-    ) {
-      this.agendaDisponibleProfesionales();
-    } else {
-      console.log("entra en agendasdisponibles null");
-      this.agendasDisponibles = null;
-    }
-    console.log("agendas dipooonibles ", this.agendasDisponibles);
-    this.setvaluesFormulario();
+      console.log("registropersona ", this.personaGestion);
+      console.log("valor de mostrar registro ", this.mostrarRegistro);
+      console.log("item estado_id ", item.estado_id);
+      if (
+        estadosDisponiblesAgendamiento.includes(item.estado_id) &&
+        this.mostrarRegistro
+      ) {
+        this.agendaDisponibleProfesionales();
+      } else {
+        console.log("entra en agendasdisponibles null");
+        this.agendasDisponibles = null;
+      }
+      console.log("agendas dipooonibles ", this.agendasDisponibles);
+      this.setvaluesFormulario();
+    }, 200);
   }
 
   setvaluesFormulario() {
@@ -415,8 +419,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       numero_citas: this.personaGestion.numero_citas,
       fecha_seguimiento: this.personaGestion.fecha_seguimiento,
       estado_seguimiento: this.personaGestion.estadoseguimiento_id,
-      //estado_id: this.personaGestion.estado_id,
-      //estado_programacion: this.personaGestion.estado_id,
+      estado_id: this.personaGestion.estado_id,
+      estado_programacion: this.personaGestion.estado_id,
       comentarios: this.personaGestion.comentarios,
       pyp_ergonomia: this.personaGestion.pyp_ergonomia,
     });

@@ -11,6 +11,7 @@ export const environment = {
     posByIdProductoRepso: "pea/productobyrepsoid/",
     getProcesarCargue: "pea/productosprocesarcargue/",
     putProductoGestionById: "pea/productoupdategestion/",
+    deleteProductoBYId: "pea/productodelete/",
   },
   tipoproductos: {
     getAll: "pea/tipoproductoslist",
@@ -24,6 +25,7 @@ export const environment = {
     getById: "pea/solicitud/",
     post: "pea/solicitud",
     put: "pea/solicitud/",
+    getStatsById: "pea/solicitud/statsbyid/",
   },
   comun: {
     getRegionales: "comun/regionaleslist",

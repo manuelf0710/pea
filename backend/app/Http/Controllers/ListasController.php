@@ -58,6 +58,7 @@ class ListasController extends Controller
     public function estadosAll()
     {
         $estadosLista = DB::table("estadoseguimientos")
+            ->where('estado', '=', 1)
             ->get();
 
         return response()->json($estadosLista);
