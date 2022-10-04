@@ -385,8 +385,13 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       console.log("registropersona ", this.personaGestion);
       console.log("valor de mostrar registro ", this.mostrarRegistro);
       console.log("item estado_id ", item.estado_id);
+      console.log(
+        "el includes ",
+        estadosDisponiblesAgendamiento.includes(parseInt(item.estado_id))
+      );
+      console.log("estadosdisponibles ", estadosDisponiblesAgendamiento);
       if (
-        estadosDisponiblesAgendamiento.includes(item.estado_id) &&
+        estadosDisponiblesAgendamiento.includes(parseInt(item.estado_id)) &&
         this.mostrarRegistro
       ) {
         this.agendaDisponibleProfesionales();
@@ -602,12 +607,14 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     const estadosDisponiblesButton = [7, 8, 9, 11];
     console.log("entrea aqui validarinformacionacionprogramaciones");
     //return estadosDisponiblesShowButton.includes(this.formulario.get("estado_programacion").value)   ?  true :   false
-    alert(this.formulario.get("estado_programacion").value);
+    //alert(this.formulario.get("estado_programacion").value);
     if (
       estadosDisponiblesShowButton.includes(
-        this.formulario.get("estado_programacion").value
+        parseInt(this.formulario.get("estado_programacion").value)
       ) &&
-      estadosDisponiblesButton.includes(this.formulario.get("estado_id").value)
+      estadosDisponiblesButton.includes(
+        parseInt(this.formulario.get("estado_id").value)
+      )
     ) {
       return true;
     }
@@ -618,10 +625,10 @@ export class ProductorepsodetallesprodComponent implements OnInit {
    * mostrar el boton de acuerdo al estado
    */
   showButtonActualizarInformacion(value) {
-    const estadosPermitidosActualizarInformacion = [7, 8, 9];
+    const estadosPermitidosActualizarInformacion = [7, 8, 9, 12];
     if (
       estadosPermitidosActualizarInformacion.includes(
-        this.formulario.get("estado_id").value
+        parseInt(this.formulario.get("estado_id").value)
       ) &&
       value != 11
     ) {
@@ -632,13 +639,14 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   }
 
   changeGenerarReprogramacionCita(value) {
+    console.log("el valor ",value, "otro = ", parseInt(this.formulario.get("estado_id").value));
     const estadosPermitidosCambio = [
       7, 11,
     ]; /** 7 citado, 11 cancelado reprogramado estaso permitido cambio de cita hora*/
 
     if (
       estadosPermitidosCambio.includes(
-        this.formulario.get("estado_id").value
+        parseInt(this.formulario.get("estado_id").value)
       ) &&
       value == 11
     ) {
@@ -647,6 +655,10 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       this.agendasDisponibles = null;
     }
     this.showButtonActualizarInformacion(value);
+  }
+
+  changeEstadoSeguimiento(value) {
+    this.showButtonInformacionProgramacion = true;
   }
 
   guardarInformacionProgramacion() {

@@ -1,5 +1,26 @@
-.card{
-    box-shadow: 2px 2px 3px #a3a8ad;
-    border-left: solid 3px #374f65;
-    padding: 5px;
+.card {
+  box-shadow: 2px 2px 3px #a3a8ad;
+  border-left: solid 3px #374f65;
+  padding: 5px;
+}
+.modules-container {
+  display: flex;
+  gap: 25px;
+  flex-wrap: wrap;
+
+}
+.module-item{
+    color: #000;
+    min-width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.module-item__header{
+    width: 100%;
+}
+
+.btn-module__header{
+    width: 100%;
 }

@@ -170,8 +170,14 @@ class ProductoController extends Controller
                     $this->resetearProductoTiemposCita($id);
                 }
 
+                $updateProducto->comentarios      = $request->post('comentarios');
+                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');                
+
                 $updateProducto->save();
             }else{
+
+                $updateProducto->comentarios      = $request->post('comentarios');
+                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');                 
                 
                 $updateProducto->estado_id = $request->post('estado_programacion');
                 $updateProducto->save();

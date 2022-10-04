@@ -300,7 +300,7 @@
       <thead>
         <tr>
           <th></th>
-          <th>Fecha Prog (d/m/Y)</th>
+          <th>Fecha Progra (d/m/Y)</th>
           <th>Profesional</th>
           <th>Cédula</th>
           <th>Nombre</th>
@@ -764,6 +764,7 @@
                       id="estado_seguimiento"
                       class="form-control form-control-sm"
                       formControlName="estado_seguimiento"
+                      (change)="changeEstadoSeguimiento($event.target.value)"
                     >
                       <option [ngValue]="null" disabled>
                         Seleccione Estado
