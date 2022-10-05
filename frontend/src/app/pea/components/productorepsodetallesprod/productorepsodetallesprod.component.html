@@ -96,6 +96,7 @@
           </div>
         </div>
       </div>
+
       <form
         [formGroup]="formularioFiltro"
         novalidate
@@ -929,6 +930,7 @@
               </div>
             </div>
 
+            <!--
             <table
               class="table table-sm table-bordered"
               *ngIf="agendasDisponibles"
@@ -966,7 +968,19 @@
                 </tr>
               </thead>
               <tbody>
-                <ng-container *ngFor="let item of agendasDisponibles">
+                <ng-container
+                  *ngFor="
+                    let item of agendasDisponibles
+                      | filterfor
+                        : {
+                            profesional:
+                              formulario.get('profesionalsearch').value || '',
+                            dateformat_name:
+                              formulario.get('profesionalsearch').value || ''
+                          }
+                        : false
+                  "
+                >
                   <tr *ngIf="item.minutes >= odsDetalles.tipo_producto.tiempo">
                     <td>{{ item.profesional }}</td>
                     <td>{{ item.dateformat_name }}</td>
@@ -985,10 +999,97 @@
                   </tr>
                 </ng-container>
               </tbody>
-            </table>
+            </table>-->
           </ng-template>
         </ngb-panel>
       </ngb-accordion>
     </div>
   </form>
+
+  <div *ngIf="agendasDisponibles">
+    <hr />
+    <form [formGroup]="searchForm" class="search__form" style="font-size:12px">
+      <mat-form-field class="search__form_field" appearance="outline">
+        <mat-label>profesional</mat-label>
+        <input
+          type="text"
+          aria-label="profesional"
+          matInput
+          formControlName="profesionalsearch"
+          (keyup)="applyFilter()"
+        />
+      </mat-form-field>
+
+      <mat-form-field class="search__form_field" appearance="outline">
+        <mat-label>Dia</mat-label>
+        <input
+          type="text"
+          aria-label="Fecha Cita"
+          matInput
+          formControlName="fechacitasearch"
+          (keyup)="applyFilter()"
+        />
+      </mat-form-field>
+
+      <mat-form-field class="search__form_field" appearance="outline">
+        <mat-label>fecha Cita Disponible</mat-label>
+        <input
+          matInput
+          formControlName="fechacitadatesearch"
+          [matDatepicker]="picker"
+          (dateInput)="applyFilter()"
+        />
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
+    </form>
+
+    <table
+      mat-table
+      [dataSource]="agendasDisponibles"
+      class="mat-elevation-z8 w-100"
+    >
+      <!-- Position Column -->
+      <ng-container matColumnDef="profesional">
+        <th mat-header-cell *matHeaderCellDef>Profesional.</th>
+        <td mat-cell *matCellDef="let element">
+          {{ element.profesional }}
+        </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="fechacita">
+        <th mat-header-cell *matHeaderCellDef>fecha cita disponible( Y-m-d)</th>
+        <td mat-cell *matCellDef="let item">
+          {{ item.dateformat_name }}
+        </td>
+      </ng-container>
+
+      <!-- Weight Column -->
+      <ng-container matColumnDef="horacita">
+        <th mat-header-cell *matHeaderCellDef>Hora cita</th>
+        <td mat-cell *matCellDef="let item">
+
+          {{ item.start }} hasta {{ item.end }} libres
+          {{ item.minutes }} minutos          
+        </td>
+      </ng-container>
+
+      <!-- Symbol Column -->
+      <ng-container matColumnDef="action">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let item">
+          <button
+            class="btn btn-sm btn-outline-secondary"
+            (click)="openModalNewCita(item)"
+          >
+            <i class="fa fa-calendar"></i> Reservar
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+    </table>
+  </div>
 </div>

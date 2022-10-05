@@ -17,6 +17,7 @@ import { NuevacitaComponent } from "./nuevacita/nuevacita.component";
 import { User } from "src/app/auth/models/user";
 import { listaItems } from "./../../../models/listaItems";
 import { estadoSeguimiento } from "../../../models/estadoSeguimiento";
+import { MatTableDataSource } from "@angular/material/table";
 
 import { UtilService } from "./../../../shared/services/util.service";
 
@@ -81,11 +82,12 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   formulario: FormGroup;
   formularioArchivo: FormGroup;
   formularioFiltro: FormGroup;
+  searchForm: FormGroup;
   public archivoscargados: any[] = [];
   urlSubidaArchivo!: String;
   active: number = 1;
   personaGestion!: gestionPersona;
-  agendasDisponibles!: agendasDisponiblesProfesionales;
+  agendasDisponibles!: MatTableDataSource<agendasDisponiblesProfesionales>;
   currentUser: User;
 
   public pageSize: number;
@@ -101,6 +103,17 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   public permisoCargueExcel: boolean = false;
   public showButtonInformacionProgramacion: boolean = false;
   public statsProductoRepso = { totalProductos: 0, totalEjecutados: 0 };
+
+  displayedColumns: string[] = [
+    "profesional",
+    "fechacita",
+    "horacita",
+    "action",
+  ];
+
+  profesionalsearch = "";
+  fechacitasearch = "";
+  fechacitadatesearch = "";
 
   constructor(
     private _ToastService: ToastService,
@@ -202,6 +215,12 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       estado: [""],
       estado_seguimiento: [""],
       modalidad: [""],
+    });
+
+    this.searchForm = this.FormBuilder.group({
+      profesionalsearch: [""],
+      fechacitasearch: [""],
+      fechacitadatesearch: [""],
     });
   }
 
@@ -513,7 +532,8 @@ export class ProductorepsodetallesprodComponent implements OnInit {
           this._ToastService.danger(res.msg);
         }
         if (res.code == 200) {
-          this.agendasDisponibles = res.data;
+          this.agendasDisponibles = new MatTableDataSource(res.data);
+          this.agendasDisponibles.filterPredicate = this.getFilterPredicate();
           if (res.data.length > 0) {
             this._ToastService.success(res.msg);
           } else {
@@ -639,7 +659,6 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   }
 
   changeGenerarReprogramacionCita(value) {
-    console.log("el valor ",value, "otro = ", parseInt(this.formulario.get("estado_id").value));
     const estadosPermitidosCambio = [
       7, 11,
     ]; /** 7 citado, 11 cancelado reprogramado estaso permitido cambio de cita hora*/
@@ -698,5 +717,82 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         "debe ingresar todos los datos obligatorios, sección gestionar programación"
       );
     }
+  }
+  applyFilter() {
+    const date = this.searchForm.get("fechacitadatesearch").value;
+    const as = this.searchForm.get("profesionalsearch").value;
+    const ds = this.searchForm.get("fechacitasearch").value;
+
+    this.fechacitadatesearch =
+      date === null || date === "" ? "" : date.toDateString();
+    this.profesionalsearch = as === null ? "" : as;
+    this.fechacitasearch = ds === null ? "" : ds;
+
+    // create string of our searching values and split if by '$'
+    const filterValue =
+      this.fechacitadatesearch +
+      "$" +
+      this.profesionalsearch +
+      "$" +
+      this.fechacitasearch;
+    this.agendasDisponibles.filter = filterValue.trim().toLowerCase();
+      }
+
+  convertirDateToString(dateFormat){
+    const dateTo = new Date(dateFormat);
+    return `${dateTo.getFullYear()}-${dateTo.getMonth()+1}-${dateTo.getDate() <10 ? '0'+dateTo.getDate(): dateTo.getDate() }`
+  }
+
+  /* this method well be called for each row in table  */
+  getFilterPredicate() {
+    return (row: any, filters: string) => {
+      // split string per '$' to array
+      console.log("filters",filters);
+      const filterArray = filters.split("$");
+      const departureDate = filterArray[0];
+      const departureStation = filterArray[1];
+      const arrivalStation = filterArray[2];
+
+      const matchFilter = [];
+
+      // Fetch data from row
+      const columnDepartureDate = row.onlydate;
+      const columnDepartureStation = row.profesional;
+      const columnArrivalStation = row.dateformat_name;
+
+        
+        //matchFilter.push(customFilterDS);
+
+        console.log("this.convertirDateToString(departureDate)" ,this.convertirDateToString(departureDate));
+        console.log("row.onlydate",row.onlydate) ;
+
+
+      // verify fetching data by our searching values
+      if(departureDate!=''){
+
+        const customFilterDD = columnDepartureDate
+          .toString()
+          .toLowerCase()
+          .includes(this.convertirDateToString(departureDate));
+              matchFilter.push(customFilterDD);
+      }
+
+      const customFilterDS = columnDepartureStation
+        .toLowerCase()
+        .includes(departureStation);
+
+      const customFilterAS = columnArrivalStation
+        .toLowerCase()
+        .includes(arrivalStation);
+
+      // push boolean values into array
+        matchFilter.push(customFilterDS);
+      matchFilter.push(customFilterAS);
+
+      // return true if all values in array is true
+      // else return false
+      
+      return matchFilter.every(Boolean);
+    };
   }
 }

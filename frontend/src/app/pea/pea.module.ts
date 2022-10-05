@@ -13,6 +13,7 @@ import { IndexComponent } from "./components/index/index.component";
 import { CrearOdsComponent } from "./components/crear-ods/crear-ods.component";
 import { SolicitudComponent } from "./components/solicitud/solicitud.component";
 import { SharedModule } from "../shared/shared.module";
+import { MaterialModule } from "../material/material.module";
 import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 import { ProgramarAgendaComponent } from "./components/programaragenda/programaragenda.component";
 import { TipoproductosService } from "../services/tipoproductos.service";
@@ -28,8 +29,9 @@ import { AgendaService } from "../services/agenda.service";
 
 import { FullCalendarModule } from "@fullcalendar/angular";
 import { NuevaAgendaProfesionalComponent } from "./components/generar-agenda/crear/nueva-agenda-profesional/nueva-agenda-profesional.component";
-import { NuevacitaComponent } from './components/productorepsodetallesprod/nuevacita/nuevacita.component';
-import { EditarComponent } from './components/solicitud-listar/editar/editar.component';
+import { NuevacitaComponent } from "./components/productorepsodetallesprod/nuevacita/nuevacita.component";
+import { EditarComponent } from "./components/solicitud-listar/editar/editar.component";
+import { MAT_DATE_LOCALE } from '@angular/material/core'
 
 @NgModule({
   declarations: [
@@ -48,6 +50,7 @@ import { EditarComponent } from './components/solicitud-listar/editar/editar.com
     CommonModule,
     PeaRoutingModule,
     SharedModule,
+    MaterialModule,
     NgbModule,
     FormsModule,
     ReactiveFormsModule,
@@ -64,6 +67,7 @@ import { EditarComponent } from './components/solicitud-listar/editar/editar.com
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthTokenInterceptor, multi: true },
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
     fakeBackendProvider,
   ],
 })
