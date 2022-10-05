@@ -14,7 +14,7 @@ import { UtilService } from "src/app/shared/services/util.service";
 @Component({
   selector: "app-nuevacita",
   templateUrl: "./nuevacita.component.html",
-  styleUrls: ["./nuevacita.component.css"],
+  styleUrls: ["./nuevacita.component.scss"],
 })
 export class NuevacitaComponent implements OnInit {
   formulario: FormGroup;

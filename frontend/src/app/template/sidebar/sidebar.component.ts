@@ -15,7 +15,7 @@ import { UtilService } from './../../shared/services/util.service';
 @Component({
   selector: 'app-sidebar',
   templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.css'],
+  styleUrls: ['./sidebar.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
 export class SidebarComponent implements OnInit {

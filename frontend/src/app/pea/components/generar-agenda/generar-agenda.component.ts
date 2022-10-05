@@ -22,7 +22,7 @@ import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
 @Component({
   selector: "app-generar-agenda",
   templateUrl: "./generar-agenda.component.html",
-  styleUrls: ["./generar-agenda.component.css"],
+  styleUrls: ["./generar-agenda.component.scss"],
 })
 export class GenerarAgendaComponent implements OnInit {
   public urlProfesionales =

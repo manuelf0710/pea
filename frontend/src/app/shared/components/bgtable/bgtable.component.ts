@@ -24,7 +24,7 @@ import { environment } from "./../../../../environments/environment";
 @Component({
   selector: "app-bgtable",
   templateUrl: "./bgtable.component.html",
-  styleUrls: ["./bgtable.component.css"],
+  styleUrls: ["./bgtable.component.scss"],
 })
 export class BgtableComponent implements OnInit {
   public api_url = environment.server_root;

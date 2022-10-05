@@ -15,7 +15,7 @@ import { CrearusuarioComponent } from "./crear/crearusuario/crearusuario.compone
 @Component({
   selector: "app-usuarios",
   templateUrl: "./usuarios.component.html",
-  styleUrls: ["./usuarios.component.css"],
+  styleUrls: ["./usuarios.component.scss"],
   encapsulation: ViewEncapsulation.None,
 })
 export class UsuariosComponent implements OnInit {

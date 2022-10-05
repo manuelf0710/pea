@@ -14,7 +14,7 @@ import { tipoProducto } from "./../../models/tipoproducto";
 @Component({
   selector: "app-solicitud",
   templateUrl: "./solicitud.component.html",
-  styleUrls: ["./solicitud.component.css"],
+  styleUrls: ["./solicitud.component.scss"],
 })
 export class SolicitudComponent implements OnInit {
   public url = environment.apiUrl + environment.comun.buscarContrato;

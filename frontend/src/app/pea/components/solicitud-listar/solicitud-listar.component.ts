@@ -23,7 +23,7 @@ import { ProductosrepsoService } from "../../services/productosrepso.service";
 @Component({
   selector: "app-solicitud-listar",
   templateUrl: "./solicitud-listar.component.html",
-  styleUrls: ["./solicitud-listar.component.css"],
+  styleUrls: ["./solicitud-listar.component.scss"],
   encapsulation: ViewEncapsulation.None,
 })
 export class SolicitudListarComponent implements OnInit {

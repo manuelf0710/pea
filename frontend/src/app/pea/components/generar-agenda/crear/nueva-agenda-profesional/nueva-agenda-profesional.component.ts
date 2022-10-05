@@ -28,7 +28,7 @@ export interface Agenda {
 @Component({
   selector: "app-nueva-agenda-profesional",
   templateUrl: "./nueva-agenda-profesional.component.html",
-  styleUrls: ["./nueva-agenda-profesional.component.css"],
+  styleUrls: ["./nueva-agenda-profesional.component.scss"],
 })
 export class NuevaAgendaProfesionalComponent implements OnInit {
   formulario: FormGroup;

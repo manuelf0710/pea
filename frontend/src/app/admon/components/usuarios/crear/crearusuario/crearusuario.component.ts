@@ -5,7 +5,7 @@ import { UsuarioService } from "./../../../../services/usuario.service";
 @Component({
   selector: "app-crearusuario",
   templateUrl: "./crearusuario.component.html",
-  styleUrls: ["./crearusuario.component.css"],
+  styleUrls: ["./crearusuario.component.scss"],
 })
 export class CrearusuarioComponent implements OnInit {
   formulario: FormGroup;

@@ -60,7 +60,7 @@ export interface agendasDisponiblesProfesionales {
 @Component({
   selector: "app-productorepsodetallesprod",
   templateUrl: "./productorepsodetallesprod.component.html",
-  styleUrls: ["./productorepsodetallesprod.component.css"],
+  styleUrls: ["./productorepsodetallesprod.component.scss"],
 })
 export class ProductorepsodetallesprodComponent implements OnInit {
   id!: number;

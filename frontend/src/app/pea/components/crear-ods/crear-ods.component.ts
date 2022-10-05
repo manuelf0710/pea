@@ -4,7 +4,7 @@ import { environment } from './../../../../environments/environment';
 @Component({
   selector: 'app-crear-ods',
   templateUrl: './crear-ods.component.html',
-  styleUrls: ['./crear-ods.component.css']
+  styleUrls: ['./crear-ods.component.scss']
 })
 export class CrearOdsComponent implements OnInit {
   public url = environment.apiUrl+'/comun/buscarproducto';

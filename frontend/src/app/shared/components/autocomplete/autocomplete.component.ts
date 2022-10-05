@@ -7,7 +7,7 @@ import { HttpClient } from '@angular/common/http';
 @Component({
   selector: 'app-autocomplete',
   templateUrl: './autocomplete.component.html',
-  styleUrls: ['./autocomplete.component.css']
+  styleUrls: ['./autocomplete.component.scss']
 })
 export class AutocompleteComponent implements OnInit {
   public modeloBusqueda: any;

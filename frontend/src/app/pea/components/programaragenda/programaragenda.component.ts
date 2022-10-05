@@ -7,7 +7,7 @@ import { tipoProductoSeleccionado } from "../../models/tipoproductoseleccionado"
 @Component({
   selector: "app-programaragenda",
   templateUrl: "./programaragenda.component.html",
-  styleUrls: ["./programaragenda.component.css"],
+  styleUrls: ["./programaragenda.component.scss"],
 })
 export class ProgramarAgendaComponent implements OnInit {
   public tipoproductosList = [];
