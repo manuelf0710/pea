@@ -62,7 +62,7 @@ export class BgtableComponent implements OnInit {
 
   constructor(private _BgtableService: BgtableService) {
     this.isSearching = true;
-    this.pageSize = 10;
+    this.pageSize = 20;
     this.currentPage = 1;
     this.editarAction = new EventEmitter();
     this.eliminarAction = new EventEmitter();

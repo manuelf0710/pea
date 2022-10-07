@@ -15,7 +15,7 @@ class TipoProductoUser extends Model
 	use SoftDeletes;
 
 	protected $fillable = [
-		'tipoproducto_id', 'user_id '
+		'tipoproducto_id', 'user_id ', 'deleted_at'
 	];
 
 	protected $dates = ['deleted_at'];

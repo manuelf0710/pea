@@ -7,10 +7,13 @@ use Illuminate\Support\Facades\DB;
 use App\Perfil;
 use App\User;
 use App\Models\pea\TipoProducto;
+use App\Models\pea\TipoProductoUser;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Auth;
 use DataTables;
+
+use function PHPSTORM_META\map;
 
 class UserController extends Controller
 {
@@ -97,10 +100,22 @@ class UserController extends Controller
 	{
 	}
 
+	function getOneUserById($id){
+		$users = DB::table('users')
+		->join('perfiles', 'users.perfil_id', '=', 'perfiles.id')
+		->select('users.id', 'users.name', 'users.email', 'users.perfil_id', 'users.cedula', 'users.status', 'perfiles.nombre as perfil')
+		->addSelect(DB::raw('case users.status when 1 then "Activo" else "Inactivo" end status_des'))
+		->where('users.id', '=', $id)
+		->whereNull('users.deleted_at')
+		->first();
+		return $users;
+	}
 
 
 	public function store(Request $request)
 	{
+
+		
 		$name = $request->post('name');
 		$email = $request->post('email');
 		$password = $request->post('password');
@@ -108,19 +123,37 @@ class UserController extends Controller
 		$perfil_id = $request->post('perfil_id');
 		$cedula = $request->post('cedula');
 
-		$validator = Validator::make($request->all(), User::rules($request));
+		$rules = [
+        	'name' => 'required | min:6 | max: 191',
+            'cedula' => 'required|numeric',
+			'email' => ['required', 'string', 'email', 'max:255', 'unique:users','required_with:confirmar_email','same:confirmar_email'],
+			'confirmar_email' => ['max:255'],
+            'perfil_id' => 'required|numeric',
+        	'password' => 'required| min:6| max:30 |confirmed',
+			'password_confirmation' => 'required| min:6'
+    	];		
+
+
+		
+		$validator = Validator::make($request->all(), $rules);
+		
+
 		if (!($validator->fails())) {
 			$user = new User();
 			$user->name = $name;
 			$user->email = $email;
-			$user->password = $password;
+			$user->password = Hash::make($password);
+			;
 			$user->perfil_id = $perfil_id;
 			$user->cedula = $cedula;
 			$user->save();
+			if($request->post('tipoProductosLista')){
+				$this->saveTipoProductosUser($request->post('tipoProductosLista'), $user->id);	
+			}			
 			$response = array(
 				'status' => 'ok',
 				'code' => 200,
-				'data'   => $request->all(),
+				'data'   => $this->getOneUserById($user->id),
 				'msg'    => 'Guardado'
 			);
 		} else {
@@ -143,9 +176,12 @@ class UserController extends Controller
 		$user_id = $request->post('user_id');
 
         $productos = TipoProducto::withoutTrashed()
-			->join('tipoproducto_users','tipo_productos.id', '=', 'tipoproducto_users.tipoproducto_id')
-            ->select('tipo_productos.id as id', 'tipo_productos.name as name', 'tipoproducto_users.id as consecutivo')
-            ->where('tipoproducto_users.user_id','=', $user_id)
+            ->select('tipo_productos.id as id', 'tipo_productos.name as name')
+			->selectRaw("( select tipoproducto_users.id total_productos from tipoproducto_users where tipoproducto_users.tipoproducto_id = tipo_productos.id 
+				and tipoproducto_users.user_id ='" . $user_id . "') as consecutivo")
+			->selectRaw("( select tipoproducto_users.id total_productos from tipoproducto_users where tipoproducto_users.tipoproducto_id = tipo_productos.id 
+				and tipoproducto_users.user_id ='" . $user_id . "' and tipoproducto_users.deleted_at is null) as marcado")
+			->whereNull('tipo_productos.deleted_at')
             ->get();
         return response()->json($productos);		
 	}
@@ -202,8 +238,38 @@ class UserController extends Controller
 		}
 	}
 
+	function saveTipoProductosUser($tipoProductosLista, $id){
+			//$algoModificado = false;
+			foreach($tipoProductosLista as $item){
+				if(isset($item['modificado']) &&($item['modificado'] == false ||  $item['modificado'] ==  true)){
+					//$algoModificado = true;
+					if($item['consecutivo'] == null){ //new item
+						$tipoProductoUser = new TipoProductoUser();
+						$tipoProductoUser->tipoproducto_id = $item['id'];
+						$tipoProductoUser->user_id = $id;
+						$tipoProductoUser->save();
+					}else{ //update item
+						
+						if($item['modificado'] == false){
+							$tipoProductoUser = TipoProductoUser::find($item['consecutivo']);
+							$tipoProductoUser->delete();
+						}else{
+							DB::table('tipoproducto_users')
+							->where('id', '=', $item['consecutivo'])
+							->update(['deleted_at' => null]);
+						}
+					}
+					
+						
+						
+				}
+			}
+	}
+
 	public function update(Request $request, $id)
-	{
+	{ //echo json_encode($request->post('tipoProductosLista'));
+
+	
 		/*
 		* Reglas iniciales de validación
 		*/
@@ -251,10 +317,14 @@ class UserController extends Controller
 
 			$modelo->save();
 
+			if($request->post('tipoProductosLista')){
+				$this->saveTipoProductosUser($request->post('tipoProductosLista'), $id);	
+			}			
+
 			$response = array(
 				'status' => 'ok',
 				'code' => 200,
-				'data'   => $request->all(),
+				'data'   => $this->getOneUserById($id),
 				'msg'    => 'Actualizado'
 			);
 		} else {

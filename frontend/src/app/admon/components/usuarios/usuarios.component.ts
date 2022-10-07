@@ -99,7 +99,22 @@ export class UsuariosComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  agregarUsuario(ev) {}
+  agregarUsuario(ev) {
+    const modalRef = this.modalService.open(CrearusuarioComponent, {
+      backdrop: "static",
+      size: "lg",
+      keyboard: false,
+    });
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+          this.dataTableReload.reload(result.data.data);
+        }
+      })
+      .catch((error) => {});
+  }
+
   editarUsuario(solicitud) {
     const modalRef = this.modalService.open(CrearusuarioComponent, {
       //backdrop: 'static',
