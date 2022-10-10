@@ -12,7 +12,7 @@
   <link href="./assets/vendors/font-awesome/css/font-awesome.min.css" rel="stylesheet" />
   <!--<link href="./assets/css/indigo-pink.css" rel="stylesheet">-->
   <link href="./assets/styles.css" rel="stylesheet">  
-<link rel="stylesheet" href="styles.db168be1c8e16c8dd78b.css"></head>
+<link rel="stylesheet" href="/assets/angular/styles.f43532ffd22e1ff808a2.css"></head>
 <body class="mat-typography">
     <app-root>
       <style>
@@ -66,5 +66,5 @@
       Cargando<span class="d">.</span><span class="d d-2">.</span><span class="d d-3">.</span>
     </app-root>
 
-<script src="runtime-es2015.fc459be65db21ab8bfbc.js" type="module"></script><script src="runtime-es5.fc459be65db21ab8bfbc.js" nomodule defer></script><script src="polyfills-es5.930150b9154140ad41c5.js" nomodule defer></script><script src="polyfills-es2015.48aff55da3842cbe913e.js" type="module"></script><script src="main-es2015.4c4391425710ae498877.js" type="module"></script><script src="main-es5.4c4391425710ae498877.js" nomodule defer></script></body>
+<script src="/assets/angular/runtime-es2015.bd94e865edbe2e694a94.js" type="module"></script><script src="/assets/angular/runtime-es5.bd94e865edbe2e694a94.js" nomodule defer></script><script src="/assets/angular/polyfills-es5.0600649735bfb4229ee8.js" nomodule defer></script><script src="/assets/angular/polyfills-es2015.af871543570bafbb3447.js" type="module"></script><script src="/assets/angular/main-es2015.4225dbb6bdaa79f94980.js" type="module"></script><script src="/assets/angular/main-es5.4225dbb6bdaa79f94980.js" nomodule defer></script></body>
 </html>
