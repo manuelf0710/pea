@@ -34,8 +34,7 @@ class UserController extends Controller
 
 	public function listarAll(Request $request)
 	{
-		$profile = $request->post('profile');
-
+		$profile = $request->get('profile');
 		$productos = User::withoutTrashed()
 			->select('id', 'name as nombre')
 			->where("status", "=", "1")
@@ -53,6 +52,7 @@ class UserController extends Controller
 		$perfil_id = $request->get('perfil_id');
 		$cedula = $request->get('cedula');
 		$globalSearch = $request->get('globalsearch');
+
 
 		if ($globalSearch != '') {
 			$users = DB::table('users')
@@ -173,7 +173,7 @@ class UserController extends Controller
 
 	public function usersTipoProducto(Request $request)
 	{
-		$user_id = $request->post('user_id');
+		$user_id = $request->get('user_id');
 
         $productos = TipoProducto::withoutTrashed()
             ->select('tipo_productos.id as id', 'tipo_productos.name as name')

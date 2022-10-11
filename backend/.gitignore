@@ -3,6 +3,7 @@
 /public/storage
 /public/uploads
 /public/assets
+/vendor2
 /storage/*.key
 /vendor
 .env
