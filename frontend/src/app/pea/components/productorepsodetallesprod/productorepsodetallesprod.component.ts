@@ -736,18 +736,21 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       "$" +
       this.fechacitasearch;
     this.agendasDisponibles.filter = filterValue.trim().toLowerCase();
-      }
+  }
 
-  convertirDateToString(dateFormat){
+  convertirDateToString(dateFormat) {
     const dateTo = new Date(dateFormat);
-    return `${dateTo.getFullYear()}-${dateTo.getMonth()+1}-${dateTo.getDate() <10 ? '0'+dateTo.getDate(): dateTo.getDate() }`
+    return `${dateTo.getFullYear()}-${
+      dateTo.getMonth() + 1 < 10
+        ? "0" + (dateTo.getMonth() + 1)
+        : dateTo.getMonth() + 1
+    }-${dateTo.getDate() < 10 ? "0" + dateTo.getDate() : dateTo.getDate()}`;
   }
 
   /* this method well be called for each row in table  */
   getFilterPredicate() {
     return (row: any, filters: string) => {
       // split string per '$' to array
-      console.log("filters",filters);
       const filterArray = filters.split("$");
       const departureDate = filterArray[0];
       const departureStation = filterArray[1];
@@ -760,21 +763,21 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       const columnDepartureStation = row.profesional;
       const columnArrivalStation = row.dateformat_name;
 
-        
-        //matchFilter.push(customFilterDS);
+      //matchFilter.push(customFilterDS);
 
-        console.log("this.convertirDateToString(departureDate)" ,this.convertirDateToString(departureDate));
-        console.log("row.onlydate",row.onlydate) ;
-
+      console.log(
+        "this.convertirDateToString(departureDate)",
+        this.convertirDateToString(departureDate)
+      );
+      console.log("row.onlydate", row.onlydate);
 
       // verify fetching data by our searching values
-      if(departureDate!=''){
-
+      if (departureDate != "") {
         const customFilterDD = columnDepartureDate
           .toString()
           .toLowerCase()
           .includes(this.convertirDateToString(departureDate));
-              matchFilter.push(customFilterDD);
+        matchFilter.push(customFilterDD);
       }
 
       const customFilterDS = columnDepartureStation
@@ -786,12 +789,12 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         .includes(arrivalStation);
 
       // push boolean values into array
-        matchFilter.push(customFilterDS);
+      matchFilter.push(customFilterDS);
       matchFilter.push(customFilterAS);
 
       // return true if all values in array is true
       // else return false
-      
+
       return matchFilter.every(Boolean);
     };
   }
