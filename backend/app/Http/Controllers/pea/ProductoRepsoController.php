@@ -81,6 +81,7 @@ class ProductoRepsoController extends Controller
                 ->regional($regional)
                 ->tipoProducto($tipoProducto)
                 ->contrato($contrato)
+                ->descripcion($descripcion)
                 ->paginate($pageSize);
         }
 

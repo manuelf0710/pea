@@ -28,6 +28,7 @@ export class SolicitudComponent implements OnInit {
     status: "close",
     data: [],
   };
+  public dateActually = new Date();
   constructor(
     private FormBuilder: FormBuilder,
     private route: ActivatedRoute,
@@ -75,7 +76,7 @@ export class SolicitudComponent implements OnInit {
           Validators.pattern("^[0-9]*$"),
           Validators.minLength(4),
           Validators.maxLength(4),
-          Validators.min(2022),
+          Validators.min(this.dateActually.getFullYear()),
         ],
       ],
       descripcion: [descripcion],

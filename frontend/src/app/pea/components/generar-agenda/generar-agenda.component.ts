@@ -14,10 +14,13 @@ import { UtilService } from "../../../shared/services/util.service";
 import { ToastService } from "../../../shared/services/toast.service";
 import { AgendaService } from "../../../services/agenda.service";
 import { ComunService } from "../../../services/comun.service";
+import { User } from "src/app/auth/models/user";
 
 import { NuevaAgendaProfesionalComponent } from "../generar-agenda/crear/nueva-agenda-profesional/nueva-agenda-profesional.component";
 import { environment } from "../../../../environments/environment";
 import { THIS_EXPR } from "@angular/compiler/src/output/output_ast";
+import { AuthenticationService } from "src/app/auth/services/authentication.service";
+import { map } from "rxjs/operators";
 
 @Component({
   selector: "app-generar-agenda",
@@ -33,8 +36,8 @@ export class GenerarAgendaComponent implements OnInit {
   public startDateView: any;
   public endDateView: any;
   public profesionalesList = [];
-  public buscarProfesional = '';
-
+  public buscarProfesional = "";
+  currentUser: User;
 
   @ViewChild("calendar") calendarComponent: FullCalendarComponent;
 
@@ -150,8 +153,21 @@ export class GenerarAgendaComponent implements OnInit {
     private _ComunService: ComunService,
     private _ToastService: ToastService,
     private modalService: NgbModal,
+    private authenticationService: AuthenticationService,
     @Inject(LOCALE_ID) public locale: string
-  ) {}
+  ) {
+    this.authenticationService.currentUser.subscribe(
+      (x) => (this.currentUser = x)
+    );
+
+    console.log("this.currentUser.perfil.id => ", this.currentUser);
+    this.profesionalSeleccionado = {
+      id: this.currentUser.id,
+      nombre: this.currentUser.name,
+    };
+
+    this.seleccionadoProfesional({ ...this.profesionalSeleccionado });
+  }
 
   ngOnInit(): void {
     this.loadForProfesionales();
@@ -233,6 +249,8 @@ export class GenerarAgendaComponent implements OnInit {
 
   handleDateSelect(selectInfo: DateSelectArg) {
     console.log("handle date select");
+    if (this.currentUser.perfil.id == 3) return;
+
     if (!this.profesionalSeleccionado) {
       this._ToastService.info("debe seleccionar primero un profesional");
       return;
@@ -288,7 +306,7 @@ export class GenerarAgendaComponent implements OnInit {
       end: end,
       end_time: end_time,
       tipo: null,
-      extendedprops:null
+      extendedprops: null,
     };
 
     modalRef.componentInstance.data = info;
@@ -314,6 +332,7 @@ export class GenerarAgendaComponent implements OnInit {
 
   handleEventClick(clickInfo: EventClickArg) {
     console.log("ingresaste manuelf ", clickInfo.event);
+    if (this.currentUser.perfil.id == 3) return;
 
     console.log("valores ", clickInfo.event.start);
     if (clickInfo.event.extendedProps.origen == "decitasproducto") {
@@ -353,7 +372,7 @@ export class GenerarAgendaComponent implements OnInit {
       end: end.split(" ")[0],
       end_time: end_time,
       tipo: clickInfo.event.extendedProps.tipo,
-      extendedprops : clickInfo.event.extendedProps
+      extendedprops: clickInfo.event.extendedProps,
     };
 
     console.log("esta es la infooo ", info);
@@ -363,7 +382,6 @@ export class GenerarAgendaComponent implements OnInit {
     modalRef.result
       .then((result) => {
         if (result.status == "ok") {
-
           this.getAgendaProfesional(
             //result.data.data[0].datesList[0].profesional_id
             this.profesionalSeleccionado.id
@@ -438,9 +456,26 @@ export class GenerarAgendaComponent implements OnInit {
     this.loading = true;
     this._AgendaService.postAgendaProfesional(id, data).subscribe(
       (res: any) => {
+        console.log("ladatata ", res.data);
+        let dataEvents = [];
+        if (this.currentUser.perfil.id == 3) {
+          dataEvents = res.data.filter(
+            (item) =>
+              item.origen.includes("decitasproducto") ||
+              item.razon_bloqueo == "tiempo espera"
+          );
+          this.calendarOptions.events = dataEvents;
+          this.agendaProfesional = dataEvents;
+
+          console.log("lso eventos jueppppp", dataEvents);
+        } else {
+          this.calendarOptions.events = res.data;
+          this.agendaProfesional = res.data;
+        }
+        //        this.calendarOptions.events = res.data;
+        //      this.agendaProfesional = res.data;
         this.calendarVisible = true;
-        this.calendarOptions.events = res.data;
-        this.agendaProfesional = res.data;
+
         res.status == "ok"
           ? this._ToastService.success(res.msg)
           : this._ToastService.warning(res.msg);

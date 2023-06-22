@@ -21,24 +21,35 @@
           (seleccionado)="seleccionadoProfesional($event)"
           [labelValue]="'profesional'"
         ></app-autocomplete>-->
-        <div class="mb-1">
-          <input type="text" placeholder="Busca Profesional"  [(ngModel)]="buscarProfesional" id="buscarprofesional" name="buscarprofesional" class="rounded float-right form-control mb-3" >
-        </div>          
+        <div class="mb-1" *ngIf="currentUser.perfil.id != 3">
+          <input
+            type="text"
+            placeholder="Busca Profesional"
+            [(ngModel)]="buscarProfesional"
+            id="buscarprofesional"
+            name="buscarprofesional"
+            class="rounded float-right form-control mb-3"
+          />
+        </div>
         <p *ngIf="profesionalSeleccionado" class="font-weight-bold text-right">
           <i class="fa fa-user-o text-success"></i>
           {{ profesionalSeleccionado.nombre }}
-        </p>      
+        </p>
         <p *ngIf="!profesionalSeleccionado" class="font-weight-bold text-right">
           <i class="fa fa-user-o text-success"></i>
           no ha seleccionado Profesional
-        </p>      
+        </p>
       </div>
 
-      <ul class="list-group mt-1">
+      <ul class="list-group mt-1" *ngIf="currentUser.perfil.id != 3">
         <a
           (click)="seleccionadoProfesional(item)"
           class="list-group-item list-group-item-action"
-          *ngFor="let item of profesionalesList | filterfor : { nombre: buscarProfesional}: false; let i = index"
+          *ngFor="
+            let item of profesionalesList
+              | filterfor : { nombre: buscarProfesional } : false;
+            let i = index
+          "
           [ngClass]="
             profesionalSeleccionado && profesionalSeleccionado.id == item.id
               ? 'active'
