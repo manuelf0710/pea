@@ -92,6 +92,26 @@ class ProductoRepsoController extends Controller
         //
     }
 
+    public function getExistProduct(Request $request){
+        $tipoproducto_id = $request->post('tipoproducto_id');
+        $contrato_id    = $request->post('contrato_id');
+        $profesional_id    = $request->post('profesional_id');       
+        $solicitud = DB::table('productos_repso')
+        ->where('productos_repso.profesional_id', '=', $profesional_id)
+        ->where('productos_repso.tipoproducto_id', '=', $tipoproducto_id)
+        ->where('productos_repso.contrato_id', '=', $contrato_id)
+        ->first();
+
+        $response = array(
+            'status' => 'ok',
+            'code' => 200,
+            'data'   => $solicitud,
+            'msg'    => 'Datos consultados'
+        );
+
+        return response()->json($response);
+    }
+
     /**
      * Store a newly created resource in storage.
      *

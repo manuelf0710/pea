@@ -534,6 +534,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         if (res.code == 200) {
           this.agendasDisponibles = new MatTableDataSource(res.data);
           this.agendasDisponibles.filterPredicate = this.getFilterPredicate();
+          console.log("agendas disponibles => ", this.agendasDisponibles);
           if (res.data.length > 0) {
             this._ToastService.success(res.msg);
           } else {

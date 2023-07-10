@@ -26,6 +26,13 @@ export class ProductosrepsoService {
     }
   }
 
+  public getExistSolicitud(data) {
+    return this._http.post<any>(
+      environment.apiUrl + environment.solicitud.getExistSolicitud,
+      data
+    );
+  }
+
   public getSolicitudById(id) {
     return this._http
       .get<productoRepso>(

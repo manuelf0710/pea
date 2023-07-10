@@ -85,6 +85,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::get('tipoproductoslist', 'pea\TipoProductoController@buscarTipoProducto')->name('tipoproductos.buscar');
 		Route::post('solicitudes', 'pea\ProductoRepsoController@listado')->name('productosrepso');
 		Route::post('solicitud', 'pea\ProductoRepsoController@store')->name('producto.solicitud');
+		Route::post('solicitudexist', 'pea\ProductoRepsoController@getExistProduct')->name('producto.getexist');
 		Route::put('solicitud/{id}', 'pea\ProductoRepsoController@update')->name('productorepso.update');
 		Route::get('solicitud/{id}', 'pea\ProductoRepsoController@show')->name('productosolicitud.show');
 		Route::get('solicitud/statsbyid/{id}', 'pea\ProductoRepsoController@statsById')->name('productosolicitud.statsbyid');

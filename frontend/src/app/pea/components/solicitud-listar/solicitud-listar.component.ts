@@ -19,6 +19,8 @@ import { ToastService } from "./../../../shared/services/toast.service";
 import { EditarComponent } from "./editar/editar.component";
 import { UtilService } from "../../../shared/services/util.service";
 import { ProductosrepsoService } from "../../services/productosrepso.service";
+import { User } from "src/app/auth/models/user";
+import { AuthenticationService } from "src/app/auth/services/authentication.service";
 
 @Component({
   selector: "app-solicitud-listar",
@@ -34,6 +36,7 @@ export class SolicitudListarComponent implements OnInit {
   public regionales: regional[];
   public tipoProductos: tipoProducto[];
   public odsLista: any[];
+  currentUser: User;
 
   buttons = {
     acciones: {
@@ -111,8 +114,15 @@ export class SolicitudListarComponent implements OnInit {
     private modalService: NgbModal,
     private _ToastService: ToastService,
     private _UtilService: UtilService,
-    private _ProductosrepsoService: ProductosrepsoService
-  ) {}
+    private _ProductosrepsoService: ProductosrepsoService,
+    private authenticationService: AuthenticationService
+  ) {
+    this.authenticationService.currentUser.subscribe((x) => {
+      this.currentUser = x;
+      this.buttons.acciones.edit =
+        this.currentUser.perfil.id == 1 ? true : false;
+    });
+  }
 
   ngOnInit(): void {
     forkJoin([

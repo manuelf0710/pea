@@ -104,36 +104,49 @@ export class SolicitudComponent implements OnInit {
       const value = {
         ...this.formulario.value,
       };
-
-      this._UtilService
-        .confirm({
-          title: "Guardar Solicitud",
-          message: "Seguro que desea guardar esta solicitud?",
-        })
-        .then(
-          () => {
-            this.loading = true;
-            this._ProductosrepsoService
-              .guardarsolicitud(value)
-              .subscribe((res: any) => {
-                if (res.status == "ok") {
-                  this.respuesta = { status: "ok", data: res };
-                  //this.formulario.get('id').setValue(res.data.id);
-                  this._ToastService.success(
-                    "Solicitud " + res.msg + " correctamente"
-                  );
-                  this.router.navigate(["/pea/solicitudes"]);
-                }
-                if (res.status == "error") {
-                  let messageError = this._ToastService.errorMessage(res.msg);
-                  this._ToastService.danger(messageError);
-                }
-              });
-          },
-          () => {
-            this.loading = false;
+      this._ProductosrepsoService
+        .getExistSolicitud(value)
+        .subscribe((res: any) => {
+          let messageSave = "Seguro que desea guardar esta solicitud?";
+          if (res.data) {
+            messageSave =
+              "Ya existe una solicitud con esta información, Seguro que desea guardar esta solicitud?";
+            this._ToastService.warning(
+              "ya existe una solicitud con esta información"
+            );
           }
-        );
+          this._UtilService
+            .confirm({
+              title: "Guardar Solicitud",
+              message: messageSave,
+            })
+            .then(
+              () => {
+                this.loading = true;
+                this._ProductosrepsoService
+                  .guardarsolicitud(value)
+                  .subscribe((res: any) => {
+                    if (res.status == "ok") {
+                      this.respuesta = { status: "ok", data: res };
+                      //this.formulario.get('id').setValue(res.data.id);
+                      this._ToastService.success(
+                        "Solicitud " + res.msg + " correctamente"
+                      );
+                      this.router.navigate(["/pea/solicitudes"]);
+                    }
+                    if (res.status == "error") {
+                      let messageError = this._ToastService.errorMessage(
+                        res.msg
+                      );
+                      this._ToastService.danger(messageError);
+                    }
+                  });
+              },
+              () => {
+                this.loading = false;
+              }
+            );
+        });
     } else {
       this.formulario.markAllAsTouched();
     }

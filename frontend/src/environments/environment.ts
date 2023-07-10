@@ -30,6 +30,7 @@ export const environment = {
     post: "pea/solicitud",
     put: "pea/solicitud/",
     getStatsById: "pea/solicitud/statsbyid/",
+    getExistSolicitud: "pea/solicitudexist/",
   },
   comun: {
     getRegionales: "comun/regionaleslist",
