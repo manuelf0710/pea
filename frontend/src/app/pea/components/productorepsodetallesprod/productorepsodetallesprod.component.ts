@@ -20,6 +20,7 @@ import { estadoSeguimiento } from "../../../models/estadoSeguimiento";
 import { MatTableDataSource } from "@angular/material/table";
 
 import { UtilService } from "./../../../shared/services/util.service";
+import dayjs from "dayjs";
 
 export interface gestionPersona {
   id: number;
@@ -114,6 +115,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   profesionalsearch = "";
   fechacitasearch = "";
   fechacitadatesearch = "";
+  horacitadatesearch = "";
 
   constructor(
     private _ToastService: ToastService,
@@ -221,6 +223,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       profesionalsearch: [""],
       fechacitasearch: [""],
       fechacitadatesearch: [""],
+      horacitadatesearch: [""],
     });
   }
 
@@ -723,11 +726,15 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     const date = this.searchForm.get("fechacitadatesearch").value;
     const as = this.searchForm.get("profesionalsearch").value;
     const ds = this.searchForm.get("fechacitasearch").value;
+    const hourSearch = this.searchForm.get("horacitadatesearch").value;
+
+    console.log("hourSearch", hourSearch);
 
     this.fechacitadatesearch =
       date === null || date === "" ? "" : date.toDateString();
     this.profesionalsearch = as === null ? "" : as;
     this.fechacitasearch = ds === null ? "" : ds;
+    this.horacitadatesearch = hourSearch;
 
     // create string of our searching values and split if by '$'
     const filterValue =
@@ -735,7 +742,9 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       "$" +
       this.profesionalsearch +
       "$" +
-      this.fechacitasearch;
+      this.fechacitasearch +
+      "$" +
+      this.horacitadatesearch;
     this.agendasDisponibles.filter = filterValue.trim().toLowerCase();
   }
 
@@ -756,6 +765,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       const departureDate = filterArray[0];
       const departureStation = filterArray[1];
       const arrivalStation = filterArray[2];
+      const hourSearch = filterArray[3];
 
       const matchFilter = [];
 
@@ -763,14 +773,45 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       const columnDepartureDate = row.onlydate;
       const columnDepartureStation = row.profesional;
       const columnArrivalStation = row.dateformat_name;
+      const columnStart = row.start;
+      const columnEnd = row.end;
+
+      console.log("rowss ", row);
 
       //matchFilter.push(customFilterDS);
 
-      console.log(
+      /*console.log(
         "this.convertirDateToString(departureDate)",
         this.convertirDateToString(departureDate)
       );
-      console.log("row.onlydate", row.onlydate);
+      console.log("row.onlydate", row.onlydate);*/
+
+      // Filtro de horas
+      const startHour = parseInt(hourSearch.slice(0, 2)); // Obtener la hora del filtro
+      const endHour = startHour + 1; // Definir una hora límite, en este caso, una hora después
+      const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
+      const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
+      const isWithinHourRange =
+        startHour >= columnStartHour &&
+        endHour <= columnEndHour &&
+        row.minutes >= this.odsDetalles.tipo_producto.tiempo; // Verificar si la columna está dentro del rango de horas especificado
+      /*
+      console.log(
+        "startHour =>",
+        startHour,
+        "endHour => ",
+        endHour,
+        "columnStartHour=> ",
+        columnStartHour,
+        "columnEndHour => ",
+        columnEndHour,
+        "isWithinHourRange=> ",
+        isWithinHourRange
+      );
+      console.log(
+        "odsDetalles.tipo_producto.tiempo ",
+        this.odsDetalles.tipo_producto.tiempo
+      );*/
 
       // verify fetching data by our searching values
       if (departureDate != "") {
@@ -792,11 +833,22 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       // push boolean values into array
       matchFilter.push(customFilterDS);
       matchFilter.push(customFilterAS);
+      matchFilter.push(isWithinHourRange);
 
       // return true if all values in array is true
       // else return false
 
       return matchFilter.every(Boolean);
     };
+  }
+
+  getHoursBetween(start: number, end: number): string[] {
+    const hours: string[] = [];
+    let hour: string;
+    for (let i = start; i <= end; i++) {
+      hour = i < 10 ? "0" + i + ":00:00" : i + ":00:00";
+      hours.push(hour);
+    }
+    return hours;
   }
 }

@@ -15,7 +15,8 @@ import { MatDatepickerModule } from "@angular/material/datepicker";
 import { MatNativeDateModule } from "@angular/material/core";
 import { MatFormFieldModule } from "@angular/material/form-field";
 import { MatInputModule } from "@angular/material/input";
-import { MAT_DATE_LOCALE } from '@angular/material/core'
+import { MatSelectModule } from "@angular/material/select";
+import { MAT_DATE_LOCALE } from "@angular/material/core";
 
 @NgModule({
   declarations: [],
@@ -32,6 +33,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
     MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
   ],
   exports: [
     MatSidenavModule,
@@ -45,6 +47,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
     MatNativeDateModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
   ],
   // schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
 })
@@ -52,7 +55,7 @@ export class MaterialModule {
   static forRoot(): ModuleWithProviders<any> {
     return {
       ngModule: MaterialModule,
-      providers: [ { provide: MAT_DATE_LOCALE, useValue: 'en-GB' } ]
+      providers: [{ provide: MAT_DATE_LOCALE, useValue: "en-GB" }],
     };
   }
 }

@@ -1048,6 +1048,28 @@
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
+
+      <mat-form-field
+        class="search__form_field"
+        appearance="outline"
+        style="width: 100px"
+      >
+        <mat-label>Hora Cita</mat-label>
+        <mat-select
+          aria-label="Hora Cita"
+          formControlName="horacitadatesearch"
+          (selectionChange)="applyFilter()"
+          placeholder="Selecciona una hora"
+        >
+          <mat-option disabled>Seleccione una hora</mat-option>
+          <mat-option
+            *ngFor="let hour of getHoursBetween(6, 19)"
+            [value]="hour"
+          >
+            {{ hour }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
     </form>
 
     <table
