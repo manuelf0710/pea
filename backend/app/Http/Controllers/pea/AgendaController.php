@@ -166,12 +166,15 @@ class AgendaController extends Controller
             ->where('citas.ocupado', '=', 1)
             ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$this->today'");
 
-        $citas = $citas->addSelect(DB::raw(
-            "date_format(citas.start, '%Y-%m-%d') onlydate"
-        ))
-            ->orderBy('citas.id', 'asc')
-            ->get();
+            $citas = $citas->addSelect(DB::raw(
+                "date_format(citas.start, '%Y-%m-%d') onlydate"
+            ));
+            if(auth()->user()->perfil_id){
+                $citas = $citas->where('users.id' , '=', auth()->user()->id );
+            }
 
+            $citas = $citas->orderBy('citas.id', 'asc')
+            ->get();
 
         //echo ("diferencia de minutos " . $this->minutosInterval('2022-03-28 08:00:00', '2022-03-28 08:15:00') . ' citastotal = ' . count($citas) . '<br>');
         $citas = json_decode($citas, true);

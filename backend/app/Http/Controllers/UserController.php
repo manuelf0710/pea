@@ -68,9 +68,12 @@ class UserController extends Controller
 				->select('users.id', 'users.name', 'users.email', 'users.perfil_id', 'users.cedula', 'users.status', 'perfiles.nombre as perfil')
 				->addSelect(DB::raw('case users.status when 1 then "Activo" else "Inactivo" end status_des'))
 				//->where('users.status', '=', 1)
-				->whereNull('users.deleted_at')
-				//->Nombre($nombre)
-				->paginate($pageSize);
+				->whereNull('users.deleted_at');
+				if ($nombre != "") {
+					$users->where('users.name', 'like', "%$nombre%");
+				}
+				
+				$users = $users->paginate($pageSize);
 		}
 		return response()->json($users);
 	}
