@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, ViewChild, AfterViewInit } from "@angular/core";
 import { ActivatedRoute, Params } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { environment } from "src/environments/environment";
@@ -18,9 +18,10 @@ import { User } from "src/app/auth/models/user";
 import { listaItems } from "./../../../models/listaItems";
 import { estadoSeguimiento } from "../../../models/estadoSeguimiento";
 import { MatTableDataSource } from "@angular/material/table";
+import { MatPaginator } from "@angular/material/paginator";
 
 import { UtilService } from "./../../../shared/services/util.service";
-import dayjs from "dayjs";
+//import dayjs from "dayjs";
 
 export interface gestionPersona {
   id: number;
@@ -63,7 +64,9 @@ export interface agendasDisponiblesProfesionales {
   templateUrl: "./productorepsodetallesprod.component.html",
   styleUrls: ["./productorepsodetallesprod.component.scss"],
 })
-export class ProductorepsodetallesprodComponent implements OnInit {
+export class ProductorepsodetallesprodComponent
+  implements OnInit, AfterViewInit
+{
   id!: number;
   odsDetalles: productoRepso;
   productosLista: any[];
@@ -88,7 +91,12 @@ export class ProductorepsodetallesprodComponent implements OnInit {
   urlSubidaArchivo!: String;
   active: number = 1;
   personaGestion!: gestionPersona;
-  agendasDisponibles!: MatTableDataSource<agendasDisponiblesProfesionales>;
+  agendasDisponibles: MatTableDataSource<agendasDisponiblesProfesionales>;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
+    this.paginator = mp;
+    this.setDataSourceAttributes();
+  }
   currentUser: User;
 
   public pageSize: number;
@@ -140,6 +148,16 @@ export class ProductorepsodetallesprodComponent implements OnInit {
     this.permisoCargueExcel = this.arrayPermisoCargueExcel.includes(
       this.currentUser.perfil.id
     );
+  }
+
+  setDataSourceAttributes() {
+    if (this.agendasDisponibles !== undefined) {
+      this.agendasDisponibles.paginator = this.paginator;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    //this.agendasDisponibles.paginator = this.paginator;
   }
 
   ngOnInit(): void {
@@ -419,7 +437,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         this.agendaDisponibleProfesionales();
       } else {
         console.log("entra en agendasdisponibles null");
-        this.agendasDisponibles = null;
+        //this.agendasDisponibles = null;
       }
       console.log("agendas dipooonibles ", this.agendasDisponibles);
       this.setvaluesFormulario();
@@ -537,7 +555,11 @@ export class ProductorepsodetallesprodComponent implements OnInit {
         if (res.code == 200) {
           this.agendasDisponibles = new MatTableDataSource(res.data);
           this.agendasDisponibles.filterPredicate = this.getFilterPredicate();
-          console.log("agendas disponibles => ", this.agendasDisponibles);
+          //this.agendasDisponibles.paginator = this.paginator;
+          /*setTimeout(
+            () => (this.agendasDisponibles.paginator = this.paginator)
+          ); */
+
           if (res.data.length > 0) {
             this._ToastService.success(res.msg);
           } else {
@@ -776,7 +798,7 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       const columnStart = row.start;
       const columnEnd = row.end;
 
-      console.log("rowss ", row);
+      //console.log("rowss ", row);
 
       //matchFilter.push(customFilterDS);
 
@@ -787,14 +809,18 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       console.log("row.onlydate", row.onlydate);*/
 
       // Filtro de horas
-      const startHour = parseInt(hourSearch.slice(0, 2)); // Obtener la hora del filtro
-      const endHour = startHour + 1; // Definir una hora límite, en este caso, una hora después
-      const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
-      const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
-      const isWithinHourRange =
-        startHour >= columnStartHour &&
-        endHour <= columnEndHour &&
-        row.minutes >= this.odsDetalles.tipo_producto.tiempo; // Verificar si la columna está dentro del rango de horas especificado
+      if (hourSearch !== "" && hourSearch !== "-1") {
+        const startHour = parseInt(hourSearch.slice(0, 2)); // Obtener la hora del filtro
+        const endHour = startHour + 1; // Definir una hora límite, en este caso, una hora después
+        const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
+        const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
+        const isWithinHourRange =
+          startHour >= columnStartHour &&
+          endHour <= columnEndHour &&
+          row.minutes >= this.odsDetalles.tipo_producto.tiempo; // Verificar si la columna está dentro del rango de horas especificado
+        matchFilter.push(isWithinHourRange);
+      }
+
       /*
       console.log(
         "startHour =>",
@@ -833,8 +859,6 @@ export class ProductorepsodetallesprodComponent implements OnInit {
       // push boolean values into array
       matchFilter.push(customFilterDS);
       matchFilter.push(customFilterAS);
-      matchFilter.push(isWithinHourRange);
-
       // return true if all values in array is true
       // else return false
 
