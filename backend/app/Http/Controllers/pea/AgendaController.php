@@ -169,7 +169,7 @@ class AgendaController extends Controller
             $citas = $citas->addSelect(DB::raw(
                 "date_format(citas.start, '%Y-%m-%d') onlydate"
             ));
-            if(auth()->user()->perfil_id){
+            if(auth()->user()->perfil_id === 3){
                 $citas = $citas->where('users.id' , '=', auth()->user()->id );
             }
 

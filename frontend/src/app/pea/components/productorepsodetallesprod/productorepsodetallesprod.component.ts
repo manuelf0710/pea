@@ -817,7 +817,7 @@ export class ProductorepsodetallesprodComponent
         const isWithinHourRange =
           startHour >= columnStartHour &&
           endHour <= columnEndHour &&
-          row.minutes >= this.odsDetalles.tipo_producto.tiempo; // Verificar si la columna está dentro del rango de horas especificado
+          row.minutes >= this.odsDetalles.tipo_producto.tiempo + 15; // Verificar si la columna está dentro del rango de horas especificado
         matchFilter.push(isWithinHourRange);
       }
 
