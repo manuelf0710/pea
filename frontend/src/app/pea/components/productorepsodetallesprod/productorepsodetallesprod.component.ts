@@ -47,6 +47,7 @@ export interface gestionPersona {
   comentarios: String;
   ciudad: String;
   pyp_ergonomia: String;
+  profesional_id: String;
 }
 
 export interface agendasDisponiblesProfesionales {
@@ -707,7 +708,18 @@ export class ProductorepsodetallesprodComponent
   }
 
   guardarInformacionProgramacion() {
+    console.log("this.formulario.value => ", this.formulario.value);
+    console.log("this.personaGestion ==>>", this.personaGestion);
+
     if (this.formulario.valid) {
+      if (
+        this.personaGestion.estado_id == 12 &&
+        this.personaGestion.profesional_id == null
+      ) {
+        this._ToastService.warning("Se debe eliminar el registro");
+        return;
+      }
+
       this._UtilService
         .confirm({
           title: "Guardar Gestión",
@@ -717,6 +729,7 @@ export class ProductorepsodetallesprodComponent
           () => {
             this.loading = true;
             let value = { ...this.formulario.value };
+            console.log("valor to save producto gestion ", value);
             this._ProductosrepsoService
               .guardarinformacionProducto(value)
               .subscribe((res: any) => {
@@ -817,8 +830,31 @@ export class ProductorepsodetallesprodComponent
         const isWithinHourRange =
           startHour >= columnStartHour &&
           endHour <= columnEndHour &&
-          row.minutes >= this.odsDetalles.tipo_producto.tiempo + 15; // Verificar si la columna está dentro del rango de horas especificado
+          row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
         matchFilter.push(isWithinHourRange);
+
+        console.log(
+          "startHour =>",
+          startHour,
+          "endHour => ",
+          endHour,
+          "columnStartHour=> ",
+          columnStartHour,
+          "columnEndHour => ",
+          columnEndHour,
+          "isWithinHourRange=> ",
+          isWithinHourRange,
+          "row.minutes =>>",
+          row.minutes,
+          "this.odsDetalles.tipo_producto.tiempo () =>",
+          this.odsDetalles.tipo_producto.tiempo,
+          "this.odsDetalles.tipo_producto.tiempo+15 >>>> ",
+          this.odsDetalles.tipo_producto.tiempo + 15
+        );
+        console.log(
+          "odsDetalles.tipo_producto.tiempo ",
+          this.odsDetalles.tipo_producto.tiempo
+        );
       }
 
       /*

@@ -369,7 +369,8 @@ class CitaController extends Controller
                 'users.name as profesional_des'
             )
             //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
-            ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+            //->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+            ->selectRaw("concat(date_format(productos.fecha_inicio, '%d/%m/%Y'), ' ', date_format(productos.fecha_inicio, '%H:%i:%s  %p'), ' - ', date_format(productos.fecha_fin, '%H:%i:%s  %p')) as fecha_programacion")
             ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
             ->where('productos.id', '=', $id)
             ->first();

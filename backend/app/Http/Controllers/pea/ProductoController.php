@@ -129,7 +129,8 @@ class ProductoController extends Controller
                 'users.name as profesional_des'
             )
             //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
-            ->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+            //->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+            ->selectRaw("concat(date_format(productos.fecha_inicio, '%d/%m/%Y'), ' ', date_format(productos.fecha_inicio, '%H:%i:%s  %p'), ' - ', date_format(productos.fecha_fin, '%H:%i:%s  %p')) as fecha_programacion")
             ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
             ->where('productos.id', '=', $id)
             ->first();
@@ -158,7 +159,7 @@ class ProductoController extends Controller
                 $productoReprogramacion->producto_id = $id;
                 $productoReprogramacion->user_id        = auth()->user()->id;
                 $productoReprogramacion->profesional_id = $updateProducto->profesional_id;
-                $productoReprogramacion->profesional_id = $updateProducto->profesional_id;
+                //$productoReprogramacion->profesional_id = $updateProducto->profesional_id;
                 $productoReprogramacion->comentario     = $request->post('comentario_cancelacion');
                 $productoReprogramacion->inicio         = $updateProducto->fecha_inicio;
                 $productoReprogramacion->end            = $updateProducto->fecha_fin;
@@ -171,7 +172,8 @@ class ProductoController extends Controller
                 }
 
                 $updateProducto->comentarios      = $request->post('comentarios');
-                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');                
+                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');   
+                $updateProducto->estado_id = $request->post('estado_programacion');             
 
                 $updateProducto->save();
             }else{
