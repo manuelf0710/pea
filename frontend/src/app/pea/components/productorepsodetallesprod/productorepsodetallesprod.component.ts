@@ -60,6 +60,14 @@ export interface agendasDisponiblesProfesionales {
   nombre: String;
 }
 
+export interface countAgendaProfesional {
+  profesional_id: number;
+  numcitas: number;
+  fecha: String;
+  fechainfo: String;
+  name: String;
+}
+
 @Component({
   selector: "app-productorepsodetallesprod",
   templateUrl: "./productorepsodetallesprod.component.html",
@@ -92,6 +100,7 @@ export class ProductorepsodetallesprodComponent
   urlSubidaArchivo!: String;
   active: number = 1;
   personaGestion!: gestionPersona;
+  countAgendas!: countAgendaProfesional;
   agendasDisponibles: MatTableDataSource<agendasDisponiblesProfesionales>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
@@ -540,11 +549,32 @@ export class ProductorepsodetallesprodComponent
     }
   }
 
+  countCitasByProfesional() {
+    let formData = {
+      tipo_producto: this.odsDetalles.tipo_producto.id,
+      start: "2023-01-01",
+    };
+    this._AgendaService
+      .postCitasByProfesional({
+        ...formData,
+      })
+      .subscribe((res: any) => {
+        this.countAgendas = res;
+        if (res.status == "error") {
+          this._ToastService.danger(res.msg);
+        }
+        if (res.code == 200) {
+          this.countAgendas = res;
+        }
+      });
+  }
+
   agendaDisponibleProfesionales() {
     this.loading = true;
     let formData = {
       tipo_producto: this.odsDetalles.tipo_producto.id,
     };
+    this.countCitasByProfesional();
     this._AgendaService
       .postAgendaProfesionalAllProfesional({
         ...formData,

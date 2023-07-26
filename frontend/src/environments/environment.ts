@@ -53,6 +53,7 @@ export const environment = {
     putAgendaProfesional: "pea/agenda/cita/",
     postAgendaDisponibleAllProfesional: "pea/agenda/agendadisponible/",
     postCita: "pea/cita",
+    postCitasByProfesional: "pea/countcitasbyprofesional",
   },
   admon: {
     postUsersList: "admon/userslist",

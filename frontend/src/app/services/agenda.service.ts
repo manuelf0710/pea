@@ -24,10 +24,11 @@ export class AgendaService {
       );
   }
 
-  postAgendaProfesionalAllProfesional( data: any): Observable<any> {
+  postAgendaProfesionalAllProfesional(data: any): Observable<any> {
     return this._http
       .post<any>(
-        environment.apiUrl + environment.agenda.postAgendaDisponibleAllProfesional,
+        environment.apiUrl +
+          environment.agenda.postAgendaDisponibleAllProfesional,
         data
       )
       .pipe(
@@ -35,18 +36,33 @@ export class AgendaService {
           return lista;
         })
       );
-  }  
+  }
+
+  public postCitasByProfesional(data: any): Observable<any> {
+    return this._http
+      .post<any>(
+        environment.apiUrl + environment.agenda.postCitasByProfesional,
+        data
+      )
+      .pipe(
+        map((lista) => {
+          return lista;
+        })
+      );
+  }
 
   public postAgenda(id, data) {
-    if(data.id ==null){
+    if (data.id == null) {
       return this._http.post<any>(
         environment.apiUrl + environment.agenda.postAgendaProfesional + id,
         data
       );
-    }else{
-      return this._http.put<any>(environment.apiUrl + environment.agenda.putAgendaProfesional + data.id, data);
+    } else {
+      return this._http.put<any>(
+        environment.apiUrl + environment.agenda.putAgendaProfesional + data.id,
+        data
+      );
     }
-
   }
   public postCita(data) {
     return this._http.post<any>(

@@ -108,5 +108,6 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 
 
 		Route::post('cita', 'pea\CitaController@store')->name('cita.store');
+		Route::post('countcitasbyprofesional', 'pea\CitaController@citasbyprofesional')->name('cita.citasvyprofesional');
 	});
 });

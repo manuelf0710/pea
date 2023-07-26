@@ -1072,6 +1072,26 @@
         </mat-select>
       </mat-form-field>
     </form>
+    <table class="table table-sm table-hover table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>profesional</th>
+          <th>Fecha</th>
+          <th>Dia</th>
+          <th>Citas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let item of countAgendas">
+          <tr>
+            <td>{{ item.name }}</td>
+            <td>{{ item.fecha }}</td>
+            <td>{{ item.fechainfo }}</td>
+            <td>{{ item.numcitas }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
     <div *ngIf="agendasDisponibles.data.length">
       <mat-paginator
         #paginator
