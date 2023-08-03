@@ -26,12 +26,14 @@ import { ProductorepsodetallesprodComponent } from "./components/productorepsode
 import { ProductoService } from "./services/producto.service";
 import { ClienteService } from "../services/cliente.service";
 import { AgendaService } from "../services/agenda.service";
+import { ComentariosService } from "../services/comentarios.service";
 
 import { FullCalendarModule } from "@fullcalendar/angular";
 import { NuevaAgendaProfesionalComponent } from "./components/generar-agenda/crear/nueva-agenda-profesional/nueva-agenda-profesional.component";
 import { NuevacitaComponent } from "./components/productorepsodetallesprod/nuevacita/nuevacita.component";
 import { EditarComponent } from "./components/solicitud-listar/editar/editar.component";
-import { MAT_DATE_LOCALE } from '@angular/material/core'
+import { MAT_DATE_LOCALE } from "@angular/material/core";
+import { ComentariosComponent } from "./components/comentarios/comentarios.component";
 
 @NgModule({
   declarations: [
@@ -45,6 +47,7 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
     NuevaAgendaProfesionalComponent,
     NuevacitaComponent,
     EditarComponent,
+    ComentariosComponent,
   ],
   imports: [
     CommonModule,
@@ -64,10 +67,11 @@ import { MAT_DATE_LOCALE } from '@angular/material/core'
     ProductosrepsoService,
     ClienteService,
     AgendaService,
+    ComentariosService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: AuthTokenInterceptor, multi: true },
-    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    { provide: MAT_DATE_LOCALE, useValue: "es-ES" },
     fakeBackendProvider,
   ],
 })

@@ -22,6 +22,9 @@ import { MatPaginator } from "@angular/material/paginator";
 
 import { UtilService } from "./../../../shared/services/util.service";
 //import dayjs from "dayjs";
+import { Solicitud } from "../../models/solicitud";
+
+import { ComentariosComponent } from "../comentarios/comentarios.component";
 
 export interface gestionPersona {
   id: number;
@@ -940,5 +943,28 @@ export class ProductorepsodetallesprodComponent
       hours.push(hour);
     }
     return hours;
+  }
+
+  addComment() {
+    const modalRef = this.modalService.open(ComentariosComponent, {
+      //backdrop: 'static',
+      size: "lg",
+      keyboard: false,
+    });
+    const producto = {
+      producto: this.personaGestion,
+      estadosListaSeguimiento: this.estadosListaSeguimiento,
+    };
+
+    modalRef.componentInstance.data = producto;
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+          //this.dataTableReload.reload(result.data.data);
+          this._ToastService.success("Comentario agregado correctamente");
+        }
+      })
+      .catch((error) => {});
   }
 }

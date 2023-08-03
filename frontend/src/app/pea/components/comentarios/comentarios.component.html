@@ -1,0 +1,96 @@
+<div *ngIf="loading">
+  <app-loading></app-loading>
+</div>
+<form [formGroup]="formulario" novalidate (ngSubmit)="guardar($event)">
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">
+      <span> Nuevo comentario </span>
+    </h3>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <i class="fa fa-close"></i>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <input type="text" id="producto_id" formControlName="producto_id" />
+    <div class="form-group">
+      <label for="exampleInputEmail1">Comentario</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-th"></i></span>
+        </div>
+        <input
+          [readonly]="loading"
+          type="text"
+          class="form-control form-control-xs"
+          placeholder="Ingrese el comentario"
+          formControlName="comentario"
+        />
+      </div>
+      <div
+        *ngIf="
+          formulario.get('comentario').errors &&
+          formulario.get('comentario').touched
+        "
+      >
+        <small
+          *ngIf="formulario.get('comentario').hasError('required')"
+          class="form-text text-danger"
+          >el campo comentario no debe estar vacío.</small
+        >
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="exampleInputEmail1">Estado Seguimiento</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-th"></i></span>
+        </div>
+        <select
+          name="festado_seguimiento"
+          id="festado_seguimiento"
+          class="form-control form-control-sm"
+          formControlName="estado_seguimiento"
+        >
+          <option [ngValue]="null" disabled>Seleccione Estado</option>
+          <option
+            [value]="item.id"
+            *ngFor="let item of estadosListaSeguimiento"
+          >
+            {{ item.nombre }}
+          </option>
+        </select>
+      </div>
+      <div
+        *ngIf="
+          formulario.get('estado_seguimiento').errors &&
+          formulario.get('estado_seguimiento').touched
+        "
+      >
+        <small
+          *ngIf="formulario.get('estado_seguimiento').hasError('required')"
+          class="form-text text-danger"
+          >el campo estado_seguimiento no debe estar vacío.</small
+        >
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-dark" (click)="closeModal()">
+      Salir
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="formulario.invalid || loading"
+    >
+      Guardar
+    </button>
+  </div>
+</form>

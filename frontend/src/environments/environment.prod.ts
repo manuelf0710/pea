@@ -12,6 +12,7 @@ export const environment = {
     getProcesarCargue: "pea/productosprocesarcargue/",
     putProductoGestionById: "pea/productoupdategestion/",
     deleteProductoBYId: "pea/productodelete/",
+    postcomentarios: "pea/comentarios",
   },
   tipoproductos: {
     getAll: "pea/tipoproductoslist",
