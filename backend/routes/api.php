@@ -101,6 +101,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::delete('productodelete/{id}', 'pea\ProductoController@destroy')->name('producto.destroy');
 
 		Route::post('comentarios', 'pea\ComentarioController@store')->name('comentario.store');
+		Route::get('comentariosbyproductoid/{id}', 'pea\ComentarioController@comentariosByProductoId')->name('comentario.byproductoid');
 
 		/*rutyas de agenda */
 		Route::post('agenda/profesionalagenda/{id}', 'pea\AgendaController@show')->name('agenda.show');

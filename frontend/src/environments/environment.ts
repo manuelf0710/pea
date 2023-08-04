@@ -17,6 +17,7 @@ export const environment = {
     putProductoGestionById: "pea/productoupdategestion/",
     deleteProductoBYId: "pea/productodelete/",
     postcomentarios: "pea/comentarios",
+    comentariosById: "pea/comentariosbyproductoid/",
   },
   tipoproductos: {
     getAll: "pea/tipoproductoslist",

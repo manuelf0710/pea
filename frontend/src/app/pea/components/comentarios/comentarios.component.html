@@ -17,7 +17,7 @@
   </div>
 
   <div class="modal-body">
-    <input type="text" id="producto_id" formControlName="producto_id" />
+    <input type="hidden" id="producto_id" formControlName="producto_id" />
     <div class="form-group">
       <label for="exampleInputEmail1">Comentario</label>
       <div class="input-group">
@@ -94,3 +94,28 @@
     </button>
   </div>
 </form>
+<div class="container-fluid">
+  <table
+    class="table table-sm table-hover table-bordered table-striped"
+    *ngIf="comentariosLista.length > 0"
+  >
+    <thead>
+      <tr>
+        <th>Comentario</th>
+        <th>Persona</th>
+        <th>Estado Seg.</th>
+        <th>Estado Producto</th>
+        <th>creado (Y-m-d)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of comentariosLista">
+        <td>{{ item.comentario }}</td>
+        <td>{{ item.usuario_comentario }}</td>
+        <td>{{ item.estado_seguimiento }}</td>
+        <td>{{ item.estado }}</td>
+        <td>{{ item.creado }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>

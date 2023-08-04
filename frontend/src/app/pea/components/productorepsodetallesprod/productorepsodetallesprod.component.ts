@@ -737,7 +737,7 @@ export class ProductorepsodetallesprodComponent
   }
 
   changeEstadoSeguimiento(value) {
-    this.showButtonInformacionProgramacion = true;
+    //this.showButtonInformacionProgramacion = true;
   }
 
   guardarInformacionProgramacion() {

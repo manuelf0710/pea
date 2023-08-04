@@ -29,4 +29,17 @@ export class ComentariosService {
       data
     );
   }
+
+  public getComentariosByProducto(cod) {
+    return this._http
+      .get<any>(
+        environment.apiUrl + environment.productos.comentariosById + cod
+      )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
 }

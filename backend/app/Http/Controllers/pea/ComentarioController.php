@@ -15,6 +15,8 @@ use App\Models\Cliente;
 use App\Imports\ClientesImport;
 use Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Carbon;
+
 
 class ComentarioController extends Controller
 {
@@ -63,6 +65,26 @@ class ComentarioController extends Controller
             }
 
     return response()->json($response);        
+    }
+
+    public function comentariosByProductoId($id){
+        $comentarios = ProductoReprogramaciones::join('lista_items', 'producto_reprogramaciones.estado_id', '=', 'lista_items.id')
+        ->leftJoin('users', 'producto_reprogramaciones.user_id', '=', 'users.id')
+        ->leftJoin('estadoseguimientos', 'producto_reprogramaciones.estadoseguimiento_id', '=', 'estadoseguimientos.id')
+        ->select('producto_reprogramaciones.id',
+        'producto_reprogramaciones.comentario',
+        'producto_reprogramaciones.created_at as creado',
+        DB::raw("CASE WHEN producto_reprogramaciones.tipo = 1 THEN 'Reprogramaciones' WHEN producto_reprogramaciones.tipo = 2 THEN 'Seguimiento' ELSE '' END AS tipo"),
+        'producto_reprogramaciones.estadoseguimiento_id',
+        'producto_reprogramaciones.estado_id',
+        'lista_items.nombre as estado',
+        'estadoseguimientos.nombre as estado_seguimiento',
+        'users.name as usuario_comentario')
+        ->where('producto_reprogramaciones.producto_id', '=', $id)
+        ->orderBy('producto_reprogramaciones.id', 'desc')
+        ->get();
+
+        return response()->json($comentarios);
     }
 
 

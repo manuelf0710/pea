@@ -4,6 +4,7 @@ import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { ComentariosService } from "src/app/services/comentarios.service";
 
 import { estadoSeguimiento } from "src/app/models/estadoSeguimiento";
+import { comentarios } from "../../models/comentarios";
 
 @Component({
   selector: "app-comentarios",
@@ -13,6 +14,7 @@ import { estadoSeguimiento } from "src/app/models/estadoSeguimiento";
 export class ComentariosComponent implements OnInit {
   formulario: FormGroup;
   @Input() data: any;
+  comentariosLista: comentarios[] = [];
 
   respuesta = {
     status: "close",
@@ -45,6 +47,20 @@ export class ComentariosComponent implements OnInit {
       comentario: [comentario, [Validators.required]],
       estado_seguimiento: [null, [Validators.required]],
     });
+    this.loadComentariosByProductoId();
+  }
+
+  loadComentariosByProductoId() {
+    this._ComentariosService
+      .getComentariosByProducto(this.data.producto.id)
+      .subscribe(
+        (res: any) => {
+          this.comentariosLista = res;
+          console.log("la resp ", res);
+        },
+        (error: any) => {},
+        () => (this.loading = false)
+      );
   }
 
   guardar(event: Event) {
