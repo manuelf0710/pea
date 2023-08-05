@@ -69,6 +69,21 @@ export interface countAgendaProfesional {
   fecha: String;
   fechainfo: String;
   name: String;
+  tipo_producto: String;
+  tipoproducto_id: number;
+}
+
+export interface tipoProducto {
+  tipo_producto: String;
+  tipoproducto_id: number;
+  current: Boolean;
+  active: Boolean;
+}
+export interface displayCountCitas {
+  all: Boolean;
+  profesional: Boolean;
+  fecha: Boolean;
+  tipoProducto: boolean;
 }
 
 @Component({
@@ -91,6 +106,7 @@ export class ProductorepsodetallesprodComponent
    */
   estadosListaProceso: listaItems[] = [];
   estadosListaSeguimiento: estadoSeguimiento[];
+  tipoProductoLista: tipoProducto[];
   loading: boolean = true;
   mostrarRegistro: boolean = false;
   mostrarCargaExcel: boolean = false;
@@ -103,7 +119,9 @@ export class ProductorepsodetallesprodComponent
   urlSubidaArchivo!: String;
   active: number = 1;
   personaGestion!: gestionPersona;
-  countAgendas!: countAgendaProfesional;
+  countAgendas: countAgendaProfesional[] = [];
+  countAgendasLista: countAgendaProfesional[] = [];
+  displayCountCitas!: displayCountCitas;
   agendasDisponibles: MatTableDataSource<agendasDisponiblesProfesionales>;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
@@ -151,6 +169,12 @@ export class ProductorepsodetallesprodComponent
     private readonly route: ActivatedRoute,
     private authenticationService: AuthenticationService
   ) {
+    this.displayCountCitas = {
+      all: false,
+      fecha: false,
+      profesional: true,
+      tipoProducto: true,
+    };
     this.pageSize = 50;
     this.currentPage = 1;
     this.authenticationService.currentUser.subscribe(
@@ -552,6 +576,97 @@ export class ProductorepsodetallesprodComponent
     }
   }
 
+  countListaFilterByProfesional(profesional: number) {
+    const activeItem = this.tipoProductoLista.find((item) => item.active);
+
+    const selectedItem =
+      activeItem || this.tipoProductoLista.find((item) => item.current);
+    const resultadoFiltrado = this.countAgendas.filter(
+      (item) =>
+        item.tipoproducto_id === selectedItem.tipoproducto_id &&
+        item.profesional_id === profesional
+    );
+    this.displayCountCitas.fecha = true;
+    this.countAgendasLista = resultadoFiltrado;
+  }
+
+  countAgendasListaAddData() {
+    const activeItem = this.tipoProductoLista.find((item) => item.active);
+
+    const selectedItem =
+      activeItem || this.tipoProductoLista.find((item) => item.current);
+
+    /*const resultadoFiltrado = this.countAgendas.filter(
+      (item) => item.tipoproducto_id === selectedItem.tipoproducto_id
+    );*/
+    const resultadoFiltrado = this.countAgendas.reduce((result, item) => {
+      if (item.tipoproducto_id === selectedItem.tipoproducto_id) {
+        const existingItem = result.find(
+          (group) => group.profesional_id === item.profesional_id
+        );
+        if (existingItem) {
+          existingItem.numcitas += item.numcitas;
+        } else {
+          result.push({
+            profesional_id: item.profesional_id,
+            name: item.name,
+            tipo_producto: item.tipo_producto,
+            tipoproducto_id: item.tipoproducto_id,
+            numcitas: item.numcitas,
+            fecha: item.fecha,
+            fechainfo: item.fechainfo,
+          });
+        }
+      }
+      return result;
+    }, []);
+    this.displayCountCitas.fecha = false;
+    this.countAgendasLista = resultadoFiltrado;
+  }
+
+  infoCountAgendas() {
+    let resultado = [];
+    console.log("this.odsDetalles =>>>>>>>> ", this.odsDetalles);
+    let these = this;
+
+    this.countAgendas.map(function (item) {
+      let tipoproducto_id = item.tipoproducto_id;
+      let tipo_producto = item.tipo_producto;
+
+      let menuExistente = resultado.find(function (element) {
+        return element.tipoproducto_id === tipoproducto_id;
+      });
+
+      if (menuExistente) {
+      } else {
+        let nuevoMenu = {
+          tipo_producto: tipo_producto,
+          tipoproducto_id: tipoproducto_id,
+          current: item.tipoproducto_id == these.odsDetalles.tipo_producto.id,
+          active: false,
+        };
+        resultado.push(nuevoMenu);
+      }
+    });
+    //console.log("resultado =Z ", resultado);
+    this.tipoProductoLista = resultado;
+    console.log(
+      "this.tipoProductoListathis.tipoProductoLista => ",
+      JSON.stringify(this.tipoProductoLista)
+    );
+    this.countAgendasListaAddData();
+  }
+
+  activeTipoProducto(tipoproducto_id: number) {
+    const nuevosTipoProductoLista = this.tipoProductoLista.map((item) => {
+      return {
+        ...item,
+        active: item.tipoproducto_id === tipoproducto_id,
+      };
+    });
+    this.tipoProductoLista = nuevosTipoProductoLista;
+    this.countAgendasListaAddData();
+  }
   countCitasByProfesional() {
     let formData = {
       tipo_producto: this.odsDetalles.tipo_producto.id,
@@ -563,6 +678,7 @@ export class ProductorepsodetallesprodComponent
       })
       .subscribe((res: any) => {
         this.countAgendas = res;
+        this.infoCountAgendas();
         if (res.status == "error") {
           this._ToastService.danger(res.msg);
         }

@@ -526,14 +526,17 @@ class CitaController extends Controller
         DB::statement("SET lc_time_names = 'es_ES'");
         $dateNow =$request->post('start') != "" ? $request->post('start') : date("Y-m-d")." 00:00:01";
         $productos = Producto::withoutTrashed()
-            ->join('users', 'productos.profesional_id', '=', 'users.id')
-            ->select('productos.profesional_id','users.name')
+            ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
+            ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
+            ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
+            ->select('productos.profesional_id','users.name','tipo_productos.name as tipo_producto', 'productos_repso.tipoproducto_id')
             ->selectRaw('count(productos.id) as numcitas')
             ->selectRaw('date_format(fecha_inicio, "%Y-%m-%d") as fecha')
             ->selectRaw('date_format(fecha_inicio, "%W %M %d, %Y") as fechainfo')
             //->where('fecha_inicio', '>=', '2023-01-01 00:00:01')
             ->where('fecha_inicio', '>=', $dateNow)
-            ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'))
+            ->where('users.perfil_id','=',3)
+            ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
             ->get();
     
         return response()->json($productos);

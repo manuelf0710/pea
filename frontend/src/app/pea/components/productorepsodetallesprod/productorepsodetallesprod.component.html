@@ -1023,148 +1023,206 @@
     </div>
   </form>
 
-  <div *ngIf="agendasDisponibles">
-    <hr />
-    <form [formGroup]="searchForm" class="search__form" style="font-size: 12px">
-      <mat-form-field class="search__form_field" appearance="outline">
-        <mat-label>profesional</mat-label>
-        <input
-          type="text"
-          aria-label="profesional"
-          matInput
-          formControlName="profesionalsearch"
-          (keyup)="applyFilter()"
-          autocomplete="off"
-        />
-      </mat-form-field>
-
-      <mat-form-field class="search__form_field" appearance="outline">
-        <mat-label>Dia</mat-label>
-        <input
-          type="text"
-          aria-label="Fecha Cita"
-          matInput
-          formControlName="fechacitasearch"
-          (keyup)="applyFilter()"
-          autocomplete="off"
-          placeholder="lunes"
-        />
-      </mat-form-field>
-
-      <mat-form-field class="search__form_field" appearance="outline">
-        <mat-label>fecha Cita Disponible</mat-label>
-        <input
-          matInput
-          formControlName="fechacitadatesearch"
-          [matDatepicker]="picker"
-          (dateInput)="applyFilter()"
-        />
-        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-        <mat-datepicker #picker></mat-datepicker>
-      </mat-form-field>
-
-      <mat-form-field
-        class="search__form_field"
-        appearance="outline"
-        style="width: 100px"
-      >
-        <mat-label>Hora Cita</mat-label>
-        <mat-select
-          aria-label="Hora Cita"
-          formControlName="horacitadatesearch"
-          (selectionChange)="applyFilter()"
-          placeholder="Selecciona una hora"
+  <div class="row">
+    <div class="col-md-8">
+      <div *ngIf="agendasDisponibles">
+        <form
+          [formGroup]="searchForm"
+          class="search__form"
+          style="font-size: 12px"
         >
-          <mat-option disabled>Seleccione una hora</mat-option>
-          <mat-option [value]="-1">Todos</mat-option>
-          <mat-option
-            *ngFor="let hour of getHoursBetween(6, 19)"
-            [value]="hour"
+          <mat-form-field class="search__form_field" appearance="outline">
+            <mat-label>profesional</mat-label>
+            <input
+              type="text"
+              aria-label="profesional"
+              matInput
+              formControlName="profesionalsearch"
+              (keyup)="applyFilter()"
+              autocomplete="off"
+            />
+          </mat-form-field>
+
+          <mat-form-field class="search__form_field" appearance="outline">
+            <mat-label>Dia</mat-label>
+            <input
+              type="text"
+              aria-label="Fecha Cita"
+              matInput
+              formControlName="fechacitasearch"
+              (keyup)="applyFilter()"
+              autocomplete="off"
+              placeholder="lunes"
+            />
+          </mat-form-field>
+
+          <mat-form-field class="search__form_field" appearance="outline">
+            <mat-label>fecha Cita Disponible</mat-label>
+            <input
+              matInput
+              formControlName="fechacitadatesearch"
+              [matDatepicker]="picker"
+              (dateInput)="applyFilter()"
+            />
+            <mat-datepicker-toggle
+              matSuffix
+              [for]="picker"
+            ></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field
+            class="search__form_field"
+            appearance="outline"
+            style="width: 100px"
           >
-            {{ hour }}
-          </mat-option>
-        </mat-select>
-      </mat-form-field>
-    </form>
-    <table class="table table-sm table-hover table-bordered table-striped">
-      <thead>
-        <tr>
-          <th>profesional</th>
-          <th>Fecha</th>
-          <th>Dia</th>
-          <th>Citas</th>
-        </tr>
-      </thead>
-      <tbody>
-        <ng-container *ngFor="let item of countAgendas">
-          <tr>
-            <td>{{ item.name }}</td>
-            <td>{{ item.fecha }}</td>
-            <td>{{ item.fechainfo }}</td>
-            <td>{{ item.numcitas }}</td>
-          </tr>
-        </ng-container>
-      </tbody>
-    </table>
-    <div *ngIf="agendasDisponibles.data.length">
-      <mat-paginator
-        #paginator
-        [pageSizeOptions]="[20, 50, 100]"
-        [length]="agendasDisponibles?.data?.length"
-        [pageSize]="50"
-        showFirstLastButtons
-      >
-      </mat-paginator>
-
-      <table
-        mat-table
-        [dataSource]="agendasDisponibles"
-        class="mat-elevation-z8 w-100"
-        #tabla1
-      >
-        <!-- Position Column -->
-        <ng-container matColumnDef="profesional">
-          <th mat-header-cell *matHeaderCellDef>Profesional.</th>
-          <td mat-cell *matCellDef="let element">
-            {{ element.profesional }}
-          </td>
-        </ng-container>
-
-        <!-- Name Column -->
-        <ng-container matColumnDef="fechacita">
-          <th mat-header-cell *matHeaderCellDef>
-            fecha cita disponible( Y-m-d)
-          </th>
-          <td mat-cell *matCellDef="let item">
-            {{ item.dateformat_name }}
-          </td>
-        </ng-container>
-
-        <!-- Weight Column -->
-        <ng-container matColumnDef="horacita">
-          <th mat-header-cell *matHeaderCellDef>Hora cita</th>
-          <td mat-cell *matCellDef="let item">
-            {{ item.start }} hasta {{ item.end }} libres
-            {{ item.minutes }} minutos
-          </td>
-        </ng-container>
-
-        <!-- Symbol Column -->
-        <ng-container matColumnDef="action">
-          <th mat-header-cell *matHeaderCellDef></th>
-          <td mat-cell *matCellDef="let item">
-            <button
-              class="btn btn-sm btn-outline-secondary"
-              (click)="openModalNewCita(item)"
+            <mat-label>Hora Cita</mat-label>
+            <mat-select
+              aria-label="Hora Cita"
+              formControlName="horacitadatesearch"
+              (selectionChange)="applyFilter()"
+              placeholder="Selecciona una hora"
             >
-              <i class="fa fa-calendar"></i> Reservar
-            </button>
-          </td>
-        </ng-container>
+              <mat-option disabled>Seleccione una hora</mat-option>
+              <mat-option [value]="-1">Todos</mat-option>
+              <mat-option
+                *ngFor="let hour of getHoursBetween(6, 19)"
+                [value]="hour"
+              >
+                {{ hour }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </form>
+      </div>
+    </div>
+  </div>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-      </table>
+  <div class="row">
+    <div class="col-md-8 mt-4">
+      <div *ngIf="agendasDisponibles">
+        <table
+          class="table table-sm table-hover table-bordered table-striped"
+        ></table>
+        <div *ngIf="agendasDisponibles.data.length">
+          <mat-paginator
+            #paginator
+            [pageSizeOptions]="[20, 50, 100]"
+            [length]="agendasDisponibles?.data?.length"
+            [pageSize]="20"
+            showFirstLastButtons
+          >
+          </mat-paginator>
+
+          <table
+            mat-table
+            [dataSource]="agendasDisponibles"
+            class="mat-elevation-z8 w-100"
+            #tabla1
+          >
+            <!-- Position Column -->
+            <ng-container matColumnDef="profesional">
+              <th mat-header-cell *matHeaderCellDef>Profesional.</th>
+              <td mat-cell *matCellDef="let element" class="font9">
+                {{ element.profesional }}
+              </td>
+            </ng-container>
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="fechacita">
+              <th mat-header-cell *matHeaderCellDef>Fecha disp.( Y-m-d)</th>
+              <td mat-cell *matCellDef="let item">
+                {{ item.dateformat_name }}
+              </td>
+            </ng-container>
+
+            <!-- Weight Column -->
+            <ng-container matColumnDef="horacita">
+              <th mat-header-cell *matHeaderCellDef>Hora cita</th>
+              <td mat-cell *matCellDef="let item" class="font9">
+                {{ item.start }} hasta {{ item.end }} libres
+                {{ item.minutes }} minutos
+              </td>
+            </ng-container>
+
+            <!-- Symbol Column -->
+            <ng-container matColumnDef="action">
+              <th mat-header-cell *matHeaderCellDef></th>
+              <td mat-cell *matCellDef="let item">
+                <button
+                  class="btn btn-sm btn-outline-secondary"
+                  (click)="openModalNewCita(item)"
+                >
+                  <i class="fa fa-calendar"></i>
+                  <span class="font8"> Reservar</span>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-4" *ngIf="agendasDisponibles">
+      <div class="row">
+        <div class="col-md-12 bg-light">
+          <button
+            class="btn btn-sm m-1"
+            (click)="activeTipoProducto(item.tipoproducto_id)"
+            [ngClass]="
+              item.current
+                ? 'btn-pea'
+                : item.active
+                ? 'btn-secondary'
+                : 'btn-light'
+            "
+            *ngFor="let item of tipoProductoLista"
+          >
+            <span class="font8">{{ item.tipo_producto }} </span
+            ><i class="fa fa-list"></i>
+          </button>
+        </div>
+        <div class="col-md-12">
+          <table
+            class="table table-sm table-hover table-bordered table-striped"
+          >
+            <thead>
+              <tr>
+                <th>profesional</th>
+                <th *ngIf="displayCountCitas.fecha">Fecha</th>
+                <th *ngIf="displayCountCitas.fecha">Dia</th>
+                <th>Citas</th>
+                <th>Tipo Producto</th>
+              </tr>
+            </thead>
+            <tbody>
+              <ng-container *ngFor="let item of countAgendasLista">
+                <tr>
+                  <td>
+                    <button
+                      class="btn btn-sm btn-block btn-light text-left"
+                      (click)="
+                        countListaFilterByProfesional(item.profesional_id)
+                      "
+                    >
+                      <i class="fa fa-arrow-right"></i>
+                      <span class="font8">{{ item.name }}</span>
+                    </button>
+                  </td>
+                  <td *ngIf="displayCountCitas.fecha">{{ item.fecha }}</td>
+                  <td *ngIf="displayCountCitas.fecha">{{ item.fechainfo }}</td>
+                  <td align="center">
+                    {{ item.numcitas }}
+                  </td>
+                  <td class="font8">{{ item.tipo_producto }}</td>
+                </tr>
+              </ng-container>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
