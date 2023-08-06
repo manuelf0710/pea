@@ -1099,11 +1099,8 @@
   </div>
 
   <div class="row">
-    <div class="col-md-8 mt-4">
+    <div [ngClass]="currentUser.perfil.id != 3 ? 'col-md-8' : 'col-md-12'">
       <div *ngIf="agendasDisponibles">
-        <table
-          class="table table-sm table-hover table-bordered table-striped"
-        ></table>
         <div *ngIf="agendasDisponibles.data.length">
           <mat-paginator
             #paginator
@@ -1167,7 +1164,10 @@
         </div>
       </div>
     </div>
-    <div class="col-md-4" *ngIf="agendasDisponibles">
+    <div
+      class="col-md-4"
+      *ngIf="agendasDisponibles && currentUser.perfil.id != 3"
+    >
       <div class="row">
         <div class="col-md-12 bg-light m3">
           <button

@@ -856,6 +856,39 @@ export class ProductorepsodetallesprodComponent
     //this.showButtonInformacionProgramacion = true;
   }
 
+  cancelarProducto() {
+    this._UtilService
+      .confirm({
+        title: "Cancelar Producto",
+        message: "Seguro que desea Cancelar este registro?",
+      })
+      .then(
+        () => {
+          this.loading = true;
+          let value = { ...this.formulario.value };
+          console.log("valor to save producto gestion ", value);
+          this._ProductoService
+            .cancelarProductoBiId(value)
+            .subscribe((res: any) => {
+              if (res.status == "ok") {
+                this._ToastService.success(
+                  "Producto " + res.msg + " correctamente"
+                );
+                this.actualizarProducto(res.data.producto);
+              }
+              if (res.status == "error") {
+                let messageError = this._ToastService.errorMessage(res.msg);
+                this._ToastService.danger(messageError);
+              }
+              this.loading = false;
+            });
+        },
+        () => {
+          this.loading = false;
+        }
+      );
+  }
+
   guardarInformacionProgramacion() {
     console.log("this.formulario.value => ", this.formulario.value);
     console.log("this.personaGestion ==>>", this.personaGestion);
@@ -865,7 +898,7 @@ export class ProductorepsodetallesprodComponent
         this.personaGestion.estado_id == 12 &&
         this.personaGestion.profesional_id == null
       ) {
-        this._ToastService.warning("Se debe eliminar el registro");
+        this.cancelarProducto();
         return;
       }
 

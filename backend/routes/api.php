@@ -98,6 +98,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 
 
 		Route::put('productoupdategestion/{id}', 'pea\ProductoController@productoUpdateGestion')->name('producto.gestion.update');
+		Route::put('productocancelstate/{id}', 'pea\ProductoController@productoCancelState')->name('producto.cancel');
 		Route::delete('productodelete/{id}', 'pea\ProductoController@destroy')->name('producto.destroy');
 
 		Route::post('comentarios', 'pea\ComentarioController@store')->name('comentario.store');

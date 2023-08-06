@@ -144,6 +144,34 @@ class ProductoController extends Controller
             ->update(['producto_id' => null, 'ocupado' => 1]);
     }
 
+    public function productoCancelState(Request $request, $id){
+            $updateProducto = Producto::find($id);
+            DB::table('productos')
+            ->where('id',  $id)
+            ->update(['estado_id' => 10, 
+                      'modalidad' => $request->post('modalidad') 
+                    ]);
+  
+            
+            $productoReprogramacion = new ProductoReprogramaciones();  
+            $productoReprogramacion->producto_id = $id;
+            $productoReprogramacion->user_id        = auth()->user()->id;
+            //$productoReprogramacion->profesional_id = $updateProducto->profesional_id;
+            $productoReprogramacion->comentario     = $request->post('comentario_cancelacion');
+            /*$productoReprogramacion->inicio         = $updateProducto->fecha_inicio;
+            $productoReprogramacion->end            = $updateProducto->fecha_fin;*/
+            $productoReprogramacion->estado_id      = $request->post('estado_programacion');
+            $productoReprogramacion->save();                              
+            
+            $response = array(
+                'status' => 'ok',
+                'code' => 200,
+                'data'   => array('producto' => $this->getProductoData($id)), 
+                'msg'    => ' Cancelado '
+            );   
+            return response()->json($response);                     
+    }
+
     public function productoUpdateGestion(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [

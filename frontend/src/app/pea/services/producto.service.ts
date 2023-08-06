@@ -49,6 +49,15 @@ export class ProductoService {
       );
   }
 
+  public cancelarProductoBiId(data) {
+    return this._http.put<any>(
+      environment.apiUrl +
+        environment.productos.putProductoCancelStateById +
+        data.id,
+      data
+    );
+  }
+
   eliminar(id) {
     return this._http.delete<any>(
       environment.apiUrl + environment.productos.deleteProductoBYId + id
