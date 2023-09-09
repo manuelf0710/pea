@@ -177,7 +177,7 @@ class ProductoController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'estado_id' => 'required',
-            'comentario_cancelacion' => 'required_if:estado_id, 10,11',
+            'comentario_cancelacion' => 'required_if:estado_programacion, 10,11',
         ], Producto::$customMessages);
         if (!($validator->fails())) {
             $updateProducto = Producto::find($id);

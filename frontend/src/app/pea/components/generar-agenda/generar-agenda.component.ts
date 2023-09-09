@@ -332,7 +332,19 @@ export class GenerarAgendaComponent implements OnInit {
 
   handleEventClick(clickInfo: EventClickArg) {
     console.log("ingresaste manuelf ", clickInfo.event);
-    if (this.currentUser.perfil.id == 3) return;
+
+    console.log(
+      "clickInfo.event.extendedProps==>",
+      clickInfo.event.extendedProps
+    );
+    if (this.currentUser.perfil.id == 3) {
+      window.open(
+        "pea/solicitudproductos?id=" +
+          clickInfo.event.extendedProps.producto_repso_id,
+        "_blank"
+      );
+      return;
+    }
 
     console.log("valores ", clickInfo.event.start);
     if (clickInfo.event.extendedProps.origen == "decitasproducto") {

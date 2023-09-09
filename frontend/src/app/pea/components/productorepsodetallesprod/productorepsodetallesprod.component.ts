@@ -73,6 +73,22 @@ export interface countAgendaProfesional {
   tipoproducto_id: number;
 }
 
+export interface agendasListaInfo {
+  originalData: countAgendaProfesional[];
+  view: String;
+  totalMonth: number;
+  todalDay: number;
+  searchDate: String;
+}
+
+export interface infoAgendasByDate {
+  originalData: countAgendaProfesional[];
+  view: String;
+  totalMonth: number;
+  todalDay: number;
+  searchDate: String;
+}
+
 export interface tipoProducto {
   tipo_producto: String;
   tipoproducto_id: number;
@@ -390,7 +406,7 @@ export class ProductorepsodetallesprodComponent
       array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
     } else if (value == 10) {
       /**cancelado */
-      let arregloPermitidosOther = [-1];
+      let arregloPermitidosOther = [11];
       array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
     } else if (value == 11) {
       /**cancelado reprogramado */
@@ -821,12 +837,13 @@ export class ProductorepsodetallesprodComponent
    * mostrar el boton de acuerdo al estado
    */
   showButtonActualizarInformacion(value) {
-    const estadosPermitidosActualizarInformacion = [7, 8, 9, 12];
+    console.log("showButtonActualizarInformacion", value);
+    const estadosPermitidosActualizarInformacion = [7, 8, 9, 11, 12];
     if (
       estadosPermitidosActualizarInformacion.includes(
         parseInt(this.formulario.get("estado_id").value)
-      ) &&
-      value != 11
+      ) /*&&
+      value != 11*/
     ) {
       this.showButtonInformacionProgramacion = true;
     } else {
@@ -835,8 +852,11 @@ export class ProductorepsodetallesprodComponent
   }
 
   changeGenerarReprogramacionCita(value) {
+    console.log("carolina ", this.formulario.get("estado_id").value);
+    console.log("personaGestion ==>", this.personaGestion);
+    console.log("value ==>>", value);
     const estadosPermitidosCambio = [
-      7, 11,
+      7, 10, 11,
     ]; /** 7 citado, 11 cancelado reprogramado estaso permitido cambio de cita hora*/
 
     if (
@@ -1010,8 +1030,9 @@ export class ProductorepsodetallesprodComponent
         const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
         const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
         const isWithinHourRange =
-          startHour >= columnStartHour &&
-          endHour <= columnEndHour &&
+          //startHour >= columnStartHour &&
+          columnStartHour >= startHour &&
+          //endHour <= columnEndHour &&
           row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
         matchFilter.push(isWithinHourRange);
 
@@ -1087,11 +1108,29 @@ export class ProductorepsodetallesprodComponent
   getHoursBetween(start: number, end: number): string[] {
     const hours: string[] = [];
     let hour: string;
+    let hourmiddle: string; /* fracciones de 30 minutos */
     for (let i = start; i <= end; i++) {
       hour = i < 10 ? "0" + i + ":00:00" : i + ":00:00";
+      hourmiddle = i < 10 ? "0" + i + ":30:00" : i + ":30:00";
       hours.push(hour);
+      hours.push(hourmiddle);
     }
     return hours;
+  }
+
+  updateEstadoSeguimiento(product) {
+    let index: any;
+    index = this.productosLista.findIndex(
+      (prod) => product.producto_id === prod["id"]
+    );
+    console.log("el index encontrado index  =", index);
+    if (index >= 0) {
+      this.productosLista[index]["estado_seguimiento"] =
+        product.estado_seguimiento;
+      this.productosLista[index]["estadoseguimiento_id"] =
+        product.estadoseguimiento_id;
+      console.log("dentro de if index ", this.productosLista[index]);
+    }
   }
 
   addComment() {
@@ -1111,6 +1150,8 @@ export class ProductorepsodetallesprodComponent
       .then((result) => {
         if (result.status == "ok") {
           //this.dataTableReload.reload(result.data.data);
+          console.log("en componente base ", result);
+          this.updateEstadoSeguimiento(result.data.data[0]);
           this._ToastService.success("Comentario agregado correctamente");
         }
       })

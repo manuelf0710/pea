@@ -47,12 +47,14 @@ class ComentarioController extends Controller
             $productoReprogramacion->estado_id      = $request->post('estado_id');
             $productoReprogramacion->estadoseguimiento_id      = $request->post('estado_seguimiento');
             $productoReprogramacion->tipo           = 2;
+            $updateProducto->estadoseguimiento_id = $request->post('estado_seguimiento');
 
             $productoReprogramacion->save();
+            $updateProducto->save();
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => $request->post(),
+                'data'   => $this->comentariosByProductoId($productoReprogramacion->producto_id, $productoReprogramacion->id), //$request->post(),
                 'msg'    => 'Guardado',
             );
         } else {
@@ -67,11 +69,12 @@ class ComentarioController extends Controller
     return response()->json($response);        
     }
 
-    public function comentariosByProductoId($id){
+    public function comentariosByProductoId($id, $commentId = null){
         $comentarios = ProductoReprogramaciones::join('lista_items', 'producto_reprogramaciones.estado_id', '=', 'lista_items.id')
         ->leftJoin('users', 'producto_reprogramaciones.user_id', '=', 'users.id')
         ->leftJoin('estadoseguimientos', 'producto_reprogramaciones.estadoseguimiento_id', '=', 'estadoseguimientos.id')
         ->select('producto_reprogramaciones.id',
+        'producto_reprogramaciones.producto_id',
         'producto_reprogramaciones.comentario',
         'producto_reprogramaciones.created_at as creado',
         DB::raw("CASE WHEN producto_reprogramaciones.tipo = 1 THEN 'Reprogramaciones' WHEN producto_reprogramaciones.tipo = 2 THEN 'Seguimiento' ELSE '' END AS tipo"),
@@ -79,11 +82,17 @@ class ComentarioController extends Controller
         'producto_reprogramaciones.estado_id',
         'lista_items.nombre as estado',
         'estadoseguimientos.nombre as estado_seguimiento',
-        'users.name as usuario_comentario')
-        ->where('producto_reprogramaciones.producto_id', '=', $id)
-        ->orderBy('producto_reprogramaciones.id', 'desc')
-        ->get();
+        'users.name as usuario_comentario');
 
+        if($commentId){
+            $comentarios->where('producto_reprogramaciones.id', '=', $commentId) ;
+        } 
+
+
+        $comentarios = $comentarios->where('producto_reprogramaciones.producto_id', '=', $id)->orderBy('producto_reprogramaciones.id', 'desc')->get();
+        if($commentId) {
+            return $comentarios;
+        }
         return response()->json($comentarios);
     }
 
@@ -95,7 +104,7 @@ class ComentarioController extends Controller
         $validator = Validator::make($request->all(), [
             'id' => 'required',
             'estado_id' => 'required',
-            'comentario_cancelacion' => 'required_if:estado_id, 10,11',
+            'comentario_cancelacion' => 'required_if:estado_programacion, 10,11',
         ], Producto::$customMessages);
         if (!($validator->fails())) {
             $updateProducto = Producto::find($id);

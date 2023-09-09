@@ -794,6 +794,7 @@ class AgendaController extends Controller
                                     citas.producto_id,
                                     '' AS display,
                                     'decitasproducto' AS origen,
+                                    productos.producto_repso_id,
                                     date_format(citas.start, '%d/%m/%Y') AS onlydate,
                                     (SELECT concat(tipo_productos.NAME, ' - ', clientes.nombre, ' -',lista_items.nombre)
                                         FROM productos, clientes, productos_repso, tipo_productos
@@ -823,6 +824,7 @@ class AgendaController extends Controller
                                     citas.producto_id,
                                     '' AS display,
                                     'decitas' AS origen,
+                                    '' as producto_repso_id,
                                     date_format(citas.start, '%d/%m/%Y') AS onlydate,
                                     citas.razon_bloqueo AS title,
                                     citas.start AS
@@ -846,6 +848,7 @@ class AgendaController extends Controller
                                     '' AS producto_id,
                                     'background' AS display,
                                     'deagenda' AS origen,
+                                    '' as producto_repso_id,
                                     date_format(agendas.start, '%d/%m/%Y') AS onlydate,
                                     lista_items.nombre AS title,
                                     agendas.start AS
