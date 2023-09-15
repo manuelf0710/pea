@@ -76,26 +76,48 @@
     </div>
 
     <div class="col-md-8">
-      <div class="row" *ngIf="mostrarCargaExcel">
-        <div class="col-md-10 offset-md-1">
-          <div class="alert alert-danger">
-            <p>espacio notificación de error</p>
-          </div>
-          <div class="card bg-light mb-1 w-100">
-            <div class="card-header">Carga un archivo de excel</div>
-            <div class="card-body">
-              <file-upload
-                [fk_key]="formularioArchivo.get('id').value"
-                [autoupload]="true"
-                (ArchivosCargados)="getArchivos($event)"
-                [title]="'Agregar Excel con personas a producto'"
-                [document_type]="'clientes'"
-                [accept_files_extension]="['xlsx', 'csv']"
-              ></file-upload>
+      <form [formGroup]="formularioArchivo" novalidate>
+        <div class="row" *ngIf="mostrarCargaExcel">
+          <div class="col-md-10 offset-md-1">
+            <div class="alert alert-danger">
+              <p>espacio notificación de error</p>
+            </div>
+            <div class="card bg-light mb-1 w-100">
+              <div class="card-header">
+                Carga un archivo de excel
+                <div class="float-right">
+                  <mat-form-field
+                    class="search__form_field"
+                    appearance="outline"
+                    style="width: 100px"
+                  >
+                    <mat-label>Forzar Cargue</mat-label>
+                    <mat-select
+                      aria-label="Forzar Cargue"
+                      placeholder="Forzar Cargue"
+                      formControlName="forzarCargue"
+                    >
+                      <mat-option disabled>...</mat-option>
+                      <mat-option [value]="'Si'">Si</mat-option>
+                      <mat-option [value]="'No'">No</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+              </div>
+              <div class="card-body">
+                <file-upload
+                  [fk_key]="formularioArchivo.get('id').value"
+                  [autoupload]="true"
+                  (ArchivosCargados)="getArchivos($event)"
+                  [title]="'Agregar Excel con personas a producto'"
+                  [document_type]="'clientes'"
+                  [accept_files_extension]="['xlsx', 'csv']"
+                ></file-upload>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
 
       <form
         [formGroup]="formularioFiltro"

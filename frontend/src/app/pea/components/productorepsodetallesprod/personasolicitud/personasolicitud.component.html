@@ -1,0 +1,29 @@
+<div class="modal-header">
+  <h3 class="modal-title" id="modal-basic-title">
+    <span> Registros existentes en otras solicitudes </span>
+  </h3>
+  <button type="button" class="close" aria-label="Close" (click)="closeModal()">
+    <i class="fa fa-close"></i>
+  </button>
+</div>
+<div class="modal-body">
+  <table class="table table-sm table-hover table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Solicitud #</th>
+        <th>Cédula</th>
+        <th>Nombre</th>
+        <th>Creado</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let item of data.info">
+        <td>{{ item.solicitud }}</td>
+        <td>{{ item.cedula }}</td>
+        <td>{{ item.nombre }}</td>
+        <td>{{ item.creado }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+<div class="modal-footer"></div>

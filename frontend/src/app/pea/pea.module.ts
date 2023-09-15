@@ -34,6 +34,7 @@ import { NuevacitaComponent } from "./components/productorepsodetallesprod/nueva
 import { EditarComponent } from "./components/solicitud-listar/editar/editar.component";
 import { MAT_DATE_LOCALE } from "@angular/material/core";
 import { ComentariosComponent } from "./components/comentarios/comentarios.component";
+import { PersonaSolicitudComponent } from "./components/productorepsodetallesprod/personasolicitud/personasolicitud.component";
 
 @NgModule({
   declarations: [
@@ -48,6 +49,7 @@ import { ComentariosComponent } from "./components/comentarios/comentarios.compo
     NuevacitaComponent,
     EditarComponent,
     ComentariosComponent,
+    PersonaSolicitudComponent,
   ],
   imports: [
     CommonModule,

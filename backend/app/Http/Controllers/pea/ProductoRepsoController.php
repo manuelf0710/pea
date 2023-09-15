@@ -93,6 +93,9 @@ class ProductoRepsoController extends Controller
     }
 
     public function getExistProduct(Request $request){
+
+        return response()->json(array("hola"));
+
         $tipoproducto_id = $request->post('tipoproducto_id');
         $contrato_id    = $request->post('contrato_id');
         $profesional_id    = $request->post('profesional_id');       

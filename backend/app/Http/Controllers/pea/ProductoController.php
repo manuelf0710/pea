@@ -387,13 +387,24 @@ class ProductoController extends Controller
     {
     }
 
+    public function insertProduct($item, $id, $user_id){
+        $producto = new Producto();
+        $producto->producto_repso_id = $id;
+        $producto->estado_id = 12;
+        $producto->cedula = $item['cedula'];
+        $producto->dependencia_id = $item['dependencia_id'];
+        $producto->user_id = $user_id;
+        $producto->modalidad = $item['modalidad'];
+        $producto->save();
+    }
+
 
     /*
     * importa el excel de clientes
      */
     public function ImportClientesByProductoRepso($id, Request $request)
     {
-
+        //return response()->json(array("forzarCargue"=> $request->get('forzarCargue')));
         //$requestData = $request->get('descripcion');
         $requestData = $request->all();
 
@@ -401,15 +412,16 @@ class ProductoController extends Controller
             ->where("id", "=", $id)
             ->select('productos_repso.*')
             ->addSelect(DB::raw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos"))
-            ->first();*/
+            ->first();*/          
 
-
+        $clientesOtrasSolicitud = array();
+        $user_id = auth()->user()->id;
 
         $find = ProductoRepso::select('id', 'tipoproducto_id', 'regional_id', 'contrato_id', 'anio', 'descripcion', 'cantidad', 'user_id', 'archivo')
             ->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
             ->find($id);
         $validacion = 0;
-
+        
         if (!empty($find)) {
             if (file_exists(public_path() . '/' . $request->get('nombrearchivo'))) {
 
@@ -440,20 +452,37 @@ class ProductoController extends Controller
                 $find->save();
                 if ($validacion == 0) {
                     foreach ($importClientes->clientesImportar as $item) {
+                        /*
+                        * Consultar si existe ya la persona registrada en esta solicitud
+                         */
                         $getClient = DB::table('productos')
                             ->where('producto_repso_id', '=', $id)
                             ->where('cedula', '=', $item['cedula'])
                             ->first();
-                        if (!$getClient) {
+                        /*
+                        * Consultar si la persona existe en otra solicitud de mismo tipoproducto
+                         */   
+                        $getClientHistories = DB::table('productos')
+                        ->join('productos_repso','productos_repso.id','productos.producto_repso_id')
+                        ->join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+                        ->select('productos_repso.id as solicitud',
+                                 'productos.cedula as cedula',
+                                 'productos.created_at as creado',
+                                 'clientes.nombre')
+                        ->where('productos.cedula', '=', $item['cedula'])
+                        ->where('productos_repso.tipoproducto_id', '=', $find->tipoproducto_id)
+                        ->whereNotIn('productos_repso.id', [$find->id])
+                        ->get();                                                   
+
+
+                        if (!$getClient && count($getClientHistories)==0) {
                             if ($item['cedula'] > 100000) {
-                                $producto = new Producto();
-                                $producto->producto_repso_id = $id;
-                                $producto->estado_id = 12;
-                                $producto->cedula = $item['cedula'];
-                                $producto->dependencia_id = $item['dependencia_id'];
-                                $producto->user_id = auth()->user()->id;
-                                $producto->modalidad = $item['modalidad'];
-                                $producto->save();
+                                $this->insertProduct($item, $id, $user_id);
+                            }
+                        }elseif(count($getClientHistories) >0 && !$getClient){
+                            array_push($clientesOtrasSolicitud, $getClientHistories);
+                            if($request->get('forzarCargue') == 'Si'){
+                                $this->insertProduct($item, $id, $user_id);
                             }
                         }
                     }
@@ -466,7 +495,7 @@ class ProductoController extends Controller
                 $response = array(
                     'status' => 'success',
                     'code' => 200,
-                    'data' => $find,
+                    'data' => array("find" => $find, "clientesOtrasSolicitudes" =>$clientesOtrasSolicitud),
                     'msg'  => 'Registro Procesado correctamente'
                 );
 

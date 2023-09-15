@@ -14,6 +14,8 @@ import { ComunService } from "./../../../services/comun.service";
 
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NuevacitaComponent } from "./nuevacita/nuevacita.component";
+import { PersonaSolicitudComponent } from "./personasolicitud/personasolicitud.component";
+
 import { User } from "src/app/auth/models/user";
 import { listaItems } from "./../../../models/listaItems";
 import { estadoSeguimiento } from "../../../models/estadoSeguimiento";
@@ -139,6 +141,7 @@ export class ProductorepsodetallesprodComponent
   countAgendasLista: countAgendaProfesional[] = [];
   displayCountCitas!: displayCountCitas;
   agendasDisponibles: MatTableDataSource<agendasDisponiblesProfesionales>;
+  @ViewChild("contentModalProductos") contentModalProductos;
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatPaginator) set matPaginator(mp: MatPaginator) {
     this.paginator = mp;
@@ -279,6 +282,7 @@ export class ProductorepsodetallesprodComponent
     this.formularioArchivo = this.FormBuilder.group({
       id: [this.id],
       archivo: ["", [Validators.required]],
+      forzarCargue: ["No"],
     });
 
     this.formularioFiltro = this.FormBuilder.group({
@@ -554,18 +558,33 @@ export class ProductorepsodetallesprodComponent
       "el valor del archivo ",
       this.formularioArchivo.get("archivo").value
     );
+    console.log(
+      "el valor del forzarCague ",
+      this.formularioArchivo.get("forzarCargue").value
+    );
+    console.log(
+      "el valor del forzarCague2 ",
+      this.formularioArchivo.value.forzarCargue
+    );
     this._ProductoService
       .procesarExcelBySolicitud(this.id, {
         nombrearchivo: this.formularioArchivo.value.archivo,
         ...this.odsDetalles,
+        forzarCargue: this.formularioArchivo.value.forzarCargue,
       })
       .subscribe((res: any) => {
         if (res.status == "error") {
           this._ToastService.danger(res.msg);
         }
         if (res.code == 200) {
-          this._ToastService.success(res.msg);
+          console.log("personas repetidas ", res.data.clientesOtrasSolicitudes);
           this.mostrarCargaExcel = false;
+          if (res.data.clientesOtrasSolicitudes.length > 0) {
+            this.simpleModal(res.data.clientesOtrasSolicitudes);
+          } else {
+            this._ToastService.success(res.msg);
+          }
+
           this._ProductoService
             .getProductosBySolicitud(this.id, {})
             .subscribe((data) => {
@@ -573,6 +592,25 @@ export class ProductorepsodetallesprodComponent
             });
         }
       });
+  }
+
+  simpleModal(infoPersonas) {
+    const modalRef = this.modalService.open(PersonaSolicitudComponent, {
+      backdrop: "static",
+      size: "xs",
+      keyboard: false,
+    });
+    const newInfoPersonas = infoPersonas.flatMap((subArray) => subArray);
+    modalRef.componentInstance.data = {
+      info: newInfoPersonas,
+    };
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+        }
+      })
+      .catch((error) => {});
   }
 
   buscarCedula(event: Event) {
