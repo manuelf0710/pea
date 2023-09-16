@@ -340,7 +340,9 @@ export class GenerarAgendaComponent implements OnInit {
     if (this.currentUser.perfil.id == 3) {
       window.open(
         "pea/solicitudproductos?id=" +
-          clickInfo.event.extendedProps.producto_repso_id,
+          clickInfo.event.extendedProps.producto_repso_id +
+          "&product_id=" +
+          clickInfo.event.extendedProps.producto_id,
         "_blank"
       );
       return;

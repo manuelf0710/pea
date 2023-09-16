@@ -325,6 +325,7 @@ class ProductoController extends Controller
         $estadoSeguimiento = $request->post('estado_seguimiento');
         $modalidad = $request->post('modalidad');
         $nombre = $request->post('nombre');
+        $product_id = $request->post('product_id');
         $globalSearch = $request->get('globalsearch');
 
         if ($globalSearch != '') {
@@ -370,6 +371,7 @@ class ProductoController extends Controller
                 ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
                 ->withoutTrashed()->orderBy('productos.id', 'desc')
                 ->where('producto_repso_id', '=', $id)
+                ->productId($product_id)
                 ->profesionalAsignado(auth()->user()->perfil_id, auth()->user()->id)
                 ->cedula($cedula)
                 ->dependencia($dependencia)

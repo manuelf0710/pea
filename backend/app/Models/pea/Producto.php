@@ -66,12 +66,20 @@ class Producto extends Model
 			return $query->where('descripcion', 'like', "%$des%");
 	}
 
+	public function scopeProductId($query, $product_id)
+	{
+		if($product_id){
+
+			return $query->where('productos.id', '=', "$product_id");
+		}
+	}
+
 	public function scopeProfesionalAsignado($query, $perfil_id, $user_id)
 	{
 		if ($perfil_id == 3) {
 			return $query->where('productos.profesional_id', '=', "$user_id");
 		}
-	}
+	}	
 
 	public function scopeCedula($query, $des)
 	{

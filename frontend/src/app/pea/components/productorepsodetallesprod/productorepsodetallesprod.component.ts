@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild, AfterViewInit } from "@angular/core";
-import { ActivatedRoute, Params } from "@angular/router";
+import { ActivatedRoute, Params, Router } from "@angular/router";
 import { forkJoin } from "rxjs";
 import { environment } from "src/environments/environment";
 import { FormGroup, FormBuilder, Validators } from "@angular/forms";
@@ -113,6 +113,7 @@ export class ProductorepsodetallesprodComponent
   implements OnInit, AfterViewInit
 {
   id!: number;
+  product_id!: number;
   odsDetalles: productoRepso;
   productosLista: any[];
   /*
@@ -186,7 +187,8 @@ export class ProductorepsodetallesprodComponent
     private _UtilService: UtilService,
     private modalService: NgbModal,
     private readonly route: ActivatedRoute,
-    private authenticationService: AuthenticationService
+    private authenticationService: AuthenticationService,
+    private _router: Router
   ) {
     this.displayCountCitas = {
       all: false,
@@ -220,6 +222,7 @@ export class ProductorepsodetallesprodComponent
     this.buildForm();
     this.route.queryParams.subscribe((params: Params) => {
       this.id = params["id"];
+      this.product_id = params["product_id"];
       this.initLoadData();
       this.urlSubidaArchivo =
         environment.apiUrl +
@@ -314,6 +317,8 @@ export class ProductorepsodetallesprodComponent
       });
   }
 
+  getPersonaProducto() {}
+
   initLoadData() {
     this.loading = true;
 
@@ -321,6 +326,7 @@ export class ProductorepsodetallesprodComponent
       this._ProductosrepsoService.getSolicitudById(this.id),
       this._ProductoService.getProductosBySolicitud(this.id, {
         ...this.formularioFiltro.value,
+        product_id: this.product_id,
       }),
       this._ComunService.getListasEstadosByPerfil(2),
       this._ComunService.getEstadosAll(),
@@ -784,6 +790,7 @@ export class ProductorepsodetallesprodComponent
   }
   limpiarFiltrosForm() {
     this.formularioFiltro.reset();
+    this._router.navigateByUrl("pea/solicitudproductos?id=" + this.id);
     this.loadProductosBySolicitud(this.id, { ...this.formularioFiltro.value });
   }
 
