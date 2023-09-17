@@ -728,9 +728,15 @@ export class ProductorepsodetallesprodComponent
     this.countAgendasListaAddData();
   }
   countCitasByProfesional() {
+    const dateNowString = this.convertirDateToString(new Date());
     let formData = {
       tipo_producto: this.odsDetalles.tipo_producto.id,
-      start: "2023-01-01",
+      start:
+        this.searchForm.get("fechacitadatesearch").value == ""
+          ? this.convertirDateToString(
+              this.searchForm.get("fechacitadatesearch").value
+            )
+          : dateNowString,
     };
     this._AgendaService
       .postCitasByProfesional({
@@ -791,7 +797,7 @@ export class ProductorepsodetallesprodComponent
   limpiarFiltrosForm() {
     this.formularioFiltro.reset();
     this._router.navigateByUrl("pea/solicitudproductos?id=" + this.id);
-    this.loadProductosBySolicitud(this.id, { ...this.formularioFiltro.value });
+    //this.loadProductosBySolicitud(this.id, { ...this.formularioFiltro.value });
   }
 
   actualizarProducto(product) {
@@ -1176,6 +1182,21 @@ export class ProductorepsodetallesprodComponent
         product.estadoseguimiento_id;
       console.log("dentro de if index ", this.productosLista[index]);
     }
+  }
+
+  clearInput() {
+    this.searchForm.get("fechacitadatesearch").setValue("");
+    this.applyFilter();
+  }
+
+  reloadInfoCouncitas() {
+    console.log(this.searchForm.get("fechacitadatesearch").value);
+    const fechaSearch = this.convertirDateToString(
+      this.searchForm.get("fechacitadatesearch").value
+    );
+    console.log("fechaSearch ==>>>>>", fechaSearch);
+    const dateNow = new Date();
+    const dateNowString = this.convertirDateToString(new Date());
   }
 
   addComment() {

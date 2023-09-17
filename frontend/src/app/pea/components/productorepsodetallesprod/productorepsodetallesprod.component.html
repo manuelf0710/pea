@@ -1078,18 +1078,33 @@
             />
           </mat-form-field>
 
-          <mat-form-field class="search__form_field" appearance="outline">
+          <mat-form-field class="search__form_field" appearance="fill">
             <mat-label>fecha Cita Disponible</mat-label>
             <input
               matInput
               formControlName="fechacitadatesearch"
               [matDatepicker]="picker"
               (dateInput)="applyFilter()"
+              (dateChange)="reloadInfoCouncitas()"
+              readonly
             />
+            <!--<button
+              mat-button
+              *ngIf="searchForm.get('fechacitadatesearch').value"
+              (click)="clearInput()"
+            >
+              <mat-icon>close</mat-icon>
+            </button>-->
             <mat-datepicker-toggle
               matSuffix
-              [for]="picker"
-            ></mat-datepicker-toggle>
+              *ngIf="searchForm.get('fechacitadatesearch').value"
+            >
+              <mat-icon matDatepickerToggleIcon (click)="clearInput()"
+                >clear</mat-icon
+              >
+            </mat-datepicker-toggle>
+            <mat-datepicker-toggle matSuffix [for]="picker">
+            </mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>
 

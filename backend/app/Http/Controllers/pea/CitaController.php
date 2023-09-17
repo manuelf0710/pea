@@ -521,10 +521,16 @@ class CitaController extends Controller
         return response()->json($response);
     }
 
+    public function getCurrentMonthFirstDay(){
+        $dateNow = date("Y-m-d");
+        $newDate = explode("-",$dateNow);
+        return $newDate[0]."-".$newDate[1]."01 00:00:01";
+    }
+
     public function citasbyprofesional(Request $request)
     {
         DB::statement("SET lc_time_names = 'es_ES'");
-        $dateNow =$request->post('start') != "" ? $request->post('start') : date("Y-m-d")." 00:00:01";
+        $dateNow =$request->post('start') != "" ? $request->post('start') : $this->getCurrentMonthFirstDay();
         $productos = Producto::withoutTrashed()
             ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
             ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
@@ -534,6 +540,7 @@ class CitaController extends Controller
             ->selectRaw('date_format(fecha_inicio, "%Y-%m-%d") as fecha')
             ->selectRaw('date_format(fecha_inicio, "%W %M %d, %Y") as fechainfo')
             //->where('fecha_inicio', '>=', '2023-01-01 00:00:01')
+            ->whereNotNull('fecha_inicio')
             ->where('fecha_inicio', '>=', $dateNow)
             ->where('users.perfil_id','=',3)
             ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
