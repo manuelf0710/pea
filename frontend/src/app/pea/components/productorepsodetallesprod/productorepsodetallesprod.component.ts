@@ -104,6 +104,17 @@ export interface displayCountCitas {
   tipoProducto: boolean;
 }
 
+export interface citasByMonth {
+  profesional_id: number;
+  name: string;
+  total: number;
+}
+export interface citasByDay {
+  profesional_id: number;
+  name: string;
+  total: number;
+  fecha: string;
+}
 @Component({
   selector: "app-productorepsodetallesprod",
   templateUrl: "./productorepsodetallesprod.component.html",
@@ -130,6 +141,7 @@ export class ProductorepsodetallesprodComponent
   mostrarRegistro: boolean = false;
   mostrarCargaExcel: boolean = false;
   mostrarFiltros: boolean = true;
+  displayByMonth: boolean = true;
   formulario: FormGroup;
   formularioArchivo: FormGroup;
   formularioFiltro: FormGroup;
@@ -141,6 +153,8 @@ export class ProductorepsodetallesprodComponent
   countAgendas: countAgendaProfesional[] = [];
   countAgendasLista: countAgendaProfesional[] = [];
   displayCountCitas!: displayCountCitas;
+  citasByMonth: citasByMonth[] = [];
+  citasByDay: citasByDay[] = [];
   agendasDisponibles: MatTableDataSource<agendasDisponiblesProfesionales>;
   @ViewChild("contentModalProductos") contentModalProductos;
   @ViewChild(MatPaginator) paginator: MatPaginator;
@@ -614,6 +628,7 @@ export class ProductorepsodetallesprodComponent
     modalRef.result
       .then((result) => {
         if (result.status == "ok") {
+          this.initLoadData();
         }
       })
       .catch((error) => {});
@@ -641,6 +656,7 @@ export class ProductorepsodetallesprodComponent
 
     const selectedItem =
       activeItem || this.tipoProductoLista.find((item) => item.current);
+    /*
     const resultadoFiltrado = this.countAgendas.filter(
       (item) =>
         item.tipoproducto_id === selectedItem.tipoproducto_id &&
@@ -648,9 +664,48 @@ export class ProductorepsodetallesprodComponent
     );
     this.displayCountCitas.fecha = true;
     this.countAgendasLista = resultadoFiltrado;
+    */
+
+    const dateNowString = this.convertirDateToString(new Date());
+
+    const daySearch =
+      this.searchForm.get("fechacitadatesearch").value != ""
+        ? this.convertirDateToString(
+            this.searchForm.get("fechacitadatesearch").value
+          )
+        : dateNowString;
+
+    const recordsByDay = this.countAgendas.reduce((acumulador, cita) => {
+      const citaExistente = acumulador.find(
+        (item) =>
+          item.profesional_id === cita.profesional_id &&
+          item.fecha === daySearch
+      );
+
+      if (citaExistente) {
+        citaExistente.total++;
+      } else {
+        acumulador.push({
+          profesional_id: cita.profesional_id,
+          total: 1,
+          name: cita.name,
+          fecha: cita.fecha,
+        });
+      }
+
+      return acumulador;
+    }, []);
+
+    this.citasByDay = recordsByDay;
+    this.displayByMonth = false;
+  }
+
+  changeDisplay() {
+    this.displayByMonth = true;
   }
 
   countAgendasListaAddData() {
+    const dateNowString = this.convertirDateToString(new Date());
     const activeItem = this.tipoProductoLista.find((item) => item.active);
 
     const selectedItem =
@@ -659,6 +714,59 @@ export class ProductorepsodetallesprodComponent
     /*const resultadoFiltrado = this.countAgendas.filter(
       (item) => item.tipoproducto_id === selectedItem.tipoproducto_id
     );*/
+
+    const recordsByProfesional = this.countAgendas.reduce(
+      (acumulador, cita) => {
+        const profesionalExistente = acumulador.find(
+          (item) => item.profesional_id === cita.profesional_id
+        );
+
+        if (profesionalExistente) {
+          profesionalExistente.total++;
+        } else {
+          acumulador.push({
+            profesional_id: cita.profesional_id,
+            total: 1,
+            name: cita.name,
+          });
+        }
+
+        return acumulador;
+      },
+      []
+    );
+    this.citasByMonth = recordsByProfesional;
+
+    const daySearch =
+      this.searchForm.get("fechacitadatesearch").value != ""
+        ? this.convertirDateToString(
+            this.searchForm.get("fechacitadatesearch").value
+          )
+        : dateNowString;
+
+    const recordsByDay = this.countAgendas.reduce((acumulador, cita) => {
+      const citaExistente = acumulador.find(
+        (item) =>
+          item.profesional_id === cita.profesional_id &&
+          item.fecha === daySearch
+      );
+
+      if (citaExistente) {
+        citaExistente.total_citas++;
+      } else {
+        acumulador.push({
+          profesional_id: cita.profesional_id,
+          total_citas: 1,
+          name: cita.name,
+          fecha: cita.fecha,
+        });
+      }
+
+      return acumulador;
+    }, []);
+
+    this.citasByDay = recordsByDay;
+
     const resultadoFiltrado = this.countAgendas.reduce((result, item) => {
       if (item.tipoproducto_id === selectedItem.tipoproducto_id) {
         const existingItem = result.find(
@@ -732,7 +840,7 @@ export class ProductorepsodetallesprodComponent
     let formData = {
       tipo_producto: this.odsDetalles.tipo_producto.id,
       start:
-        this.searchForm.get("fechacitadatesearch").value == ""
+        this.searchForm.get("fechacitadatesearch").value != ""
           ? this.convertirDateToString(
               this.searchForm.get("fechacitadatesearch").value
             )
@@ -1187,16 +1295,18 @@ export class ProductorepsodetallesprodComponent
   clearInput() {
     this.searchForm.get("fechacitadatesearch").setValue("");
     this.applyFilter();
+    this.countCitasByProfesional();
   }
 
   reloadInfoCouncitas() {
-    console.log(this.searchForm.get("fechacitadatesearch").value);
+    /*console.log(this.searchForm.get("fechacitadatesearch").value);
     const fechaSearch = this.convertirDateToString(
       this.searchForm.get("fechacitadatesearch").value
     );
     console.log("fechaSearch ==>>>>>", fechaSearch);
     const dateNow = new Date();
-    const dateNowString = this.convertirDateToString(new Date());
+    const dateNowString = this.convertirDateToString(new Date());*/
+    this.countCitasByProfesional();
   }
 
   addComment() {

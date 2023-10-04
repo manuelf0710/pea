@@ -1206,6 +1206,66 @@
       *ngIf="agendasDisponibles && currentUser.perfil.id != 3"
     >
       <div class="row">
+        <div class="col-md-12" *ngIf="!displayByMonth">
+          <table
+            class="table table-sm table-hover table-bordered table-striped mt-3"
+          >
+            <thead>
+              <tr>
+                <th colspan="4">
+                  <button
+                    class="btn btn-sm btn-block btn-light text-left"
+                    (click)="changeDisplay()"
+                  >
+                    <i class="fa fa-arrow-circle-o-left"></i>
+                    <span class="font8"> Volver</span>
+                  </button>
+                </th>
+              </tr>
+              <tr>
+                <th>profesional</th>
+                <th>Fecha</th>
+                <th>#citas</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of citasByDay">
+                <td>{{ item.name }}</td>
+                <td>{{ item.fecha }}</td>
+                <td>{{ item.total }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="col-md-12" *ngIf="displayByMonth">
+          <table
+            class="table table-sm table-hover table-bordered table-striped mt-3"
+          >
+            <thead>
+              <tr>
+                <th>Profesional</th>
+                <th># Mes</th>
+              </tr>
+            </thead>
+            <tbody *ngFor="let item of citasByMonth">
+              <tr>
+                <td>
+                  <button
+                    class="btn btn-sm btn-block btn-light text-left"
+                    (click)="countListaFilterByProfesional(item.profesional_id)"
+                  >
+                    <i class="fa fa-arrow-circle-o-right"></i>
+                    <span class="font8"> {{ item.name }}</span>
+                  </button>
+                </td>
+                <td>{{ item.total }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!--
+      <div class="row">
         <div class="col-md-12 bg-light m3">
           <button
             class="btn btn-sm m-1"
@@ -1261,7 +1321,7 @@
             </tbody>
           </table>
         </div>
-      </div>
+      </div>-->
     </div>
   </div>
 </div>

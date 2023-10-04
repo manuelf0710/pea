@@ -543,6 +543,7 @@ class CitaController extends Controller
             ->whereNotNull('fecha_inicio')
             ->where('fecha_inicio', '>=', $dateNow)
             ->where('users.perfil_id','=',3)
+            ->whereRaw('MONTH(fecha_inicio) = ?', [explode("-", $dateNow)[1]])
             ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
             ->get();
     

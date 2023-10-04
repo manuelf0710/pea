@@ -481,7 +481,7 @@ export class GenerarAgendaComponent implements OnInit {
           this.calendarOptions.events = dataEvents;
           this.agendaProfesional = dataEvents;
 
-          console.log("lso eventos jueppppp", dataEvents);
+          console.log("lso eventos =>", dataEvents);
         } else {
           this.calendarOptions.events = res.data;
           this.agendaProfesional = res.data;

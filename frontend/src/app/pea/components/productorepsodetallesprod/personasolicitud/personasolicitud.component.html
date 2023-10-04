@@ -7,13 +7,19 @@
   </button>
 </div>
 <div class="modal-body">
-  <table class="table table-sm table-hover table-bordered table-striped">
+  <app-loading *ngIf="loading"></app-loading>
+  <p *ngIf="data.info.length == 0">No existen registros</p>
+  <table
+    class="table table-sm table-hover table-bordered table-striped"
+    *ngIf="!loading && data.info.length"
+  >
     <thead>
       <tr>
         <th>Solicitud #</th>
         <th>Cédula</th>
         <th>Nombre</th>
         <th>Creado</th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
@@ -22,6 +28,14 @@
         <td>{{ item.cedula }}</td>
         <td>{{ item.nombre }}</td>
         <td>{{ item.creado }}</td>
+        <td>
+          <button
+            class="btn btn-outline-secondary btn-sm pull-right"
+            (click)="addRecordToSolicitud(item)"
+          >
+            <i class="fa fa-plus"></i>
+          </button>
+        </td>
       </tr>
     </tbody>
   </table>

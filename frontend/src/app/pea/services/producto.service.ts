@@ -58,6 +58,17 @@ export class ProductoService {
     );
   }
 
+  public saveOneProduct(data) {
+    return this._http
+      .post<any>(environment.apiUrl + environment.productos.posProduct, data)
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
+
   eliminar(id) {
     return this._http.delete<any>(
       environment.apiUrl + environment.productos.deleteProductoBYId + id

@@ -70,6 +70,24 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
+        $product = $this->insertProduct($request, $request->post('producto_repso_id') , $request->post('user_id'), true);
+        if($product){
+            $response = array(
+                'status' => 'ok',
+                'code' => 200,
+                'data'   => array('producto' => $product), 
+                'msg'    => ' producto agregado correctamente '
+            );               
+            return response()->json($response);
+        }else{
+            $response = array(
+                'status' => 'error',
+                'msg' => "Ha ocurrido un error al guardar el registro",
+                'validator' => "Archivo no guardado"
+            );
+            return response()->json($response);
+        }
+        
     }
 
     /**
@@ -143,6 +161,7 @@ class ProductoController extends Controller
             ->where('producto_id',  $producto_id)
             ->update(['producto_id' => null, 'ocupado' => 1]);
     }
+    
 
     public function productoCancelState(Request $request, $id){
             $updateProducto = Producto::find($id);
@@ -389,7 +408,7 @@ class ProductoController extends Controller
     {
     }
 
-    public function insertProduct($item, $id, $user_id){
+    public function insertProduct($item, $id, $user_id, $callbackValue=false){
         $producto = new Producto();
         $producto->producto_repso_id = $id;
         $producto->estado_id = 12;
@@ -398,7 +417,11 @@ class ProductoController extends Controller
         $producto->user_id = $user_id;
         $producto->modalidad = $item['modalidad'];
         $producto->save();
+        if($callbackValue){
+            return $producto;
+        }
     }
+
 
 
     /*
@@ -470,7 +493,7 @@ class ProductoController extends Controller
                         ->select('productos_repso.id as solicitud',
                                  'productos.cedula as cedula',
                                  'productos.created_at as creado',
-                                 'clientes.nombre')
+                                 'clientes.nombre')                               
                         ->where('productos.cedula', '=', $item['cedula'])
                         ->where('productos_repso.tipoproducto_id', '=', $find->tipoproducto_id)
                         ->whereNotIn('productos_repso.id', [$find->id])
@@ -482,6 +505,10 @@ class ProductoController extends Controller
                                 $this->insertProduct($item, $id, $user_id);
                             }
                         }elseif(count($getClientHistories) >0 && !$getClient){
+                            $getClientHistories[0]->modalidad =$item['modalidad'];
+                            $getClientHistories[0]->dependencia_id =$item['dependencia_id'];
+                            $getClientHistories[0]->producto_repso_id =$id;
+                            $getClientHistories[0]->user_id =$user_id;
                             array_push($clientesOtrasSolicitud, $getClientHistories);
                             if($request->get('forzarCargue') == 'Si'){
                                 $this->insertProduct($item, $id, $user_id);
