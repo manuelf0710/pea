@@ -165,8 +165,9 @@ export class GenerarAgendaComponent implements OnInit {
       id: this.currentUser.id,
       nombre: this.currentUser.name,
     };
-
-    this.seleccionadoProfesional({ ...this.profesionalSeleccionado });
+    if (this.currentUser.perfil.id == 3) {
+      this.seleccionadoProfesional({ ...this.profesionalSeleccionado });
+    }
   }
 
   ngOnInit(): void {
@@ -351,6 +352,13 @@ export class GenerarAgendaComponent implements OnInit {
     console.log("valores ", clickInfo.event.start);
     if (clickInfo.event.extendedProps.origen == "decitasproducto") {
       this._ToastService.info("este evento no se puede editar");
+      window.open(
+        "pea/solicitudproductos?id=" +
+          clickInfo.event.extendedProps.producto_repso_id +
+          "&product_id=" +
+          clickInfo.event.extendedProps.producto_id,
+        "_blank"
+      );
       return;
     }
 
@@ -462,7 +470,7 @@ export class GenerarAgendaComponent implements OnInit {
     this.getAgendaProfesional(item.id);
   }
 
-  getAgendaProfesional(id) {
+  loadDataByProfesional(id) {
     let data = {
       startDateView: this.startDateView,
       endDateView: this.endDateView,
@@ -471,7 +479,9 @@ export class GenerarAgendaComponent implements OnInit {
     this._AgendaService.postAgendaProfesional(id, data).subscribe(
       (res: any) => {
         console.log("ladatata ", res.data);
-        let dataEvents = [];
+        this.calendarOptions.events = res.data;
+        this.agendaProfesional = res.data;
+        /*let dataEvents = [];
         if (this.currentUser.perfil.id == 3) {
           dataEvents = res.data.filter(
             (item) =>
@@ -485,7 +495,7 @@ export class GenerarAgendaComponent implements OnInit {
         } else {
           this.calendarOptions.events = res.data;
           this.agendaProfesional = res.data;
-        }
+        } */
         //        this.calendarOptions.events = res.data;
         //      this.agendaProfesional = res.data;
         this.calendarVisible = true;
@@ -503,5 +513,15 @@ export class GenerarAgendaComponent implements OnInit {
         this.loading = false;
       }
     );
+  }
+
+  getAgendaProfesional(id) {
+    if (this.startDateView) {
+      this.loadDataByProfesional(id);
+    } else {
+      setTimeout(() => {
+        this.loadDataByProfesional(id);
+      }, 1000);
+    }
   }
 }

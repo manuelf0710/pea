@@ -533,9 +533,14 @@ class CitaController extends Controller
         $dateNow =$request->post('start') != "" ? $request->post('start') : $this->getCurrentMonthFirstDay();
         $productos = Producto::withoutTrashed()
             ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
+            ->join('tipoproducto_users', 'users.id', '=', 'tipoproducto_users.user_id')
             ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
             ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
-            ->select('productos.profesional_id','users.name','tipo_productos.name as tipo_producto', 'productos_repso.tipoproducto_id')
+            ->select('productos.profesional_id',
+                     'users.name','tipo_productos.name as tipo_producto', 
+                     'productos_repso.tipoproducto_id',
+                     'tipoproducto_users.id as id_tipr'
+                     )
             ->selectRaw('count(productos.id) as numcitas')
             ->selectRaw('date_format(fecha_inicio, "%Y-%m-%d") as fecha')
             ->selectRaw('date_format(fecha_inicio, "%W %M %d, %Y") as fechainfo')
@@ -543,6 +548,8 @@ class CitaController extends Controller
             ->whereNotNull('fecha_inicio')
             ->where('fecha_inicio', '>=', $dateNow)
             ->where('users.perfil_id','=',3)
+            ->where('users.status', '=', 1)   
+            ->whereNull('tipoproducto_users.deleted_at')         
             ->whereRaw('MONTH(fecha_inicio) = ?', [explode("-", $dateNow)[1]])
             ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
             ->get();

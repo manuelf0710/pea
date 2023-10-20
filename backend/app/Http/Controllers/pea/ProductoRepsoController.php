@@ -70,7 +70,9 @@ class ProductoRepsoController extends Controller
                     'contratos.nombre as contrato',
                     'users.name as profesional',
                     'tipo_productos.name as tipoproducto',
-                    'regionales.nombre as regional'
+                    'regionales.nombre as regional',
+                    'productos_repso.grupal as grupal',
+                    \DB::raw('CASE WHEN productos_repso.grupal = 1 THEN "Individual" WHEN productos_repso.grupal = 2 THEN "Grupal" ELSE "" END as grupal_des')
                 )
                 ->join('regionales', 'productos_repso.regional_id', '=', 'regionales.id')
                 ->join('contratos', 'productos_repso.contrato_id', '=', 'contratos.id')
@@ -130,6 +132,7 @@ class ProductoRepsoController extends Controller
             $modelo->regional_id    = $request->post('regional_id');
             $modelo->contrato_id    = $request->post('contrato_id');
             $modelo->profesional_id    = $request->post('profesional_id');
+            $modelo->grupal    = $request->post('grupal');
             $modelo->anio  = $request->post('anio');
             $modelo->cantidad  = $request->post('cantidad');
             $modelo->descripcion  = $request->post('descripcion');

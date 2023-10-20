@@ -28,6 +28,10 @@ export class SolicitudComponent implements OnInit {
     status: "close",
     data: [],
   };
+  public productoGrupal = [
+    { label: "Individual", value: 1 },
+    { label: "Grupal", value: 2 },
+  ];
   public dateActually = new Date();
   constructor(
     private FormBuilder: FormBuilder,
@@ -58,6 +62,7 @@ export class SolicitudComponent implements OnInit {
     let id = null;
     let tipoproducto_id = null;
     let regional_id = null;
+    let grupal = 1;
     let contrato_id = null;
     let anio = null;
     let descripcion = null;
@@ -67,6 +72,7 @@ export class SolicitudComponent implements OnInit {
       id: [id],
       tipoproducto_id: [tipoproducto_id, [Validators.required]],
       regional_id: [regional_id, [Validators.required]],
+      grupal: [grupal, [Validators.required]],
       contrato_id: [contrato_id, [Validators.required]],
       profesional_id: ["", [Validators.required]],
       anio: [

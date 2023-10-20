@@ -16,7 +16,7 @@ class ProductoRepso extends Model
 	use SoftDeletes;
 
 	protected $fillable = [
-		'tipoproducto_id', 'regional_id', 'contrato_id', 'anio', 'descripcion', 'cantidad'
+		'tipoproducto_id', 'regional_id','grupal', 'contrato_id', 'anio', 'descripcion', 'cantidad'
 	];
 
 	protected $dates = ['deleted_at'];
@@ -36,6 +36,7 @@ class ProductoRepso extends Model
 		$rules = [
 			'tipoproducto_id' => 'required|integer',
 			'regional_id' => 'required|integer',
+			'grupal' => 'required|integer',
 			'contrato_id' => 'required|integer',
 			'anio' => 'required|integer',
 			'cantidad' => 'required|integer',

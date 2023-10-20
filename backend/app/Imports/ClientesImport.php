@@ -19,8 +19,8 @@ class ClientesImport implements ToCollection, WithChunkReading, WithCustomCsvSet
 
     public function obtenerModalidad($StringToSearch){
         if($StringToSearch == null) return null;
-        if(str_contains($StringToSearch, 'vi')) return '2'; /**si contiene la palaba vi es virtual */
-        if(str_contains($StringToSearch, 'pr')) return '1'; /** si contiene pr es presencial */
+        if(str_contains(strtolower($StringToSearch), 'vi')) return '2'; /**si contiene la palaba vi es virtual */
+        if(str_contains(strtolower($StringToSearch), 'pr')) return '1'; /** si contiene pr es presencial */
         return null; 
     }
     public function collection(Collection $collection)

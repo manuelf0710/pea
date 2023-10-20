@@ -926,6 +926,7 @@ export class ProductorepsodetallesprodComponent
     if (
       this.personaGestion.estado_id != 12 &&
       this.personaGestion.estado_id != 11 &&
+      this.personaGestion.estado_id != 10 &&
       this.personaGestion.estado_id != 7
     ) {
       this._ToastService.info("esta persona ya ha sido programada");

@@ -317,6 +317,7 @@ class UserController extends Controller
 			$modelo->name = $request->post('name');
 			$modelo->perfil_id = $request->post('perfil_id');
 			$modelo->cedula = $request->post('cedula');
+			$modelo->status = $request->post('status');
 
 			$modelo->save();
 

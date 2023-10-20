@@ -102,6 +102,13 @@ export class SolicitudListarComponent implements OnInit {
       searchable: true,
       type: "text",
     },
+    {
+      title: "Grupal",
+      data: "grupal_des",
+      orderable: false,
+      searchable: true,
+      type: "text",
+    },
   ];
 
   tableConfig;

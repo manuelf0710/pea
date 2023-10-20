@@ -164,6 +164,8 @@ class AgendaController extends Controller
             )
             ->where('tipoproducto_users.tipoproducto_id', '=', $tipoproducto_id)
             ->where('citas.ocupado', '=', 1)
+            ->where('users.status', '=', 1)
+            ->whereNull('tipoproducto_users.deleted_at')
             ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$this->today'");
 
             $citas = $citas->addSelect(DB::raw(
@@ -796,7 +798,13 @@ class AgendaController extends Controller
                                     'decitasproducto' AS origen,
                                     productos.producto_repso_id,
                                     date_format(citas.start, '%d/%m/%Y') AS onlydate,
-                                    (SELECT concat(tipo_productos.NAME, ' - ', clientes.nombre, ' -',lista_items.nombre)
+                                    (SELECT concat(tipo_productos.NAME, ' - ', clientes.nombre, ' -',lista_items.nombre, ' -',
+                                       case productos.modalidad
+                                        when 1 then 'Presencial'
+                                        when 2 then 'Virtual'
+                                        else 'Virtual'
+                                        end
+                                        )
                                         FROM productos, clientes, productos_repso, tipo_productos
                                         WHERE productos.id = citas.producto_id
                                         AND productos.cedula = clientes.cedula
