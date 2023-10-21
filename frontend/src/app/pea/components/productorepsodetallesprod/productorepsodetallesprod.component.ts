@@ -189,6 +189,7 @@ export class ProductorepsodetallesprodComponent
   fechacitasearch = "";
   fechacitadatesearch = "";
   horacitadatesearch = "";
+  horacitadateendsearch = "";
 
   constructor(
     private _ToastService: ToastService,
@@ -316,6 +317,7 @@ export class ProductorepsodetallesprodComponent
       fechacitasearch: [""],
       fechacitadatesearch: [""],
       horacitadatesearch: [""],
+      horacitadateendsearch: [""],
     });
   }
 
@@ -1124,6 +1126,7 @@ export class ProductorepsodetallesprodComponent
     const as = this.searchForm.get("profesionalsearch").value;
     const ds = this.searchForm.get("fechacitasearch").value;
     const hourSearch = this.searchForm.get("horacitadatesearch").value;
+    const hourEndSearch = this.searchForm.get("horacitadateendsearch").value;
 
     console.log("hourSearch", hourSearch);
 
@@ -1132,6 +1135,7 @@ export class ProductorepsodetallesprodComponent
     this.profesionalsearch = as === null ? "" : as;
     this.fechacitasearch = ds === null ? "" : ds;
     this.horacitadatesearch = hourSearch;
+    this.horacitadateendsearch = hourEndSearch;
 
     // create string of our searching values and split if by '$'
     const filterValue =
@@ -1141,7 +1145,9 @@ export class ProductorepsodetallesprodComponent
       "$" +
       this.fechacitasearch +
       "$" +
-      this.horacitadatesearch;
+      this.horacitadatesearch +
+      "$" +
+      this.horacitadateendsearch;
     this.agendasDisponibles.filter = filterValue.trim().toLowerCase();
   }
 
@@ -1163,6 +1169,7 @@ export class ProductorepsodetallesprodComponent
       const departureStation = filterArray[1];
       const arrivalStation = filterArray[2];
       const hourSearch = filterArray[3];
+      const hourEndSearch = filterArray[4];
 
       const matchFilter = [];
 
@@ -1182,16 +1189,55 @@ export class ProductorepsodetallesprodComponent
         this.convertirDateToString(departureDate)
       );
       console.log("row.onlydate", row.onlydate);*/
+      let valid = false;
 
       // Filtro de horas
+      if (hourEndSearch !== "" && hourEndSearch !== "-1") {
+        const endHour = parseInt(hourEndSearch.slice(0, 2)); // Obtener la hora del filtro
+        //const endHour = startHour + 1; // Definir una hora límite, en este caso, una hora después
+        const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
+        const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
+        const isWithinHourRange =
+          endHour <= columnEndHour && endHour >= columnStartHour;
+        //columnEndHour <= endHour &&
+        //endHour <= columnEndHour &&
+        row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+        matchFilter.push(isWithinHourRange);
+
+        console.log(
+          "item () => startHour =>",
+          "startHour",
+          "endHour => ",
+          endHour,
+          "columnStartHour=> ",
+          columnStartHour,
+          "columnEndHour => ",
+          columnEndHour,
+          "isWithinHourRange=> ",
+          isWithinHourRange,
+          "row.minutes =>>",
+          row.minutes,
+          "this.odsDetalles.tipo_producto.tiempo () =>",
+          this.odsDetalles.tipo_producto.tiempo,
+          "this.odsDetalles.tipo_producto.tiempo+15 >>>> ",
+          this.odsDetalles.tipo_producto.tiempo + 15
+        );
+        console.log(
+          "odsDetalles.tipo_producto.tiempo ",
+          this.odsDetalles.tipo_producto.tiempo
+        );
+      }
+      /*
+       *  hoursearch terms
+       */
       if (hourSearch !== "" && hourSearch !== "-1") {
         const startHour = parseInt(hourSearch.slice(0, 2)); // Obtener la hora del filtro
         const endHour = startHour + 1; // Definir una hora límite, en este caso, una hora después
         const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
         const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
         const isWithinHourRange =
-          //startHour >= columnStartHour &&
-          columnStartHour >= startHour &&
+          startHour >= columnStartHour &&
+          //columnStartHour >= startHour &&
           //endHour <= columnEndHour &&
           row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
         matchFilter.push(isWithinHourRange);

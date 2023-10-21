@@ -1065,7 +1065,11 @@
             />
           </mat-form-field>
 
-          <mat-form-field class="search__form_field" appearance="outline">
+          <mat-form-field
+            class="search__form_field"
+            appearance="outline"
+            style="width: 120px"
+          >
             <mat-label>Dia</mat-label>
             <input
               type="text"
@@ -1078,7 +1082,11 @@
             />
           </mat-form-field>
 
-          <mat-form-field class="search__form_field" appearance="fill">
+          <mat-form-field
+            class="search__form_field"
+            appearance="fill"
+            style="width: 170px"
+          >
             <mat-label>fecha Cita Disponible</mat-label>
             <input
               matInput
@@ -1111,12 +1119,35 @@
           <mat-form-field
             class="search__form_field"
             appearance="outline"
-            style="width: 100px"
+            style="width: 120px"
           >
-            <mat-label>Hora Cita</mat-label>
+            <mat-label>Hora desde</mat-label>
             <mat-select
-              aria-label="Hora Cita"
+              aria-label="Hora Desde"
               formControlName="horacitadatesearch"
+              (selectionChange)="applyFilter()"
+              placeholder="Selecciona una hora"
+            >
+              <mat-option disabled>Seleccione una hora</mat-option>
+              <mat-option [value]="-1">Todos</mat-option>
+              <mat-option
+                *ngFor="let hour of getHoursBetween(6, 19)"
+                [value]="hour"
+              >
+                {{ hour }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field
+            class="search__form_field"
+            appearance="outline"
+            style="width: 120px"
+          >
+            <mat-label>Hora Hasta</mat-label>
+            <mat-select
+              aria-label="Hora Hasta"
+              formControlName="horacitadateendsearch"
               (selectionChange)="applyFilter()"
               placeholder="Selecciona una hora"
             >
