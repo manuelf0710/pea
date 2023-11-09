@@ -14,9 +14,10 @@ import { NgbModule } from "@ng-bootstrap/ng-bootstrap";
 
 import { UsuariosComponent } from "./components/usuarios/usuarios.component";
 import { CrearusuarioComponent } from './components/usuarios/crear/crearusuario/crearusuario.component';
+import { ProfileComponent } from './profile/profile.component';
 
 @NgModule({
-  declarations: [UsuariosComponent, CrearusuarioComponent],
+  declarations: [UsuariosComponent, CrearusuarioComponent, ProfileComponent],
   imports: [
     CommonModule,
     AdmonRoutingModule,

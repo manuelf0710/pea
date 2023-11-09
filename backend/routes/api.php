@@ -70,6 +70,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		Route::post('usuario', 'UserController@store')->name('users.store');
 		Route::put('usuario/{id}', 'UserController@update')->name('users.update');
 		Route::get('usuario', 'UserController@usersTipoProducto')->name('users.tipo.productos');
+		Route::get('usuariobyid/{id}', 'UserController@userById')->name('users.userbyid');
 	});
 
 

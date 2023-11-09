@@ -134,4 +134,6 @@ export class UsuariosComponent implements OnInit {
       .catch((error) => {});
   }
   eliminar(ev) {}
+
+  closeModal() {}
 }

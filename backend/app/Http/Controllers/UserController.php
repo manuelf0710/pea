@@ -174,6 +174,29 @@ class UserController extends Controller
 	{
 	}
 
+	public function userById(Request $request, $id){
+		$user = User::find($id);
+
+		if (!empty($user)) {
+
+			$response = array(
+				'status' => 'ok',
+				'code' => 200,
+				'data'   => $this->getOneUserById($user->id),
+				'msg'    => 'Guardado'
+			);
+		}else {
+			$response = array(
+				'status' => 'error',
+				'msg' => "Usuario no encontrado",
+				'validator' => "error"
+			);
+		}
+
+		return response()->json($response);
+
+	}
+
 	public function usersTipoProducto(Request $request)
 	{
 		$user_id = $request->get('user_id');

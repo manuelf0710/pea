@@ -1,11 +1,12 @@
 import { NgModule } from "@angular/core";
 import { Routes, RouterModule } from "@angular/router";
 import { AuthGuard } from "./../auth/guards/auth.guard";
-import { UsuariosComponent } from './components/usuarios/usuarios.component';
+import { UsuariosComponent } from "./components/usuarios/usuarios.component";
 
 const routes: Routes = [
   {
     path: "",
+    component: UsuariosComponent,
     canActivate: [AuthGuard],
     data: {
       breadcrumb: {

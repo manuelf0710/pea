@@ -1,0 +1,277 @@
+<div *ngIf="loading">
+  <app-loading></app-loading>
+</div>
+<form
+  [formGroup]="formulario"
+  novalidate
+  (ngSubmit)="guardar($event)"
+  autocomplete="off"
+>
+  <div class="modal-header">
+    <h3 class="modal-title" id="modal-basic-title">
+      <span *ngIf="!formulario.get('id').value"> Información usuario </span>
+      <span *ngIf="formulario.get('id').value"> Editar usuario </span>
+    </h3>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <i class="fa fa-close"></i>
+    </button>
+  </div>
+
+  <div class="modal-body">
+    <input type="hidden" id="id" formControlName="id" />
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Nombre</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-th"></i></span>
+            </div>
+            <input
+              [readonly]="loading"
+              type="text"
+              class="form-control form-control-xs"
+              placeholder="Ingrese el nombre"
+              formControlName="name"
+            />
+          </div>
+          <div
+            *ngIf="
+              formulario.get('name').errors && formulario.get('name').touched
+            "
+          >
+            <small
+              *ngIf="formulario.get('name').hasError('required')"
+              class="form-text text-danger"
+              >el campo nombre no debe estar vacío.</small
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Cédula</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-th"></i></span>
+            </div>
+            <input
+              [readonly]="loading"
+              type="number"
+              class="form-control form-control-xs"
+              placeholder="Ingrese la cédula"
+              formControlName="cedula"
+            />
+          </div>
+          <div
+            *ngIf="
+              formulario.get('cedula').errors &&
+              formulario.get('cedula').touched
+            "
+          >
+            <small
+              *ngIf="formulario.get('cedula').hasError('required')"
+              class="form-text text-danger"
+              >el campo cédula no debe estar vacío.</small
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="exampleInputEmail1">Email</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-th"></i></span>
+        </div>
+        <input
+          [readonly]="formulario.get('id').value"
+          type="email"
+          class="form-control form-control-xs"
+          placeholder="Ingrese el email"
+          formControlName="email"
+          autocomplete="off"
+        />
+      </div>
+      <div
+        *ngIf="
+          formulario.get('email').errors && formulario.get('email').touched
+        "
+      >
+        <small
+          *ngIf="formulario.get('email').hasError('required')"
+          class="form-text text-danger"
+          >el campo email no debe estar vacío.</small
+        >
+      </div>
+    </div>
+
+    <div class="form-group" *ngIf="!formulario.get('id').value">
+      <label for="exampleInputEmail1">Confirmar Email</label>
+      <div class="input-group">
+        <div class="input-group-prepend">
+          <span class="input-group-text"><i class="fa fa-th"></i></span>
+        </div>
+        <input
+          [readonly]="formulario.get('id').value"
+          type="email"
+          class="form-control form-control-xs"
+          placeholder="Ingrese confirmar email"
+          formControlName="confirmar_email"
+          autocomplete="off"
+        />
+      </div>
+      <div
+        *ngIf="
+          formulario.get('confirmar_email').errors &&
+          formulario.get('confirmar_email').touched
+        "
+      >
+        <small
+          *ngIf="formulario.get('confirmar_email').hasError('required')"
+          class="form-text text-danger"
+          >el campo confirmar email no debe estar vacío.</small
+        >
+      </div>
+    </div>
+
+    <div class="row" *ngIf="!formulario.get('id').value">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Contraseña</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-th"></i></span>
+            </div>
+            <input
+              [readonly]="loading"
+              type="password"
+              class="form-control form-control-xs"
+              placeholder="Ingrese la contraseña"
+              formControlName="password"
+              autocomplete="off"
+            />
+          </div>
+          <div
+            *ngIf="
+              formulario.get('password').errors &&
+              formulario.get('password').touched
+            "
+          >
+            <small
+              *ngIf="formulario.get('password').hasError('required')"
+              class="form-text text-danger"
+              >el campo contraseña no debe estar vacío.</small
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Repita Contraseña</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-th"></i></span>
+            </div>
+            <input
+              [readonly]="loading"
+              type="password"
+              class="form-control form-control-xs"
+              placeholder="repita la contraseña"
+              formControlName="password_confirmation"
+              autocomplete="off"
+            />
+          </div>
+          <div
+            *ngIf="
+              formulario.get('password_confirmation').errors &&
+              formulario.get('password_confirmation').touched
+            "
+          >
+            <small
+              *ngIf="
+                formulario.get('password_confirmation').hasError('required')
+              "
+              class="form-text text-danger"
+              >el campo repetir contraseña no debe estar vacío.</small
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="exampleInputEmail1">Estado</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-th"></i></span>
+            </div>
+            <select
+              type="number"
+              name="fmodalidad"
+              id="fmodalidad"
+              class="form-control form-control-sm"
+              formControlName="status"
+            >
+              <option value="1">Activo</option>
+              <option value="2">Inactivo</option>
+            </select>
+          </div>
+          <div
+            *ngIf="
+              formulario.get('status').errors &&
+              formulario.get('status').touched
+            "
+          >
+            <small
+              *ngIf="formulario.get('status').hasError('required')"
+              class="form-text text-danger"
+              >el campo estado no debe estar vacío.</small
+            >
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label for="regional">Perfil</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <span class="input-group-text"><i class="fa fa-map"></i></span>
+            </div>
+            <select
+              name="festado_seguimiento"
+              id="festado_seguimiento"
+              class="form-control form-control-sm"
+              formControlName="perfil_id"
+            >
+              <option [ngValue]="null" disabled>Seleccione perfil</option>
+              <option [value]="item.id" *ngFor="let item of perfiles">
+                {{ item.nombre }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-dark" (click)="closeModal()">
+      Salir
+    </button>
+    <button
+      type="submit"
+      class="btn btn-primary"
+      [disabled]="formulario.invalid || loading"
+    >
+      Guardar
+    </button>
+  </div>
+</form>
