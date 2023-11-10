@@ -926,6 +926,16 @@ export class ProductorepsodetallesprodComponent
     console.log("el dato de la citaa ", cita);
     console.log("lapersonagetsion aid ", this.personaGestion);
     if (
+      this.personaGestion.estadoseguimiento_id == 2 ||
+      this.personaGestion.estadoseguimiento_id == 10
+    ) {
+      this._ToastService.info(
+        "no se puede programar un registro en estado seguimiento, pendiente o no contactar"
+      );
+      return;
+    }
+
+    if (
       this.personaGestion.estado_id != 12 &&
       this.personaGestion.estado_id != 11 &&
       this.personaGestion.estado_id != 10 &&
@@ -1375,6 +1385,11 @@ export class ProductorepsodetallesprodComponent
           //this.dataTableReload.reload(result.data.data);
           console.log("en componente base ", result);
           this.updateEstadoSeguimiento(result.data.data[0]);
+          this.formulario
+            .get("estado_seguimiento")
+            .setValue(result.data.data[0].estadoseguimiento_id);
+          this.personaGestion.estadoseguimiento_id =
+            result.data.data[0].estadoseguimiento_id;
           this._ToastService.success("Comentario agregado correctamente");
         }
       })
