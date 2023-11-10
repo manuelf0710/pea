@@ -41,19 +41,19 @@ export class HeaderComponent implements OnInit {
     this.router.navigate(["/login"]);
   }
   viewProfile() {
-    let solicitud = 20;
     const modalRef = this.modalService.open(ProfileComponent, {
       //backdrop: 'static',
       size: "lg",
       keyboard: false,
     });
 
-    modalRef.componentInstance.data = solicitud;
+    modalRef.componentInstance.data = this.currentUser;
 
     modalRef.result
       .then((result) => {
         if (result.status == "ok") {
-          this._ToastService.success("Registro editado correctamente");
+          this._ToastService.success("contraseña modificada correctamente");
+          this.logout();
         }
       })
       .catch((error) => {});

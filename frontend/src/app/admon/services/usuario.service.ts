@@ -39,4 +39,20 @@ export class UsuarioService {
         })
       );
   }
+
+  getUserById(id: number): Observable<any> {
+    return this._http
+      .get<any>(
+        environment.apiUrl +
+          environment.admon.getUserById +
+          //"?user_id=" +
+          id
+      )
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
 }

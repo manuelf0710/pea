@@ -33,7 +33,7 @@
               <span class="input-group-text"><i class="fa fa-th"></i></span>
             </div>
             <input
-              [readonly]="loading"
+              [readonly]="formulario.get('cedula').value"
               type="text"
               class="form-control form-control-xs"
               placeholder="Ingrese el nombre"
@@ -61,7 +61,7 @@
               <span class="input-group-text"><i class="fa fa-th"></i></span>
             </div>
             <input
-              [readonly]="loading"
+              [readonly]="formulario.get('cedula').value"
               type="number"
               class="form-control form-control-xs"
               placeholder="Ingrese la cédula"
@@ -141,7 +141,7 @@
       </div>
     </div>
 
-    <div class="row" *ngIf="!formulario.get('id').value">
+    <div class="row">
       <div class="col-md-6">
         <div class="form-group">
           <label for="exampleInputEmail1">Contraseña</label>
@@ -214,16 +214,14 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-th"></i></span>
             </div>
-            <select
-              type="number"
-              name="fmodalidad"
-              id="fmodalidad"
-              class="form-control form-control-sm"
+
+            <input
+              [readonly]="formulario.get('status').value"
+              type="text"
+              class="form-control form-control-xs"
+              placeholder="Status"
               formControlName="status"
-            >
-              <option value="1">Activo</option>
-              <option value="2">Inactivo</option>
-            </select>
+            />
           </div>
           <div
             *ngIf="
@@ -246,7 +244,9 @@
             <div class="input-group-prepend">
               <span class="input-group-text"><i class="fa fa-map"></i></span>
             </div>
+
             <select
+              disabled
               name="festado_seguimiento"
               id="festado_seguimiento"
               class="form-control form-control-sm"
@@ -271,7 +271,7 @@
       class="btn btn-primary"
       [disabled]="formulario.invalid || loading"
     >
-      Guardar
+      Actualizar Contraseña
     </button>
   </div>
 </form>
