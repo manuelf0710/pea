@@ -658,12 +658,13 @@ export class ProductorepsodetallesprodComponent
 
     const selectedItem =
       activeItem || this.tipoProductoLista.find((item) => item.current);
-    /*
+
     const resultadoFiltrado = this.countAgendas.filter(
       (item) =>
         item.tipoproducto_id === selectedItem.tipoproducto_id &&
         item.profesional_id === profesional
     );
+    /*
     this.displayCountCitas.fecha = true;
     this.countAgendasLista = resultadoFiltrado;
     */
@@ -677,7 +678,7 @@ export class ProductorepsodetallesprodComponent
           )
         : dateNowString;
 
-    const recordsByDay = this.countAgendas.reduce((acumulador, cita) => {
+    const recordsByDay = resultadoFiltrado.reduce((acumulador, cita) => {
       const citaExistente = acumulador.find(
         (item) =>
           item.profesional_id === cita.profesional_id &&
@@ -685,11 +686,12 @@ export class ProductorepsodetallesprodComponent
       );
 
       if (citaExistente) {
-        citaExistente.total++;
+        //citaExistente.total++;
+        citaExistente.total = citaExistente.total + cita.numcitas;
       } else {
         acumulador.push({
           profesional_id: cita.profesional_id,
-          total: 1,
+          total: cita.numcitas,
           name: cita.name,
           fecha: cita.fecha,
         });
@@ -700,6 +702,8 @@ export class ProductorepsodetallesprodComponent
 
     this.citasByDay = recordsByDay;
     this.displayByMonth = false;
+
+    console.log("this.citasByDay => ", this.citasByDay);
   }
 
   changeDisplay() {
@@ -724,11 +728,13 @@ export class ProductorepsodetallesprodComponent
         );
 
         if (profesionalExistente) {
-          profesionalExistente.total++;
+          //profesionalExistente.total++;
+          profesionalExistente.total =
+            profesionalExistente.total + cita.numcitas;
         } else {
           acumulador.push({
             profesional_id: cita.profesional_id,
-            total: 1,
+            total: cita.numcitas,
             name: cita.name,
           });
         }

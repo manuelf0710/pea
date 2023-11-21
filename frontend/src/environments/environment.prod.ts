@@ -60,6 +60,7 @@ export const environment = {
     postUsuario: "admon/usuario/",
     putUsuario: "admon/usuario/",
     getProductosByUser: "admon/usuario",
+    getUserById: "admon/usuariobyid/",
   },
 };
 

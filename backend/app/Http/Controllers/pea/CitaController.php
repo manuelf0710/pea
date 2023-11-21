@@ -529,10 +529,42 @@ class CitaController extends Controller
 
     public function citasbyprofesional(Request $request)
     {
+      DB::statement("SET lc_time_names = 'es_ES'");
+    
+      $dateNow = $request->post('start') != "" ? $request->post('start') : $this->getCurrentMonthFirstDay();
+    
+      $fecha = date("Y-m-d", strtotime($dateNow));
+      $mes = date("m", strtotime($dateNow));
+    
+      $productos = Producto::withoutTrashed()
+        ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
+        ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
+        ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
+        ->select('productos.profesional_id',
+          'users.name',
+          'tipo_productos.name as tipo_producto',
+          'productos_repso.tipoproducto_id'
+        )
+        ->selectRaw('count(productos.id) as numcitas')
+        ->selectRaw('date_format(fecha_inicio, "%Y-%m-%d") as fecha')
+        ->selectRaw('date_format(fecha_inicio, "%W %M %d, %Y") as fechainfo')        
+        ->whereNotNull('fecha_inicio')
+        ->where('fecha_inicio', '>=', $fecha)
+        ->where('users.perfil_id', '=', 3)
+        ->where('users.status', '=', 1)
+        ->whereRaw('MONTH(fecha_inicio) = ?', [$mes])
+        ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
+        ->get();
+    
+      return response()->json($productos);
+    }
+
+    public function citasbyprofesionalBK(Request $request)
+    {
         DB::statement("SET lc_time_names = 'es_ES'");
         $dateNow =$request->post('start') != "" ? $request->post('start') : $this->getCurrentMonthFirstDay();
         $productos = Producto::withoutTrashed()
-            ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
+            ->join('users', 'productos.profesional_id', '=', 'users.id')
             ->join('tipoproducto_users', 'users.id', '=', 'tipoproducto_users.user_id')
             ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
             ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
@@ -551,7 +583,7 @@ class CitaController extends Controller
             ->where('users.status', '=', 1)   
             ->whereNull('tipoproducto_users.deleted_at')         
             ->whereRaw('MONTH(fecha_inicio) = ?', [explode("-", $dateNow)[1]])
-            ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
+            ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), 'tipo_productos.id')
             ->get();
     
         return response()->json($productos);
