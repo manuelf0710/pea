@@ -424,8 +424,8 @@ export class ProductorepsodetallesprodComponent
       let arregloPermitidos = [9];
       array_vacio = this.manejadorFilterSelect(arregloPermitidos);
     } else if (value == 7) {
-      /*citado */
-      let arregloPermitidosCita = [8, 10, 11];
+      /*citado ahora se llama agendado */
+      let arregloPermitidosCita = [6, 8, 10, 11];
       array_vacio = this.manejadorFilterSelect(arregloPermitidosCita);
     } else if (value == 9) {
       let arregloPermitidosOther = [9]; /**informe */
@@ -510,7 +510,8 @@ export class ProductorepsodetallesprodComponent
       );
       console.log("estadosdisponibles ", estadosDisponiblesAgendamiento);
       if (
-        estadosDisponiblesAgendamiento.includes(parseInt(item.estado_id)) &&
+        estadosDisponiblesAgendamiento.includes(parseInt(item.estado_id)) ===
+          true &&
         this.mostrarRegistro
       ) {
         this.agendaDisponibleProfesionales();
