@@ -64,6 +64,12 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 	});
 
 	Route::group([
+		'prefix' => 'exports',
+	], function () {
+		Route::post('productos', 'pea\ProductoController@exportExcelProducto')->name('productos.export.excel');
+	});	
+
+	Route::group([
 		'prefix' => 'admon',
 	], function () {
 		Route::post('userslist', 'UserController@listado')->name('users.listado');

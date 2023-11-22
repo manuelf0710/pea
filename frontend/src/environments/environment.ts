@@ -51,6 +51,10 @@ export const environment = {
     uploadExcelToProductRepso: "files/uploads/",
     importExcelToProductRepso: "imports/importclientesproducto/",
   },
+  exports: {
+    generarExcelProductos: "exports/productos/",
+  },
+
   agenda: {
     getAgendaProfesional: "pea/agenda/profesionalagenda/",
     postAgendaProfesional: "pea/agenda/profesional/",

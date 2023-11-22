@@ -28,6 +28,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import listPlugin from "@fullcalendar/list";
 import interactionPlugin from "@fullcalendar/interaction";
+import { FileSaverModule } from "ngx-filesaver";
 
 FullCalendarModule.registerPlugins([
   dayGridPlugin,
@@ -59,12 +60,14 @@ FullCalendarModule.registerPlugins([
     HttpClientModule,
     SharedModule.forRoot(),
     BreadcrumbModule,
+    FileSaverModule,
   ],
   exports: [
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
     FullCalendarModule,
+    FileSaverModule,
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

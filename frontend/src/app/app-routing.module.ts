@@ -67,6 +67,22 @@ const routes: Routes = [
           },
         },
       },
+      {
+        path: "reports",
+        loadChildren: () =>
+          import("./reports/reports.module").then((m) => m.ReportsModule),
+        canActivate: [AuthGuard],
+        data: {
+          breadcrumb: {
+            label: "Reportes",
+            info: {
+              icon: "fa fa-arrow-fa-asterisk-down",
+              iconType: "bootstrap",
+              label: "reportes",
+            },
+          },
+        },
+      },
     ],
   },
 

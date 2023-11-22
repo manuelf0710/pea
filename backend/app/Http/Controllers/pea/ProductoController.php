@@ -13,6 +13,7 @@ use App\Models\pea\ProductoReprogramaciones;
 use App\Models\pea\ProductoRepso;
 use App\Models\Cliente;
 use App\Imports\ClientesImport;
+use App\Exports\ProductosExport;
 use Auth;
 use Illuminate\Support\Facades\Storage;
 
@@ -421,6 +422,15 @@ class ProductoController extends Controller
             return $producto;
         }
     }
+
+    /*
+    * Exportar Excel de productos
+     */
+
+     public function exportExcelProducto(Request $request){
+        return Excel::download(new ProductosExport(), 'productos.xlsx');
+
+     }
 
 
 

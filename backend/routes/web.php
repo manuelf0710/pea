@@ -22,4 +22,5 @@ Route::get('/', function () {
 Route::get('/', 'AngularController@index')->name('inicio');
 Route::get('/home', 'AngularController@index')->name('home');
 Route::get('/test', 'HomeController@test')->name('testHoras');
+Route::get('/reporteproductos', 'pea\ProductoController@exportExcelProducto')->name('reporteproductos.excel');
 Route::any('/{any}', 'AngularController@index')->where('any', '^(?!api).*$');
