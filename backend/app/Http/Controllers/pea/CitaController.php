@@ -522,19 +522,35 @@ class CitaController extends Controller
     }
 
     public function getCurrentMonthFirstDay(){
-        $dateNow = date("Y-m-d");
+        $dateNow = date("Y-m-d",);
         $newDate = explode("-",$dateNow);
-        return $newDate[0]."-".$newDate[1]."01 00:00:01";
+        return $newDate[0]."-".$newDate[1]."-01 00:00:01";
     }
+
+    public function getMonthFirstDayByDate($start){
+        $dateNow = date("Y-m-d", strtotime($start));
+        $newDate = explode("-",$dateNow);
+        return $newDate[0]."-".$newDate[1]."-01 00:00:01";
+    }    
 
     public function citasbyprofesional(Request $request)
     {
       DB::statement("SET lc_time_names = 'es_ES'");
     
-      $dateNow = $request->post('start') != "" ? $request->post('start') : $this->getCurrentMonthFirstDay();
-    
+      //$dateNow = $request->post('start') != "" ? $request->post('start') : $this->getCurrentMonthFirstDay();
+      $dateNow = $request->post('start') != "" ? $this->getMonthFirstDayByDate($request->post('start')) : $this->getCurrentMonthFirstDay();
       $fecha = date("Y-m-d", strtotime($dateNow));
       $mes = date("m", strtotime($dateNow));
+      /*
+      if($dateNow != ""){
+        $fecha = date("Y-m-d", strtotime($dateNow));
+        $mes = date("m", strtotime($dateNow));
+        echo "ingreso aqui".$dateNow;
+      }else{
+        $fecha = date("Y-m")."-01";
+        $mes = date("m");
+      }
+      return response()->json(date("Y-m-d"));*/
     
       $productos = Producto::withoutTrashed()
         ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')

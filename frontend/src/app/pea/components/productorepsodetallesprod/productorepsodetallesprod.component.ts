@@ -216,8 +216,7 @@ export class ProductorepsodetallesprodComponent
     this.authenticationService.currentUser.subscribe(
       (x) => (this.currentUser = x)
     );
-    /*console.log("productorepsodetallescomponent ",this.currentUser);
-    console.log("productorepsodetallescomponent profileId ",this.currentUser.perfil.id);*/
+
     this.permisoCargueExcel = this.arrayPermisoCargueExcel.includes(
       this.currentUser.perfil.id
     );
@@ -359,7 +358,6 @@ export class ProductorepsodetallesprodComponent
         this.productosLista = productosLista.data;
         this.estadosLista = estadosLista;
         this.estadosListaSeguimiento = estadosListaSeguimiento;
-        console.log("los estados lista ", this.estadosLista);
 
         this.totalRecords = productosLista.total;
         this.from = productosLista.from;
@@ -391,7 +389,6 @@ export class ProductorepsodetallesprodComponent
   }
 
   manejadorOptionsSelect(arrayItems, arrayIncludes) {
-    console.log("aarrayitems ", arrayItems);
     this.estadosListaProceso = [];
     arrayItems.map((item) => {
       if (arrayIncludes.includes(item.id)) {
@@ -455,7 +452,6 @@ export class ProductorepsodetallesprodComponent
       })
       .then(
         () => {
-          //console.log('deleting...');
           this._ProductoService.eliminar(data.id).subscribe(
             (result: any) => {
               if (result["code"] == 200) {
@@ -468,16 +464,13 @@ export class ProductorepsodetallesprodComponent
               }
             },
             (error) => {
-              console.log("el error fue ", error);
               this._ToastService.errorMessage(
                 "se ha presentado un error " + error
               );
             }
           );
         },
-        () => {
-          //console.log('not deleting...');
-        }
+        () => {}
       );
   }
 
@@ -486,7 +479,6 @@ export class ProductorepsodetallesprodComponent
     this.showButtonInformacionProgramacion = false;
     this.estadosListaProceso = [];
     setTimeout(() => {
-      console.log("elvalord e item select ", item);
       this.mostrarRegistro = !this.mostrarRegistro;
       if (this.personaGestion === undefined) {
         this.personaGestion = item;
@@ -501,9 +493,6 @@ export class ProductorepsodetallesprodComponent
       //this.mostrarRegistro == true ? this.agendaDisponibleProfesionales() : "";
       const estadosDisponiblesAgendamiento = [11, 12];
 
-      console.log("registropersona ", this.personaGestion);
-      console.log("valor de mostrar registro ", this.mostrarRegistro);
-      console.log("item estado_id ", item.estado_id);
       console.log(
         "el includes ",
         estadosDisponiblesAgendamiento.includes(parseInt(item.estado_id))
@@ -516,7 +505,6 @@ export class ProductorepsodetallesprodComponent
       ) {
         this.agendaDisponibleProfesionales();
       } else {
-        console.log("entra en agendasdisponibles null");
         //this.agendasDisponibles = null;
       }
       console.log("agendas dipooonibles ", this.agendasDisponibles);
@@ -565,7 +553,6 @@ export class ProductorepsodetallesprodComponent
   getArchivos(archivos_upload) {
     /*archivos subidos, desde fileuploadcomponent */
     this.archivoscargados = archivos_upload;
-    console.log("algo paso", this.archivoscargados);
     this.formularioArchivo
       .get("archivo")
       .setValue(this.archivoscargados[0]["path"]);
@@ -577,18 +564,6 @@ export class ProductorepsodetallesprodComponent
   }
 
   procesarDatosExcel() {
-    console.log(
-      "el valor del archivo ",
-      this.formularioArchivo.get("archivo").value
-    );
-    console.log(
-      "el valor del forzarCague ",
-      this.formularioArchivo.get("forzarCargue").value
-    );
-    console.log(
-      "el valor del forzarCague2 ",
-      this.formularioArchivo.value.forzarCargue
-    );
     this._ProductoService
       .procesarExcelBySolicitud(this.id, {
         nombrearchivo: this.formularioArchivo.value.archivo,
@@ -600,7 +575,6 @@ export class ProductorepsodetallesprodComponent
           this._ToastService.danger(res.msg);
         }
         if (res.code == 200) {
-          console.log("personas repetidas ", res.data.clientesOtrasSolicitudes);
           this.mostrarCargaExcel = false;
           if (res.data.clientesOtrasSolicitudes.length > 0) {
             this.simpleModal(res.data.clientesOtrasSolicitudes);
@@ -660,15 +634,7 @@ export class ProductorepsodetallesprodComponent
     const selectedItem =
       activeItem || this.tipoProductoLista.find((item) => item.current);
 
-    const resultadoFiltrado = this.countAgendas.filter(
-      (item) =>
-        item.tipoproducto_id === selectedItem.tipoproducto_id &&
-        item.profesional_id === profesional
-    );
-    /*
-    this.displayCountCitas.fecha = true;
-    this.countAgendasLista = resultadoFiltrado;
-    */
+    console.log("selectedItem =>", selectedItem);
 
     const dateNowString = this.convertirDateToString(new Date());
 
@@ -677,17 +643,33 @@ export class ProductorepsodetallesprodComponent
         ? this.convertirDateToString(
             this.searchForm.get("fechacitadatesearch").value
           )
-        : dateNowString;
+        : "";
 
+    const resultadoFiltrado = this.countAgendas.filter(
+      (item) =>
+        item.tipoproducto_id === selectedItem.tipoproducto_id &&
+        (daySearch !== "" ? item.fecha === daySearch : true) &&
+        item.profesional_id === profesional
+    );
+    /*
+    this.displayCountCitas.fecha = true;
+    this.countAgendasLista = resultadoFiltrado;
+    */
+    console.log(
+      " this.countAgendasLista = resultadoFiltrado;",
+      (this.countAgendasLista = resultadoFiltrado)
+    );
     const recordsByDay = resultadoFiltrado.reduce((acumulador, cita) => {
       const citaExistente = acumulador.find(
         (item) =>
           item.profesional_id === cita.profesional_id &&
+          //item.tipoproducto_id === cita.tipoproducto_id &&
           item.fecha === daySearch
       );
-
+      console.log("valor de citaExistente ", citaExistente);
       if (citaExistente) {
         //citaExistente.total++;
+        console.log("existe el dia y profesional");
         citaExistente.total = citaExistente.total + cita.numcitas;
       } else {
         acumulador.push({
@@ -803,7 +785,6 @@ export class ProductorepsodetallesprodComponent
 
   infoCountAgendas() {
     let resultado = [];
-    console.log("this.odsDetalles =>>>>>>>> ", this.odsDetalles);
     let these = this;
 
     this.countAgendas.map(function (item) {
@@ -825,12 +806,7 @@ export class ProductorepsodetallesprodComponent
         resultado.push(nuevoMenu);
       }
     });
-    //console.log("resultado =Z ", resultado);
     this.tipoProductoLista = resultado;
-    console.log(
-      "this.tipoProductoListathis.tipoProductoLista => ",
-      JSON.stringify(this.tipoProductoLista)
-    );
     this.countAgendasListaAddData();
   }
 
@@ -844,7 +820,11 @@ export class ProductorepsodetallesprodComponent
     this.tipoProductoLista = nuevosTipoProductoLista;
     this.countAgendasListaAddData();
   }
+
   countCitasByProfesional() {
+    console.log("displayByMonth ==>", this.displayByMonth);
+    this.displayByMonth = true;
+    console.log("displayByMonth Dos ==>", this.displayByMonth);
     const dateNowString = this.convertirDateToString(new Date());
     let formData = {
       tipo_producto: this.odsDetalles.tipo_producto.id,
@@ -853,7 +833,7 @@ export class ProductorepsodetallesprodComponent
           ? this.convertirDateToString(
               this.searchForm.get("fechacitadatesearch").value
             )
-          : dateNowString,
+          : "",
     };
     this._AgendaService
       .postCitasByProfesional({
@@ -908,7 +888,6 @@ export class ProductorepsodetallesprodComponent
   guardar(ev) {}
 
   filtrarResultados(ev) {
-    console.log("asdf");
     this.loadProductosBySolicitud(this.id, { ...this.formularioFiltro.value });
   }
   limpiarFiltrosForm() {
@@ -918,20 +897,14 @@ export class ProductorepsodetallesprodComponent
   }
 
   actualizarProducto(product) {
-    console.log("en function actualziarProducto ", product);
     let index: any;
     index = this.productosLista.findIndex((prod) => product.id === prod["id"]);
-    console.log("el index encontrado index  =", index);
     if (index >= 0) {
       this.productosLista[index] = product;
-      console.log("dentro de if index ", this.productosLista[index]);
     }
   }
 
   openModalNewCita(cita: any) {
-    console.log("el formulario ", this.formulario);
-    console.log("el dato de la citaa ", cita);
-    console.log("lapersonagetsion aid ", this.personaGestion);
     if (
       this.personaGestion.estadoseguimiento_id == 2 ||
       this.personaGestion.estadoseguimiento_id == 10
@@ -996,7 +969,6 @@ export class ProductorepsodetallesprodComponent
   validarInformacionProgramacion() {
     const estadosDisponiblesShowButton = [10, 9, 8];
     const estadosDisponiblesButton = [7, 8, 9, 11];
-    console.log("entrea aqui validarinformacionacionprogramaciones");
     //return estadosDisponiblesShowButton.includes(this.formulario.get("estado_programacion").value)   ?  true :   false
     //alert(this.formulario.get("estado_programacion").value);
     if (
@@ -1016,7 +988,6 @@ export class ProductorepsodetallesprodComponent
    * mostrar el boton de acuerdo al estado
    */
   showButtonActualizarInformacion(value) {
-    console.log("showButtonActualizarInformacion", value);
     const estadosPermitidosActualizarInformacion = [7, 8, 9, 11, 12];
     if (
       estadosPermitidosActualizarInformacion.includes(
@@ -1031,9 +1002,6 @@ export class ProductorepsodetallesprodComponent
   }
 
   changeGenerarReprogramacionCita(value) {
-    console.log("carolina ", this.formulario.get("estado_id").value);
-    console.log("personaGestion ==>", this.personaGestion);
-    console.log("value ==>>", value);
     const estadosPermitidosCambio = [
       7, 10, 11,
     ]; /** 7 citado, 11 cancelado reprogramado estaso permitido cambio de cita hora*/
@@ -1065,7 +1033,6 @@ export class ProductorepsodetallesprodComponent
         () => {
           this.loading = true;
           let value = { ...this.formulario.value };
-          console.log("valor to save producto gestion ", value);
           this._ProductoService
             .cancelarProductoBiId(value)
             .subscribe((res: any) => {
@@ -1089,9 +1056,6 @@ export class ProductorepsodetallesprodComponent
   }
 
   guardarInformacionProgramacion() {
-    console.log("this.formulario.value => ", this.formulario.value);
-    console.log("this.personaGestion ==>>", this.personaGestion);
-
     if (this.formulario.valid) {
       if (
         this.personaGestion.estado_id == 12 &&
@@ -1110,7 +1074,6 @@ export class ProductorepsodetallesprodComponent
           () => {
             this.loading = true;
             let value = { ...this.formulario.value };
-            console.log("valor to save producto gestion ", value);
             this._ProductosrepsoService
               .guardarinformacionProducto(value)
               .subscribe((res: any) => {
@@ -1197,8 +1160,6 @@ export class ProductorepsodetallesprodComponent
       const columnStart = row.start;
       const columnEnd = row.end;
 
-      //console.log("rowss ", row);
-
       //matchFilter.push(customFilterDS);
 
       /*console.log(
@@ -1220,7 +1181,7 @@ export class ProductorepsodetallesprodComponent
         //endHour <= columnEndHour &&
         row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
         matchFilter.push(isWithinHourRange);
-
+        /*
         console.log(
           "item () => startHour =>",
           "startHour",
@@ -1242,7 +1203,7 @@ export class ProductorepsodetallesprodComponent
         console.log(
           "odsDetalles.tipo_producto.tiempo ",
           this.odsDetalles.tipo_producto.tiempo
-        );
+        );*/
       }
       /*
        *  hoursearch terms
@@ -1258,7 +1219,7 @@ export class ProductorepsodetallesprodComponent
           //endHour <= columnEndHour &&
           row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
         matchFilter.push(isWithinHourRange);
-
+        /*
         console.log(
           "startHour =>",
           startHour,
@@ -1280,7 +1241,7 @@ export class ProductorepsodetallesprodComponent
         console.log(
           "odsDetalles.tipo_producto.tiempo ",
           this.odsDetalles.tipo_producto.tiempo
-        );
+        ); */
       }
 
       /*
@@ -1346,13 +1307,11 @@ export class ProductorepsodetallesprodComponent
     index = this.productosLista.findIndex(
       (prod) => product.producto_id === prod["id"]
     );
-    console.log("el index encontrado index  =", index);
     if (index >= 0) {
       this.productosLista[index]["estado_seguimiento"] =
         product.estado_seguimiento;
       this.productosLista[index]["estadoseguimiento_id"] =
         product.estadoseguimiento_id;
-      console.log("dentro de if index ", this.productosLista[index]);
     }
   }
 
@@ -1390,7 +1349,6 @@ export class ProductorepsodetallesprodComponent
       .then((result) => {
         if (result.status == "ok") {
           //this.dataTableReload.reload(result.data.data);
-          console.log("en componente base ", result);
           this.updateEstadoSeguimiento(result.data.data[0]);
           this.formulario
             .get("estado_seguimiento")
