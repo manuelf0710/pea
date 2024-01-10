@@ -177,6 +177,7 @@ class AgendaController extends Controller
 
             $citas = $citas->orderBy('citas.id', 'asc')
             ->get();
+            //->toSql();
 
         //echo ("diferencia de minutos " . $this->minutosInterval('2022-03-28 08:00:00', '2022-03-28 08:15:00') . ' citastotal = ' . count($citas) . '<br>');
         $citas = json_decode($citas, true);

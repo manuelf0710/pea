@@ -1140,6 +1140,28 @@ export class ProductorepsodetallesprodComponent
     }-${dateTo.getDate() < 10 ? "0" + dateTo.getDate() : dateTo.getDate()}`;
   }
 
+  validarHoraEnd(columnEndHour, endHour, row) {
+    console.log("ingresa a fecha hasta function");
+    let isWithinHourRange = false;
+    if (columnEndHour <= 12) {
+      isWithinHourRange =
+        endHour <= columnEndHour &&
+        //endHour >= columnStartHour &&
+        //columnEndHour <= endHour &&
+        //endHour <= columnEndHour &&
+        row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+    }
+    if (columnEndHour > 12) {
+      isWithinHourRange =
+        endHour >= columnEndHour &&
+        //endHour >= columnStartHour &&
+        //columnEndHour <= endHour &&
+        //endHour <= columnEndHour &&
+        row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+    }
+    return isWithinHourRange;
+  }
+
   /* this method well be called for each row in table  */
   getFilterPredicate() {
     return (row: any, filters: string) => {
@@ -1170,17 +1192,91 @@ export class ProductorepsodetallesprodComponent
       let valid = false;
 
       // Filtro de horas
-      if (hourEndSearch !== "" && hourEndSearch !== "-1") {
+
+      if (
+        hourEndSearch != "" &&
+        hourEndSearch != "-1" &&
+        hourSearch != "" &&
+        hourSearch != "-1"
+      ) {
+        const startHour = parseInt(hourSearch.slice(0, 2)); // Obtener la hora del filtro
+        const endHour = parseInt(hourEndSearch.slice(0, 2)); // Obtener la hora del filtro
+        const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
+        const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
+        const isWithinHourRange =
+          startHour <= columnStartHour &&
+          //startHour <= columnEndHour &&
+          endHour >= columnStartHour &&
+          //this.validarHoraEnd(columnEndHour, endHour, row) == true &&
+          row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+
+        console.log(
+          "item ()",
+          "startHour==>",
+          startHour,
+          "endHour => ",
+          endHour,
+          "columnStartHour=> ",
+          columnStartHour,
+          "columnEndHour => ",
+          columnEndHour,
+          "isWithinHourRange=> ",
+          isWithinHourRange,
+          "row.minutes =>>",
+          row.minutes,
+          "this.odsDetalles.tipo_producto.tiempo () =>",
+          this.odsDetalles.tipo_producto.tiempo,
+          "this.odsDetalles.tipo_producto.tiempo+15 >>>> ",
+          this.odsDetalles.tipo_producto.tiempo + 15
+        );
+        matchFilter.push(isWithinHourRange);
+      }
+
+      if (
+        hourEndSearch !== "" &&
+        hourEndSearch !== "-1" &&
+        (hourSearch == "" || hourSearch == "-1")
+      ) {
+        console.log("ingreso  endSearch");
         const endHour = parseInt(hourEndSearch.slice(0, 2)); // Obtener la hora del filtro
         //const endHour = startHour + 1; // Definir una hora límite, en este caso, una hora después
         const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
         const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
-        const isWithinHourRange =
-          endHour <= columnEndHour && endHour >= columnStartHour;
-        //columnEndHour <= endHour &&
-        //endHour <= columnEndHour &&
-        row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+        let isWithinHourRange = false;
+        if (columnEndHour <= 12) {
+          isWithinHourRange =
+            endHour >= columnEndHour &&
+            //endHour >= columnStartHour &&
+            //columnEndHour <= endHour &&
+            //endHour <= columnEndHour &&
+            row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+        }
+        if (columnEndHour > 12) {
+          isWithinHourRange =
+            endHour <= columnEndHour &&
+            //endHour >= columnStartHour &&
+            //columnEndHour <= endHour &&
+            //endHour <= columnEndHour &&
+            row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+        }
+        /*isWithinHourRange =
+          endHour >= columnEndHour &&
+          //endHour >= columnStartHour &&
+          //columnEndHour <= endHour &&
+          //endHour <= columnEndHour &&
+          row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
+          */
         matchFilter.push(isWithinHourRange);
+        console.log(
+          "row ==>",
+          row,
+          "iswithoutrangestartEnded ==> ",
+          isWithinHourRange,
+          "columnEndHour ==>",
+          columnEndHour,
+          "endHour ==>",
+          endHour
+        );
         /*
         console.log(
           "item () => startHour =>",
@@ -1208,17 +1304,28 @@ export class ProductorepsodetallesprodComponent
       /*
        *  hoursearch terms
        */
-      if (hourSearch !== "" && hourSearch !== "-1") {
+      if (
+        hourSearch !== "" &&
+        hourSearch !== "-1" &&
+        (hourEndSearch == "" || hourEndSearch == "-1")
+      ) {
+        console.log("ingreso searchstart");
         const startHour = parseInt(hourSearch.slice(0, 2)); // Obtener la hora del filtro
         const endHour = startHour + 1; // Definir una hora límite, en este caso, una hora después
         const columnStartHour = parseInt(columnStart.slice(11, 13)); // Obtener la hora de inicio de la columna
         const columnEndHour = parseInt(columnEnd.slice(11, 13)); // Obtener la hora de fin de la columna
         const isWithinHourRange =
-          startHour >= columnStartHour &&
+          columnStartHour >= startHour &&
           //columnStartHour >= startHour &&
           //endHour <= columnEndHour &&
           row.minutes >= Number(this.odsDetalles.tipo_producto.tiempo) + 15; // Verificar si la columna está dentro del rango de horas especificado
         matchFilter.push(isWithinHourRange);
+        console.log(
+          "row ==>",
+          row,
+          "iswithoutrangestart ==> ",
+          isWithinHourRange
+        );
         /*
         console.log(
           "startHour =>",
