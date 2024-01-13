@@ -559,9 +559,11 @@ class CitaController extends Controller
         ->select('productos.profesional_id',
           'users.name',
           'tipo_productos.name as tipo_producto',
-          'productos_repso.tipoproducto_id'
+          'productos_repso.tipoproducto_id',
+          'productos.fecha_inicio as start_time',
+          'productos.fecha_fin as end_time',
         )
-        ->selectRaw('count(productos.id) as numcitas')
+        //->selectRaw('count(productos.id) as numcitas')
         ->selectRaw('date_format(fecha_inicio, "%Y-%m-%d") as fecha')
         ->selectRaw('date_format(fecha_inicio, "%W %M %d, %Y") as fechainfo')        
         ->whereNotNull('fecha_inicio')
@@ -569,10 +571,48 @@ class CitaController extends Controller
         ->where('users.perfil_id', '=', 3)
         ->where('users.status', '=', 1)
         ->whereRaw('MONTH(fecha_inicio) = ?', [$mes])
-        ->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
+        //->groupBy('profesional_id', DB::raw('date_format(fecha_inicio, "%Y-%m-%d")'), )
         ->get();
+        $response = array("citas"=> $productos, "citasGroup" => $this->filterByProfesionalAndFecha($productos));
     
-      return response()->json($productos);
+      return response()->json($response);
+    }
+
+    public function filterByProfesionalAndFecha($productos){
+        $resultado = [];
+
+        foreach ($productos as $producto) {
+            $profesional_id = $producto['profesional_id'];
+            $fecha = $producto['fecha'];
+        
+            // Verificar si ya existe una entrada para el profesional_id y fecha en $resultado
+            $encontrado = false;
+            foreach ($resultado as &$item) {
+                if ($item['profesional_id'] == $profesional_id && $item['fecha'] == $fecha) {
+                    $item['numcitas']++;
+                    $encontrado = true;
+                    break;
+                }
+            }
+        
+            // Si no se encontró, agregar una nueva entrada a $resultado
+            if (!$encontrado) {
+                $itemNuevo = [
+                    'profesional_id' => $profesional_id,
+                    'name' => $producto['name'],
+                    'tipo_producto' => $producto['tipo_producto'],
+                    'tipoproducto_id' => $producto['tipoproducto_id'],
+                    'start_time' => $producto['start_time'],
+                    'end_time' => $producto['end_time'],
+                    'fecha' => $fecha,
+                    'fechainfo' => $producto['fechainfo'],
+                    'numcitas' => 1,
+                ];
+                $resultado[] = $itemNuevo;
+            }
+        }
+
+        return $resultado;
     }
 
     public function citasbyprofesionalBK(Request $request)

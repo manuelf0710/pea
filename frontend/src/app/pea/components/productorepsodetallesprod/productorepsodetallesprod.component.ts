@@ -150,6 +150,7 @@ export class ProductorepsodetallesprodComponent
   urlSubidaArchivo!: String;
   active: number = 1;
   personaGestion!: gestionPersona;
+  countAgendasByProfesionalDate: countAgendaProfesional[] = [];
   countAgendas: countAgendaProfesional[] = [];
   countAgendasLista: countAgendaProfesional[] = [];
   displayCountCitas!: displayCountCitas;
@@ -190,6 +191,7 @@ export class ProductorepsodetallesprodComponent
   fechacitadatesearch = "";
   horacitadatesearch = "";
   horacitadateendsearch = "";
+  mesBuscadoCitasProfesional = "";
 
   constructor(
     private _ToastService: ToastService,
@@ -420,6 +422,10 @@ export class ProductorepsodetallesprodComponent
       /**ejecutado */
       let arregloPermitidos = [9];
       array_vacio = this.manejadorFilterSelect(arregloPermitidos);
+    } else if (value == 6) {
+      /*citado ahora se llama agendado */
+      let arregloPermitidosCita = [8, 10, 11];
+      array_vacio = this.manejadorFilterSelect(arregloPermitidosCita);
     } else if (value == 7) {
       /*citado ahora se llama agendado */
       let arregloPermitidosCita = [6, 8, 10, 11];
@@ -644,11 +650,16 @@ export class ProductorepsodetallesprodComponent
             this.searchForm.get("fechacitadatesearch").value
           )
         : "";
+    console.log(
+      "this.countAgendasByProfesionalDate ===>",
+      this.countAgendasByProfesionalDate
+    );
 
-    const resultadoFiltrado = this.countAgendas.filter(
+    console.log("daySearch ====>", daySearch);
+    const resultadoFiltrado = this.countAgendasByProfesionalDate.filter(
       (item) =>
-        item.tipoproducto_id === selectedItem.tipoproducto_id &&
-        (daySearch !== "" ? item.fecha === daySearch : true) &&
+        //item.tipoproducto_id === selectedItem.tipoproducto_id &&
+        //(daySearch !== "" ? item.fecha === daySearch : true) &&
         item.profesional_id === profesional
     );
     /*
@@ -703,6 +714,9 @@ export class ProductorepsodetallesprodComponent
     /*const resultadoFiltrado = this.countAgendas.filter(
       (item) => item.tipoproducto_id === selectedItem.tipoproducto_id
     );*/
+    console.log("selectedItem ==> ", selectedItem);
+    console.log("activeItem ==> ", activeItem);
+    console.log("this.countAgendas antes del proceso ==> ", this.countAgendas);
 
     const recordsByProfesional = this.countAgendas.reduce(
       (acumulador, cita) => {
@@ -713,11 +727,13 @@ export class ProductorepsodetallesprodComponent
         if (profesionalExistente) {
           //profesionalExistente.total++;
           profesionalExistente.total =
-            profesionalExistente.total + cita.numcitas;
+            //profesionalExistente.total + cita.numcitas;
+            profesionalExistente.total + 1;
         } else {
           acumulador.push({
             profesional_id: cita.profesional_id,
-            total: cita.numcitas,
+            //total: cita.numcitas,
+            total: 1,
             name: cita.name,
           });
         }
@@ -759,24 +775,24 @@ export class ProductorepsodetallesprodComponent
     this.citasByDay = recordsByDay;
 
     const resultadoFiltrado = this.countAgendas.reduce((result, item) => {
-      if (item.tipoproducto_id === selectedItem.tipoproducto_id) {
-        const existingItem = result.find(
-          (group) => group.profesional_id === item.profesional_id
-        );
-        if (existingItem) {
-          existingItem.numcitas += item.numcitas;
-        } else {
-          result.push({
-            profesional_id: item.profesional_id,
-            name: item.name,
-            tipo_producto: item.tipo_producto,
-            tipoproducto_id: item.tipoproducto_id,
-            numcitas: item.numcitas,
-            fecha: item.fecha,
-            fechainfo: item.fechainfo,
-          });
-        }
+      //if (item.tipoproducto_id === selectedItem.tipoproducto_id) {
+      const existingItem = result.find(
+        (group) => group.profesional_id === item.profesional_id
+      );
+      if (existingItem) {
+        existingItem.numcitas += item.numcitas;
+      } else {
+        result.push({
+          profesional_id: item.profesional_id,
+          name: item.name,
+          tipo_producto: item.tipo_producto,
+          tipoproducto_id: item.tipoproducto_id,
+          numcitas: item.numcitas,
+          fecha: item.fecha,
+          fechainfo: item.fechainfo,
+        });
       }
+      //}
       return result;
     }, []);
     this.displayCountCitas.fecha = false;
@@ -835,18 +851,30 @@ export class ProductorepsodetallesprodComponent
             )
           : "",
     };
+    /*
+     * Evitar que genere peticiones cuando no ha cambiado el mes por el que se busca
+     */
+    if (
+      this.mesBuscadoCitasProfesional != "" &&
+      this.mesBuscadoCitasProfesional != formData.start.split("-")[1]
+    ) {
+      return;
+    }
+    this.mesBuscadoCitasProfesional = formData.start.split("-")[1];
     this._AgendaService
       .postCitasByProfesional({
         ...formData,
       })
       .subscribe((res: any) => {
-        this.countAgendas = res;
+        this.countAgendasByProfesionalDate = res.citasGroup;
+        this.countAgendas = res.citas;
+        console.log("ejecuto");
         this.infoCountAgendas();
         if (res.status == "error") {
           this._ToastService.danger(res.msg);
         }
         if (res.code == 200) {
-          this.countAgendas = res;
+          this.countAgendas = res.citas;
         }
       });
   }
