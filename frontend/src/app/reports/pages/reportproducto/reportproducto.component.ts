@@ -33,7 +33,7 @@ export class ReportproductoComponent implements OnInit {
       );
   }
 
-  exportarExcel() {
+  exportarExcel2() {
     let data = {
       startDateView: "",
       endDateView: "",
@@ -44,6 +44,42 @@ export class ReportproductoComponent implements OnInit {
       (res: any) => {
         console.log("ingreso o que hizo esto");
         this.downloadFile(res);
+        this.loading = false;
+      },
+      (error: any) => {
+        this.loading = false;
+      },
+      () => {
+        this.loading = false;
+      }
+    );
+  }
+
+  exportarExcel() {
+    window.open(environment.server_root + "/reporteproductos");
+  }
+
+  exportarExcel3() {
+    let data = {
+      startDateView: "",
+      endDateView: "",
+    };
+    this.loading = true;
+
+    this._ExportService.exportarExcel().subscribe(
+      (res: any) => {
+        const blob = new Blob([res], {
+          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "archivoprueba.xlsx";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+
         this.loading = false;
       },
       (error: any) => {
