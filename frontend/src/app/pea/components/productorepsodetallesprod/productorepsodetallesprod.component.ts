@@ -439,7 +439,8 @@ export class ProductorepsodetallesprodComponent
       array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
     } else if (value == 11) {
       /**cancelado reprogramado */
-      let arregloPermitidosOther = [11, 8];
+      //let arregloPermitidosOther = [11, 8];
+      let arregloPermitidosOther = [6, 11];
       array_vacio = this.manejadorFilterSelect(arregloPermitidosOther);
     } else if (value == 12) {
       /**Registrado */
@@ -659,7 +660,7 @@ export class ProductorepsodetallesprodComponent
     const resultadoFiltrado = this.countAgendasByProfesionalDate.filter(
       (item) =>
         //item.tipoproducto_id === selectedItem.tipoproducto_id &&
-        //(daySearch !== "" ? item.fecha === daySearch : true) &&
+        (daySearch !== "" ? item.fecha === daySearch : true) &&
         item.profesional_id === profesional
     );
     /*
@@ -670,29 +671,33 @@ export class ProductorepsodetallesprodComponent
       " this.countAgendasLista = resultadoFiltrado;",
       (this.countAgendasLista = resultadoFiltrado)
     );
-    const recordsByDay = resultadoFiltrado.reduce((acumulador, cita) => {
-      const citaExistente = acumulador.find(
-        (item) =>
-          item.profesional_id === cita.profesional_id &&
-          //item.tipoproducto_id === cita.tipoproducto_id &&
-          item.fecha === daySearch
-      );
-      console.log("valor de citaExistente ", citaExistente);
-      if (citaExistente) {
-        //citaExistente.total++;
-        console.log("existe el dia y profesional");
-        citaExistente.total = citaExistente.total + cita.numcitas;
-      } else {
-        acumulador.push({
-          profesional_id: cita.profesional_id,
-          total: cita.numcitas,
-          name: cita.name,
-          fecha: cita.fecha,
-        });
-      }
+    const recordsByDay = resultadoFiltrado.reduce(
+      (acumulador, cita, indice, vector) => {
+        console.log("indice ==>", indice);
+        const citaExistente = acumulador.find(
+          (item) =>
+            item.profesional_id === cita.profesional_id &&
+            //item.tipoproducto_id === cita.tipoproducto_id &&
+            item.fecha === daySearch
+        );
+        console.log("valor de citaExistente ", citaExistente);
+        if (citaExistente) {
+          //citaExistente.total++;
+          console.log("existe el dia y profesional");
+          citaExistente.total = citaExistente.total + cita.numcitas;
+        } else {
+          acumulador.push({
+            profesional_id: cita.profesional_id,
+            total: cita.numcitas,
+            name: cita.name,
+            fecha: cita.fecha,
+          });
+        }
 
-      return acumulador;
-    }, []);
+        return acumulador;
+      },
+      []
+    );
 
     this.citasByDay = recordsByDay;
     this.displayByMonth = false;

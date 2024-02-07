@@ -5,6 +5,7 @@ use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use App\Models\pea\Producto;
+use Illuminate\Support\Facades\DB;
 class ProductosExport implements FromQuery, WithHeadings
 {
     public function collection()
@@ -23,14 +24,15 @@ class ProductosExport implements FromQuery, WithHeadings
             ->select(
                      'contratos.nombre as ODS',
                      'tipo_productos.name as PRODUCTO', 
-                     'productos.cedula as DESCRIPCION_NOMBRE',                     
+                     'clientes.nombre as DESCRIPCION_NOMBRE',                     
                      'productos.cedula as CEDULA',
                      'clientes.email as CORREO',
                      'clientes.telefono as CELULAR',
                      'lista_items.nombre as ESTADO',
                      'estadoseguimientos.nombre as ESTADO_SEGUIMIENTO',
                      'productos.fecha_programacion as FECHA_PROGRAMACION',
-                     'productos.fecha_programacion as HORA'
+                     'productos.fecha_programacion as FECHA_AGENDAMIENTO',
+                     DB::raw('(SELECT GROUP_CONCAT(comentario SEPARATOR " -* ") FROM producto_reprogramaciones WHERE producto_id = productos.id) as COMENTARIOS')
                     );                    
                     
         /*->where('columna1', $this->parametro1)
@@ -48,7 +50,9 @@ class ProductosExport implements FromQuery, WithHeadings
             'CELULAR',
             'ESTADO',
             'ESTADO_SEGUIMIENTO',
-            'FECHA_PROGRAMACION'
+            'FECHA_PROGRAMACION',
+            'FECHA_AGENDAMIENTO',
+            'COMENTARIOS',
             
         ];
     }    
