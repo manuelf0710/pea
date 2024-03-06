@@ -21,18 +21,21 @@ class ProductosExport implements FromQuery, WithHeadings
             ->join('tipo_productos', 'productos_repso.tipoproducto_id', '=', 'tipo_productos.id')
             ->join('lista_items', 'productos.estado_id', '=', 'lista_items.id')
             ->leftJoin('estadoseguimientos', 'productos.estadoseguimiento_id', 'estadoseguimientos.id')
+            ->leftJoin('users', 'productos.profesional_id', 'users.id')
             ->select(
                      'contratos.nombre as ODS',
+                     'productos_repso.id as CODIGO_PRODUCTO', 
                      'tipo_productos.name as PRODUCTO', 
                      'clientes.nombre as DESCRIPCION_NOMBRE',                     
                      'productos.cedula as CEDULA',
                      'clientes.email as CORREO',
                      'clientes.telefono as CELULAR',
                      'lista_items.nombre as ESTADO',
+                     'users.name as PROFESIONAL_REGISTRO',
                      'estadoseguimientos.nombre as ESTADO_SEGUIMIENTO',
                      'productos.fecha_programacion as FECHA_PROGRAMACION',
                      'productos.fecha_programacion as FECHA_AGENDAMIENTO',
-                     DB::raw('(SELECT GROUP_CONCAT(comentario SEPARATOR " -* ") FROM producto_reprogramaciones WHERE producto_id = productos.id) as COMENTARIOS')
+                     DB::raw('(SELECT GROUP_CONCAT(comentario SEPARATOR \'\n-\') FROM producto_reprogramaciones WHERE producto_id = productos.id) as COMENTARIOS')
                     );                    
                     
         /*->where('columna1', $this->parametro1)
@@ -43,12 +46,14 @@ class ProductosExport implements FromQuery, WithHeadings
         // Devuelve un array con los nombres de las columnas en el archivo Excel
         return [
             'ODS',
+            'CODIGO_PRODUCTO',
             'PRODUCTO',
             'DESCRIPCION_NOMBRE',
             'CEDULA',
             'CORREO',
             'CELULAR',
             'ESTADO',
+            'PROFESIONAL_REGISTRO',
             'ESTADO_SEGUIMIENTO',
             'FECHA_PROGRAMACION',
             'FECHA_AGENDAMIENTO',

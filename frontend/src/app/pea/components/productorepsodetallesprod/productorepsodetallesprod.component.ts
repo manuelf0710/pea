@@ -1021,7 +1021,7 @@ export class ProductorepsodetallesprodComponent
    * mostrar el boton de acuerdo al estado
    */
   showButtonActualizarInformacion(value) {
-    const estadosPermitidosActualizarInformacion = [7, 8, 9, 11, 12];
+    const estadosPermitidosActualizarInformacion = [6, 7, 8, 9, 11, 12];
     if (
       estadosPermitidosActualizarInformacion.includes(
         parseInt(this.formulario.get("estado_id").value)
