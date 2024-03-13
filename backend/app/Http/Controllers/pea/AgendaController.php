@@ -145,14 +145,16 @@ class AgendaController extends Controller
     public function enableAgenda(Request $request)
     {
         $tipoproducto_id = $request->post('tipo_producto');
+        $fechaStartAgenda = Carbon::parse($this->today);
+        $fechaHastaAgenda = $fechaStartAgenda->addDays(35);
 
         $this->tipoProductoData = DB::table('tipo_productos')
             ->where('id', '=', $tipoproducto_id)
             ->first();
 
         $citas = DB::table('agendas')
-            ->join('citas', 'agendas.id', '=', 'citas.agenda_id')
-            ->join('users', 'citas.profesional_id', '=', 'users.id')
+            ->leftJoin('citas', 'agendas.id', '=', 'citas.agenda_id')
+            ->leftJoin('users', 'citas.profesional_id', '=', 'users.id')
             ->join('tipoproducto_users', 'users.id', '=', 'tipoproducto_users.user_id')
             ->select(
                 "citas.id as id",
@@ -165,8 +167,10 @@ class AgendaController extends Controller
             ->where('tipoproducto_users.tipoproducto_id', '=', $tipoproducto_id)
             ->where('citas.ocupado', '=', 1)
             ->where('users.status', '=', 1)
+            //->where('users.id', '=', 48)
             ->whereNull('tipoproducto_users.deleted_at')
-            ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$this->today'");
+            ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$this->today'")
+            ->whereRaw("date_format(agendas.end, '%Y-%m-%d') <=  " . "'$fechaHastaAgenda'");
 
             $citas = $citas->addSelect(DB::raw(
                 "date_format(citas.start, '%Y-%m-%d') onlydate"
@@ -176,14 +180,19 @@ class AgendaController extends Controller
             }
 
             $citas = $citas->orderBy('citas.id', 'asc')
-            ->get();
-            //->toSql();
-
+           ->get();
+           //->toSql();
+           //return response()->json($citas);
+//echo $citas;
         //echo ("diferencia de minutos " . $this->minutosInterval('2022-03-28 08:00:00', '2022-03-28 08:15:00') . ' citastotal = ' . count($citas) . '<br>');
         $citas = json_decode($citas, true);
+        
 
-        $uniquesProfesionalescitas = $this->unique_multidim_array($citas, 'profesional_id');
-        $uniquesDatesCitas = $this->unique_multidim_array($citas, 'onlydate');
+        $getUniquesProfesionalescitas = $this->unique_multidim_array($citas, 'profesional_id');
+        $getUniquesDatesCitas = $this->unique_multidim_array($citas, 'onlydate');
+        $uniquesDatesCitas = collect($getUniquesDatesCitas)->sortBy('onlydate')->values()->all();
+        $uniquesProfesionalescitas = collect($getUniquesProfesionalescitas)->sortBy('profesional_id')->values()->all();
+        //return response()->json($uniquesProfesionalescitas);
 
         $data = [];
         $index = 0;
@@ -236,7 +245,7 @@ class AgendaController extends Controller
         $response = array(
             'status' => 'ok',
             'code' => 200,
-            'data'   => $this->tiempos,
+            'data'   => collect($this->tiempos)->sortBy('onlydate')->values()->all() ,
             'msg'    => 'Consulta de tiempos disponibles realizados'
         );
 

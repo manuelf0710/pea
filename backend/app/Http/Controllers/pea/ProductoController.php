@@ -507,6 +507,7 @@ class ProductoController extends Controller
                         ->where('productos.cedula', '=', $item['cedula'])
                         ->where('productos_repso.tipoproducto_id', '=', $find->tipoproducto_id)
                         ->whereNotIn('productos_repso.id', [$find->id])
+                        ->whereNull('productos.deleted_at')
                         ->get();                                                   
 
 
