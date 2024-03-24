@@ -195,10 +195,10 @@ class AgendaController extends Controller
         //return response()->json($uniquesProfesionalescitas);
 
         $data = [];
-        $index = 0;
         $recolector = array();
         foreach ($uniquesProfesionalescitas as $profesionalItem) {
             foreach ($uniquesDatesCitas as $uniquesCitas) {
+                $index = 0;
                 foreach ($citas as $cita) {
                     if ($uniquesCitas['onlydate'] == $cita['onlydate']  && $profesionalItem['profesional_id'] == $cita['profesional_id']) {
                         $actual = $index;
@@ -236,8 +236,9 @@ class AgendaController extends Controller
                             $this->sumarTiempos($recolector);
                             $recolector = array();
                         }
-                        $index++;
+                        
                     }
+                    $index++;
                 }
             }
         }
@@ -246,10 +247,18 @@ class AgendaController extends Controller
             'status' => 'ok',
             'code' => 200,
             'data'   => collect($this->tiempos)->sortBy('onlydate')->values()->all() ,
+            //'otro' => $this->enableAgendaSimple($citas, $uniquesProfesionalescitas, $uniquesDatesCitas),
             'msg'    => 'Consulta de tiempos disponibles realizados'
         );
 
         return response()->json($response);
+    }
+
+    public function enableAgendaSimple($citas, $uniquesProfesionalescitas, $uniquesDatesCitas){        
+        $response = array();
+        foreach ($citas as $cita) {
+            
+        }
     }
 
 
