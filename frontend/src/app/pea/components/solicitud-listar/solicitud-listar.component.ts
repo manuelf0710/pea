@@ -57,7 +57,7 @@ export class SolicitudListarComponent implements OnInit {
       title: "Id",
       data: "id",
       orderable: false,
-      searchable: false,
+      searchable: true,
       type: "text",
     },
     {

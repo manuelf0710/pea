@@ -179,7 +179,8 @@ class AgendaController extends Controller
                 $citas = $citas->where('users.id' , '=', auth()->user()->id );
             }
 
-            $citas = $citas->orderBy('citas.id', 'asc')
+            $citas = $citas->orderBy('agendas.id', 'asc')
+            ->orderBy('citas.start', 'asc')
            ->get();
            //->toSql();
            //return response()->json($citas);
@@ -304,6 +305,7 @@ class AgendaController extends Controller
                     "profesional_id" => $profesional_id,
                     "start" => $dateStartToMysql,
                     "end" => $dateEndToMysql,
+                    "onlydate" => $newStartDate->format('Y-m-d'),
                     //"ocupado" => ($startTimeHour * 1 >= $this->launchTimeStart && $startTimeHour * 1 < $this->launchTimeEnd) ? 2 : 1,
                     "ocupado" => 1,
                     //"starttimehour" => $startTimeHour*1,
@@ -335,6 +337,177 @@ class AgendaController extends Controller
             ->get();
 
         return $agendas;
+    }
+
+    /*
+    *Buscar todos las agendas existentes para la persona en la fecha rango start y end
+    */
+    public function getAgendasByprofesionaGroupByDay($dateStart, $dateRepeat, $profesional_id, $tipo)
+    {
+        $agendas = DB::table('agendas')
+            ->select(
+                'agendas.id',
+                'profesional_id',
+                'agendas.tipo',
+                'start',
+                'end'
+            )
+            ->where('profesional_id', '=', $profesional_id)
+            ->where('tipo', '=', '1')
+            ->orderBy('agendas.id', 'asc');
+
+        
+        if($dateRepeat){
+            $agendas = $agendas->whereRaw("date_format(start, '%Y-%m-%d') >=  " . "'$dateStart'")
+                                ->whereRaw("date_format(start, '%Y-%m-%d') <=  " . "'$dateRepeat'");
+        }else{
+            $agendas = $agendas->whereRaw("date_format(start, '%Y-%m-%d') =  " . "'$dateStart'");
+        }
+
+
+           $agendas = $agendas->get();
+
+        return $agendas;
+    }  
+
+  /*
+  *
+   */  public function getTimesCitasFree($agenda){
+            $citas = DB::table('agendas')
+                ->join('citas', 'agendas.id', '=', 'citas.agenda_id')
+                ->select(
+                    "citas.id as id",
+                    "citas.start",
+                    "citas.end",
+                    "citas.agenda_id",
+                    "citas.profesional_id as profesional_id"
+                )
+                ->where('agendas.id' , '=', $agenda->id);
+
+                $citas = $citas->addSelect(DB::raw(
+                    "date_format(citas.start, '%Y-%m-%d') onlydate"
+                ));
+
+                $citas = $citas->orderBy('citas.id', 'asc')
+            ->get();
+            return $citas;
+   }
+
+   public function clasificarCitas($citasExistentes, $citasNuevas, $agendaId){
+    $response = array();
+    $citasToInsert = array();
+    /*foreach($citasExistentes as $existente){
+        $found = null;
+        foreach($citasNuevas as $nueva){
+            if($existente->start === $nueva['start']){
+                $existente->action = 'nothing';
+                $found = $existente;
+                break;
+            }
+        }
+        if($found != null){
+            array_push($response, $found);
+        }
+    } */
+
+    foreach ($citasExistentes as $item) {
+        $response[] = (array) $item;
+    }
+
+    foreach($citasNuevas as $nueva){
+        $found = null;
+        foreach($citasExistentes as $existente){           
+            if($nueva['start'] === $existente->start){
+               $nueva['action'] = "nothing" ;
+               $found = $nueva;
+               break;
+            }
+        }
+        if($found == null){
+            $nueva['agenda_id'] = $agendaId;
+            $nueva['action'] = "insert";
+            array_push($response, $nueva);
+        }
+
+    }
+
+
+
+    /*foreach($citasToInsert as $item){
+        /*$arregloAsociativo = array(
+            "agenda_id"=> $agendaId,
+            "end"=> $item->end,
+            "id"=> null,
+            "onlydate" => $item->onlydate,
+            "profesional_id" => $item->profesional_id,
+            "start" => $item->start
+        );
+       array_push($response, $item);
+    } */
+
+    return $response;
+   }
+    
+    /*
+    * validar y registrar cada nuevo cita fraccion de 15 minutos a una agenda existente
+     */
+    public function getInsertarCitasToAgendas($agendas, $dateStart, $dateEnd){         
+            //$newDate = $dateStart;
+            $newDate =  CarbonImmutable::createFromFormat('Y-m-d H:i:s', $agendas->start);
+            //$newDate = $newDate->addDays($i, 'day');
+            //$newDate2 = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $newDate->toDateTimeString());
+            $startTime  = $newDate->format('H:i:s');
+            $onlyDate  = $newDate->format('Y-m-d');
+            $dayName = $newDate->englishDayOfWeek;
+            $dateToMysql = $newDate->toDateTimeString();
+            $dayNumber = $newDate->dayOfWeekIso;
+
+            $datesList = $this->addMinutesToDate($this->timeStart, $this->timeEnd, $agendas->profesional_id, $this->dateStart, $this->dateRepeat, $this->dateEnd, $this->diffOnMinutes, $dateStart);            
+
+
+            //$acumuladorCitas = array();
+            if(is_object($agendas)){
+                $citas = $this->getTimesCitasFree($agendas);
+                //array_push($acumuladorCitas, $citas);
+            }
+
+            $nuevasCitas = $this->clasificarCitas($citas, $datesList, $agendas->id);
+            $response = array(
+                "dateStart" => $this->dateStart,
+                "newDate" => $newDate,
+                "startTime" => $startTime,
+                "onlyDate" => $onlyDate,
+                "dayName" => $dayName,
+                "dateToMysql" => $dateToMysql,
+                "dayNumber" => $dayNumber,
+                "diffOnMinutes" => $this->diffOnMinutes,
+                "timeStart" => $this->timeStart,
+                "timeEnd" => $this->timeEnd,
+                "index" => 1,
+                "id" => $agendas->id,
+                "citas" => $citas,
+                "datesList" => $nuevasCitas
+            );            
+
+            /*$response = array("dateStart" => $this->dateStart,
+                                "startTime" => $startTime,
+                                "onlyDate" => $onlyDate,
+                                "dayName" => $dayName,
+                                "dateToMysql" => $dateToMysql,
+                                "dayNumber" => $dayNumber,
+                                "datesList" => $datesList,
+                                "acumuladorCitas" => $acumuladorCitas,
+                                "nuevasCitas" => $nuevasCitas,
+                                "citas" => $citas,
+                                "id" => $agendas->id
+            );  */   
+            
+            //$response = array(
+                               // "nuevasCitas" => $nuevasCitas
+                                //"citas" => $citas,
+                                //"id" => $agendas->id
+            //);              
+        return $response;
     }
 
     public function validateDataMayorToToday($dateStart)
@@ -480,12 +653,63 @@ class AgendaController extends Controller
         $this->diffOnMinutes = $this->dateStart->diffInMinutes($this->dateEnd);
     }
 
+    public function insertarRegistrosCitasAgendas($datesArray, $profesional_id){
+        $indexAgenda = 0;
+        foreach ($datesArray as $item) {
+                //$agendaByDay = $this->validarOnlyEnableAgendaByDay($item['onlyDate'], $profesional_id, 1);
+                $totalC = count($item['datesList']); 
+                /*echo("agenda = ".json_encode($agendaConsulta));
+                $resp[] = (array) $item['datesList'];
+                echo('dateslisttest='.json_encode($resp));*/
+                //echo("onlydate => ".$item['onlyDate']."|");
+                
+                if($totalC > 0){             
+                    $fechaAgenda = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $item['onlyDate']." ".$item['timeEnd']);
+                   // echo("firstmsg => ".$item['onlyDate']." ".$item['timeEnd']."|");
+                    $agendaConsulta = Agenda::find($item['id']);
+                    //echo("agendaConsulta = ".$agendaConsulta->id)."|";
+                    if (!empty($agendaConsulta)) {
+                        //echo("no es emnpty |");
+                        if (($fechaAgenda)->gt($agendaConsulta->end)) {
+                            //echo "entro por gt =".$fechaAgenda." & ".$agendaConsulta->end."|";
+                            $agendaConsulta->end = $item['onlyDate']." ".$item['timeEnd'];
+                            $agendaConsulta->save();
+                        } else{
+                            //echo "entro por el else de gt fechaagendada =".$fechaAgenda." & ".$agendaConsulta->end."|";
+                        }           
+                    }
+                }
+                    //if (count($agendaByDay) == 0) {
+
+                   
+                    /*
+                    * Set value agenda id de modelo agenda recien guardado
+                    */
+                    
+                    foreach ($item['datesList'] as $newRecordCita) {
+                        if(isset($newRecordCita['action']) && $newRecordCita['action'] == 'insert'){
+                            $newRecord = new Cita();
+                            $newRecord->profesional_id = $newRecordCita['profesional_id'];
+                            $newRecord->start = $newRecordCita['start'];
+                            $newRecord->end = $newRecordCita['end'];
+                            $newRecord->ocupado = $newRecordCita['ocupado'];
+                            $newRecord->razon_bloqueo = $newRecordCita['razon_bloqueo'];
+                            $newRecord->agenda_id =$newRecordCita['agenda_id'];
+                            $newRecord->save();
+                        }
+                    } 
+                //}
+       $indexAgenda++;            
+    }
+}
+
 
     public function store(Request $request, $id)
     {
         $validator = Validator::make($request->all(), Agenda::rules($request));
         if (!($validator->fails())) {
             $this->setVarsTime($request);
+            
 
             $datesArray = array();
 
@@ -529,20 +753,53 @@ class AgendaController extends Controller
             /*
             * $request->post('tipo'); 1 = disponible, 2, bloqueo, 3 informe.
             */
-            //$getDateStart = explode(" ", $dateStart);           
+            //$getDateStart = explode(" ", $dateStart);    
             $getDateStart = $this->dateStart->format('Y-m-d');
             $agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart, $id, 1);
-
+                   
+            $crearNuevosCitasAgenda = array();
+            $acumuladorCitas = array();
             switch ($request->post('tipo')) {
 
                 case 1:
                     //$agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart[0], $id, $request->post('tipo'));  
+                      $getAgendasProfesional = $this->getAgendasByprofesionaGroupByDay($getDateStart, $this->dateRepeat->format('Y-m-d'), $id, 1);
+                      
+                      /*
+                      * insertar nuevas citas fracciones de 15 minutos a agendas ya creadas.
+                       */
+
+                      foreach($getAgendasProfesional as $item){
+                            $crearNuevosCitasAgenda = $this->getInsertarCitasToAgendas($item,$this->dateStart, $this->dateEnd);
+                            if(count($crearNuevosCitasAgenda['datesList']) > 0){
+                                array_push($acumuladorCitas, $crearNuevosCitasAgenda);                               
+                            }
+                      }
+
+                      if (count($acumuladorCitas) > 0) {
+                               
+                               $appointments = $this->insertarRegistrosCitasAgendas($acumuladorCitas, $id);
+                               $response = array(
+                                'status' => 'ok',
+                                'code' => 200,
+                                'data'   => $acumuladorCitas,
+                                //'data'   => 21,
+                                'msg'    => 'Guardadoggg'
+                            );  
+                            return response()->json($response);
+                            
+                      }
+
                     if (count($agendaByDayValidateStart) > 0) {
                         $response = array(
                             'status' => 'errortime',
                             'code' => 200,
                             'data'   => -1,
-                            'msg'    => 'ya existe una agenda programada para el profesional seleccionado en la fecha ' . $getDateStart[0]
+                            //'otraInfo' => $agendaByDayValidateStart,
+                            //'agendasExistentes' => $getAgendasProfesional,
+                            "acumuladorCitas" => $acumuladorCitas,
+                            'nuevasCitasAgenda' => $crearNuevosCitasAgenda,
+                            'msg'    => 'ya existe una agenda programada para el profesional seleccionado en la fecha ' . $getDateStart
                         );
                         return response()->json($response);
                     }
@@ -601,7 +858,7 @@ class AgendaController extends Controller
             //return 'el tipo = '.$request->post('tipo');
             //echo ' otherfield'. $agendaByDayValidateStart[0]->id;
 
-            if ($this->diffOnDays >= 0) {
+            if ($this->diffOnDays >= 0 && count($acumuladorCitas) == 0) {
                 for ($i = 0; $i <= $this->diffOnDays; $i++) {
                     $newDate = $this->dateStart;
                     $newDate = $newDate->addDays($i, 'day');

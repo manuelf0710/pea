@@ -101,4 +101,9 @@ class ProductoRepso extends Model
 		if ($des)
 			return $query->where('tipoproducto_id', '=', "$des");
 	}
+	public function scopeId($query, $des)
+	{
+		if ($des)
+			return $query->where('productos_repso.id', '=', "$des");
+	}	
 }

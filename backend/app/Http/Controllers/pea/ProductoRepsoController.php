@@ -49,6 +49,7 @@ class ProductoRepsoController extends Controller
         $descripcion = $request->get('descripcion');
         $contrato = $request->get('ods');
         $globalSearch = $request->get('globalsearch');
+        $id = $request->get('id');
 
         if ($globalSearch != '') {
             $response = ProductoRepso::withoutTrashed()->orderBy('productos_repso.id', 'desc')
@@ -84,6 +85,7 @@ class ProductoRepsoController extends Controller
                 ->tipoProducto($tipoProducto)
                 ->contrato($contrato)
                 ->descripcion($descripcion)
+                ->id($id)
                 ->paginate($pageSize);
         }
 
