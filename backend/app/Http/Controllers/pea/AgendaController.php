@@ -353,8 +353,7 @@ class AgendaController extends Controller
                 'end'
             )
             ->where('profesional_id', '=', $profesional_id)
-            ->where('tipo', '=', '1')
-            ->orderBy('agendas.id', 'asc');
+            ->where('tipo', '=', '1');
 
         
         if($dateRepeat){
@@ -365,7 +364,7 @@ class AgendaController extends Controller
         }
 
 
-           $agendas = $agendas->get();
+           $agendas = $agendas->orderBy('agendas.id', 'asc')->get();
 
         return $agendas;
     }  
@@ -410,9 +409,9 @@ class AgendaController extends Controller
         }
     } */
 
-    foreach ($citasExistentes as $item) {
+    /*foreach ($citasExistentes as $item) {
         $response[] = (array) $item;
-    }
+    }*/
 
     foreach($citasNuevas as $nueva){
         $found = null;
@@ -453,7 +452,8 @@ class AgendaController extends Controller
      */
     public function getInsertarCitasToAgendas($agendas, $dateStart, $dateEnd){         
             //$newDate = $dateStart;
-            $newDate =  CarbonImmutable::createFromFormat('Y-m-d H:i:s', $agendas->start);
+            $fechaAgendaPart = explode(" ", $agendas->start);
+            $newDate =  CarbonImmutable::createFromFormat('Y-m-d H:i:s', $fechaAgendaPart[0]." ".$this->timeStart);
             //$newDate = $newDate->addDays($i, 'day');
             //$newDate2 = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $newDate->toDateTimeString());
             $startTime  = $newDate->format('H:i:s');
@@ -462,7 +462,10 @@ class AgendaController extends Controller
             $dateToMysql = $newDate->toDateTimeString();
             $dayNumber = $newDate->dayOfWeekIso;
 
-            $datesList = $this->addMinutesToDate($this->timeStart, $this->timeEnd, $agendas->profesional_id, $this->dateStart, $this->dateRepeat, $this->dateEnd, $this->diffOnMinutes, $dateStart);            
+            //function addMinutesToDate($timeStart, $timeEnd, ||$profesional_id, $dateStart, $dateRepeat, $dateEnd, ||$diffOnMinutes, ||$newDate)            
+
+           //$datesList = $this->addMinutesToDate($this->timeStart, $this->timeEnd, $agendas->profesional_id, $this->dateStart, $this->dateRepeat, $this->dateEnd, $this->diffOnMinutes, $dateStart);            
+            $datesList = $this->addMinutesToDate($this->timeStart, $this->timeEnd, $agendas->profesional_id, $this->dateStart, $this->dateRepeat, $this->dateEnd, $this->diffOnMinutes, $newDate);            
 
 
             //$acumuladorCitas = array();
@@ -768,13 +771,12 @@ class AgendaController extends Controller
                       /*
                       * insertar nuevas citas fracciones de 15 minutos a agendas ya creadas.
                        */
-
                       foreach($getAgendasProfesional as $item){
                             $crearNuevosCitasAgenda = $this->getInsertarCitasToAgendas($item,$this->dateStart, $this->dateEnd);
                             if(count($crearNuevosCitasAgenda['datesList']) > 0){
                                 array_push($acumuladorCitas, $crearNuevosCitasAgenda);                               
                             }
-                      }
+                      }                    
 
                       if (count($acumuladorCitas) > 0) {
                                
@@ -783,8 +785,9 @@ class AgendaController extends Controller
                                 'status' => 'ok',
                                 'code' => 200,
                                 'data'   => $acumuladorCitas,
+                                'extradata' => $getAgendasProfesional,
                                 //'data'   => 21,
-                                'msg'    => 'Guardadoggg'
+                                'msg'    => 'Guardado'
                             );  
                             return response()->json($response);
                             
