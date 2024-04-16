@@ -92,7 +92,6 @@ export class ReportproductoComponent implements OnInit {
   }
 
   downloadFile(data: Blob) {
-    console.log("hizo algo laura comida");
     this._FileSaverService.save(data, "archivoprueba.xlsx");
   }
 }

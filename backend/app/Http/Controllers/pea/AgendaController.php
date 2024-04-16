@@ -146,11 +146,22 @@ class AgendaController extends Controller
     {
         $tipoproducto_id = $request->post('tipo_producto');
         $fechaStartAgenda = Carbon::parse($this->today);
-        $fechaHastaAgenda = $fechaStartAgenda->addDays(35);
+        $today = Carbon::parse($this->today);
+        if(auth()->user()->perfil_id === 1){
+            $fechaStartAgenda = Carbon::now()->subDays(7);
+        }
+        $fechaHastaAgenda = $today->addDays(35);
 
         $this->tipoProductoData = DB::table('tipo_productos')
             ->where('id', '=', $tipoproducto_id)
             ->first();
+/*echo $fechaHastaAgenda;
+$res = array(
+    "fechadesde"=>$fechaStartAgenda,
+    "fechahasta"=>$fechaHastaAgenda
+);
+return response()->json($res);
+            exit;*/
 
         $citas = DB::table('agendas')
             ->leftJoin('citas', 'agendas.id', '=', 'citas.agenda_id')
@@ -169,7 +180,7 @@ class AgendaController extends Controller
             ->where('users.status', '=', 1)
             //->where('users.id', '=', 48)
             ->whereNull('tipoproducto_users.deleted_at')
-            ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$this->today'")
+            ->whereRaw("date_format(agendas.start, '%Y-%m-%d') >=  " . "'$fechaStartAgenda'")
             ->whereRaw("date_format(agendas.end, '%Y-%m-%d') <=  " . "'$fechaHastaAgenda'");
 
             $citas = $citas->addSelect(DB::raw(
