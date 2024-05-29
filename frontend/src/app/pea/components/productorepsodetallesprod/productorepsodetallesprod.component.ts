@@ -482,6 +482,7 @@ export class ProductorepsodetallesprodComponent
   }
 
   gestionProgramacion(item) {
+    this.agendasDisponibles = null;
     this.formulario.reset();
     this.showButtonInformacionProgramacion = false;
     this.estadosListaProceso = [];
@@ -1036,9 +1037,8 @@ export class ProductorepsodetallesprodComponent
 
   changeGenerarReprogramacionCita(value) {
     const estadosPermitidosCambio = [
-      7, 10, 11,
+      6, 7, 10, 11,
     ]; /** 7 citado, 11 cancelado reprogramado estaso permitido cambio de cita hora*/
-
     if (
       estadosPermitidosCambio.includes(
         parseInt(this.formulario.get("estado_id").value)

@@ -34,7 +34,7 @@ class ProductosExport implements FromQuery, WithHeadings
                      'users.name as PROFESIONAL_REGISTRO',
                      'estadoseguimientos.nombre as ESTADO_SEGUIMIENTO',
                      'productos.fecha_programacion as FECHA_PROGRAMACION',
-                     'productos.fecha_programacion as FECHA_AGENDAMIENTO',
+                     DB::raw('CONCAT(productos.fecha_inicio, " - ", productos.fecha_fin) as FECHA_AGENDAMIENTO'),
                      DB::raw('(SELECT GROUP_CONCAT(comentario SEPARATOR \'\n-\') FROM producto_reprogramaciones WHERE producto_id = productos.id) as COMENTARIOS')
                     );                    
                     
