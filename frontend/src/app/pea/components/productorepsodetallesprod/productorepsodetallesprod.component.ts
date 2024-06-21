@@ -949,11 +949,14 @@ export class ProductorepsodetallesprodComponent
       return;
     }
 
+    console.log("this.personaGestion.estado_id", this.personaGestion.estado_id);
+
     if (
       this.personaGestion.estado_id != 12 &&
       this.personaGestion.estado_id != 11 &&
       this.personaGestion.estado_id != 10 &&
-      this.personaGestion.estado_id != 7
+      this.personaGestion.estado_id != 7 &&
+      this.personaGestion.estado_id != 6
     ) {
       this._ToastService.info("esta persona ya ha sido programada");
       return;
