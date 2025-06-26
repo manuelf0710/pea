@@ -8,13 +8,21 @@ use App\Models\pea\Producto;
 use Illuminate\Support\Facades\DB;
 class ProductosExport implements FromQuery, WithHeadings
 {
+
+    protected $params;
+
+    public function __construct($params)
+    {
+        $this->params = $params;
+    }
     public function collection()
     {
         return Producto::all(); 
     }
+    
     public function query()
     {
-        return Producto::query()
+        $query = Producto::query()
             ->join('productos_repso', 'productos.producto_repso_id', '=', 'productos_repso.id')
             ->join('contratos', 'productos_repso.contrato_id', '=', 'contratos.id')
             ->join('clientes', 'productos.cedula', '=', 'clientes.cedula')
@@ -40,6 +48,59 @@ class ProductosExport implements FromQuery, WithHeadings
                     
         /*->where('columna1', $this->parametro1)
         ->where('columna2', $this->parametro2);*/
+        if (!empty($this->params['tipoProducto'])) {
+            $query->where('productos_repso.tipoproducto_id', $this->params['tipoProducto']);
+        }
+
+        if (!empty($this->params['regional'])) {
+            $query->where('productos_repso.regional_id', $this->params['regional']);
+        }
+
+        if (!empty($this->params['modalidad'])) {
+            $query->where('productos.modalidad', $this->params['modalidad']);
+        }
+
+        if (!empty($this->params['grupal'])) {
+            $query->where('productos_repso.grupal', $this->params['grupal']);
+        }
+
+        if (!empty($this->params['cedula'])) {
+            $query->where('productos.cedula', $this->params['cedula']);
+        }
+
+        if (!empty($this->params['estado'])) {
+            $query->where('productos.estado_id', $this->params['estado']);
+        }
+
+        if (!empty($this->params['contrato'])) {
+            $query->where('productos_repso.contrato_id', $this->params['contrato']);
+        }
+
+        if (!empty($this->params['profesional'])) {
+            $query->where('productos.profesional_id', $this->params['profesional']);
+        }
+
+        if (!empty($this->params['productoRepsoId'])) {
+            $query->where('productos_repso.id', $this->params['productoRepsoId']);
+        }
+
+        if (!empty($this->params['fechaProgramacionDesde'])) {
+            $query->whereDate('productos.fecha_programacion', '>=', $this->params['fechaProgramacionDesde']);
+        }
+
+        if (!empty($this->params['fechaProgramacionHasta'])) {
+            $query->whereDate('productos.fecha_programacion', '<=', $this->params['fechaProgramacionHasta']);
+        }
+
+        if (!empty($this->params['fechaInicio'])) {
+            $query->whereDate('productos.fecha_inicio', '>=', $this->params['fechaInicio']);
+        }
+
+        if (!empty($this->params['fechaFin'])) {
+            $query->whereDate('productos.fecha_fin', '<=', $this->params['fechaFin']);
+        }
+
+        return $query;        
     }
     public function headings(): array
     {

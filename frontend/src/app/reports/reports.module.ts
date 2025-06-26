@@ -1,4 +1,5 @@
 import { NgModule } from "@angular/core";
+import { ReactiveFormsModule } from "@angular/forms";
 import { CommonModule } from "@angular/common";
 import { HTTP_INTERCEPTORS } from "@angular/common/http";
 import { JwtInterceptor } from "../auth/guards/jwt.interceptor";
@@ -6,6 +7,8 @@ import { AuthTokenInterceptor } from "../auth/services/authtokeninterceptor.serv
 import { ErrorInterceptor } from "../auth/guards/error.interceptor";
 import { fakeBackendProvider } from "../auth/guards/fake-backend";
 import { MAT_DATE_LOCALE } from "@angular/material/core";
+
+import { SharedModule } from "../shared/shared.module";
 
 import { ReportsRoutingModule } from "./reports-routing.module";
 import { ReportproductoComponent } from "./pages/reportproducto/reportproducto.component";
@@ -15,7 +18,13 @@ import { FileSaverModule } from "ngx-filesaver";
 
 @NgModule({
   declarations: [ReportproductoComponent],
-  imports: [CommonModule, ReportsRoutingModule, FileSaverModule],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    ReportsRoutingModule,
+    SharedModule,
+    FileSaverModule,
+  ],
   providers: [
     ExportService,
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },

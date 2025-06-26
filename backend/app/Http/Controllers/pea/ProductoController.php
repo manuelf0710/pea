@@ -428,7 +428,11 @@ class ProductoController extends Controller
      */
 
      public function exportExcelProducto(Request $request){
-        return Excel::download(new ProductosExport(), 'productos.xlsx');
+        $params = $request->all();
+        return Excel::download(new ProductosExport($params), 'productos.xlsx', \Maatwebsite\Excel\Excel::XLSX, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="productos.xlsx"'
+        ]);
 
      }
 

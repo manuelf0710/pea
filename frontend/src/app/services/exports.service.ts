@@ -11,17 +11,18 @@ import { environment } from "../../environments/environment";
 export class ExportService {
   constructor(private _http: HttpClient) {}
 
-  exportarExcel(): Observable<any> {
-    let data = {};
+  exportarExcel(data): Observable<Blob> {
     return this._http
-      .post<any>(
+      .post(
         environment.apiUrl + environment.exports.generarExcelProductos,
-        data
+        data,
+        {
+          responseType: "blob" as "json",
+        }
       )
       .pipe(
-        map((lista) => {
-          console.log("Respuesta del servicio:", lista);
-          return new Blob([lista], {
+        map((response: Blob) => {
+          return new Blob([response], {
             type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
           });
         })

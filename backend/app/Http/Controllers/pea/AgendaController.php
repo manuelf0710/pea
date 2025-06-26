@@ -679,7 +679,8 @@ return response()->json($res);
                 
                 if($totalC > 0){             
                     $fechaAgenda = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $item['onlyDate']." ".$item['timeEnd']);
-                   // echo("firstmsg => ".$item['onlyDate']." ".$item['timeEnd']."|");
+                    $fechaAgendaStart = CarbonImmutable::createFromFormat('Y-m-d H:i:s', $item['onlyDate']." ".$item['timeStart']);                    
+                    //echo("firstmsg => ".$item['onlyDate']." ".$item['timeEnd']."|");
                     $agendaConsulta = Agenda::find($item['id']);
                     //echo("agendaConsulta = ".$agendaConsulta->id)."|";
                     if (!empty($agendaConsulta)) {
@@ -690,7 +691,17 @@ return response()->json($res);
                             $agendaConsulta->save();
                         } else{
                             //echo "entro por el else de gt fechaagendada =".$fechaAgenda." & ".$agendaConsulta->end."|";
-                        }           
+                        }
+                        /**
+                         * Esta parte del if para actualizar la fecha inicio ejemplo programado desde
+                         * las 12 del medio dia y se quiere reagendar tiempo de 8am a 12 no se actualiza la fecha
+                         * inicio start ya que en la agenda actual aparece 12 y debe ajustarse a la del nuevo                         * 
+                         */
+                        /*if($fechaAgendaStart->lt($agendaConsulta->start)){
+                            $agendaConsulta->start = $item['onlyDate']." ".$item['timeStart'];
+                            $agendaConsulta->save();
+                        } */
+
                     }
                 }
                     //if (count($agendaByDay) == 0) {
@@ -778,7 +789,7 @@ return response()->json($res);
                 case 1:
                     //$agendaByDayValidateStart = $this->validarOnlyEnableAgendaByDay($getDateStart[0], $id, $request->post('tipo'));  
                       $getAgendasProfesional = $this->getAgendasByprofesionaGroupByDay($getDateStart, $this->dateRepeat->format('Y-m-d'), $id, 1);
-                      
+                      //echo "ingresaste aqui manuelf dateStart ".$this->dateStart." dateend ".$this->dateEnd;
                       /*
                       * insertar nuevas citas fracciones de 15 minutos a agendas ya creadas.
                        */
@@ -788,7 +799,7 @@ return response()->json($res);
                                 array_push($acumuladorCitas, $crearNuevosCitasAgenda);                               
                             }
                       }                    
-
+//echo json_encode($getAgendasProfesional)."&contador=". count($acumuladorCitas) ."</br>";
                       if (count($acumuladorCitas) > 0) {
                                
                                $appointments = $this->insertarRegistrosCitasAgendas($acumuladorCitas, $id);
