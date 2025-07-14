@@ -35,6 +35,7 @@ import { EditarComponent } from "./components/solicitud-listar/editar/editar.com
 import { MAT_DATE_LOCALE } from "@angular/material/core";
 import { ComentariosComponent } from "./components/comentarios/comentarios.component";
 import { PersonaSolicitudComponent } from "./components/productorepsodetallesprod/personasolicitud/personasolicitud.component";
+import { ReasignarPersonaComponent } from './components/productorepsodetallesprod/reasignarPersona/reasignar-persona/reasignar-persona.component';
 
 @NgModule({
   declarations: [
@@ -50,6 +51,7 @@ import { PersonaSolicitudComponent } from "./components/productorepsodetallespro
     EditarComponent,
     ComentariosComponent,
     PersonaSolicitudComponent,
+    ReasignarPersonaComponent,
   ],
   imports: [
     CommonModule,

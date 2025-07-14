@@ -357,6 +357,14 @@
                 >
                   <i class="fa fa-close"></i>
                 </button>
+                <button
+                  *ngIf="currentUser.perfil.id == 1"
+                  type="button"
+                  class="btn btn-warning btn-sm"
+                  (click)="reasignarPersona(item)"
+                >
+                  <i class="fa fa-pencil"></i>
+                </button>
               </div>
             </td>
             <td>{{ item.fecha_programacion }}</td>

@@ -15,6 +15,7 @@ import { ComunService } from "./../../../services/comun.service";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { NuevacitaComponent } from "./nuevacita/nuevacita.component";
 import { PersonaSolicitudComponent } from "./personasolicitud/personasolicitud.component";
+import { ReasignarPersonaComponent } from "./reasignarPersona/reasignar-persona/reasignar-persona.component";
 
 import { User } from "src/app/auth/models/user";
 import { listaItems } from "./../../../models/listaItems";
@@ -450,6 +451,26 @@ export class ProductorepsodetallesprodComponent
   }
 
   eliminarProductoFromArray() {}
+
+  reasignarPersona(data) {
+    const modalRef = this.modalService.open(ReasignarPersonaComponent, {
+      backdrop: "static",
+      size: "xs",
+      keyboard: false,
+    });
+    const newInfoPersonas = {}
+    modalRef.componentInstance.data = {
+      info: newInfoPersonas,
+    };
+
+    modalRef.result
+      .then((result) => {
+        if (result.status == "ok") {
+          this.initLoadData();
+        }
+      })
+      .catch((error) => {});
+  }
 
   eliminarProgramacion(data) {
     this._UtilService
