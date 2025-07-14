@@ -24,9 +24,7 @@ class ProductoController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-    }
+    public function index() {}
 
     /**
      * Show the form for creating a new resource.
@@ -71,16 +69,16 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        $product = $this->insertProduct($request, $request->post('producto_repso_id') , $request->post('user_id'), true);
-        if($product){
+        $product = $this->insertProduct($request, $request->post('producto_repso_id'), $request->post('user_id'), true);
+        if ($product) {
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => array('producto' => $product), 
+                'data'   => array('producto' => $product),
                 'msg'    => ' producto agregado correctamente '
-            );               
+            );
             return response()->json($response);
-        }else{
+        } else {
             $response = array(
                 'status' => 'error',
                 'msg' => "Ha ocurrido un error al guardar el registro",
@@ -88,7 +86,6 @@ class ProductoController extends Controller
             );
             return response()->json($response);
         }
-        
     }
 
     /**
@@ -124,6 +121,9 @@ class ProductoController extends Controller
             ->leftJoin('users', 'productos.profesional_id', '=', 'users.id')
             ->select(
                 'productos.id',
+                'productos.producto_repso_id',
+                'productos.productoReasignado',
+                'productos.fechaReasignado',
                 'productos.modalidad',
                 'productos.descripcion',
                 'productos.comentarios',
@@ -149,6 +149,7 @@ class ProductoController extends Controller
             )
             //->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
             //->selectRaw("date_format(productos.fecha_programacion, '%d/%m/%Y') as fecha_programacion")
+            ->selectRaw("DATE_FORMAT(productos.fechaReasignado, '%d/%m/%Y') as fechaReasignado")
             ->selectRaw("concat(date_format(productos.fecha_inicio, '%d/%m/%Y'), ' ', date_format(productos.fecha_inicio, '%H:%i:%s  %p'), ' - ', date_format(productos.fecha_fin, '%H:%i:%s  %p')) as fecha_programacion")
             ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
             ->where('productos.id', '=', $id)
@@ -162,35 +163,75 @@ class ProductoController extends Controller
             ->where('producto_id',  $producto_id)
             ->update(['producto_id' => null, 'ocupado' => 1]);
     }
-    
 
-    public function productoCancelState(Request $request, $id){
-            $updateProducto = Producto::find($id);
-            DB::table('productos')
+
+    public function productoCancelState(Request $request, $id)
+    {
+        $updateProducto = Producto::find($id);
+        DB::table('productos')
             ->where('id',  $id)
-            ->update(['estado_id' => 10, 
-                      'modalidad' => $request->post('modalidad') 
-                    ]);
-  
-            
-            $productoReprogramacion = new ProductoReprogramaciones();  
-            $productoReprogramacion->producto_id = $id;
-            $productoReprogramacion->user_id        = auth()->user()->id;
-            //$productoReprogramacion->profesional_id = $updateProducto->profesional_id;
-            $productoReprogramacion->comentario     = $request->post('comentario_cancelacion');
-            /*$productoReprogramacion->inicio         = $updateProducto->fecha_inicio;
+            ->update([
+                'estado_id' => 10,
+                'modalidad' => $request->post('modalidad')
+            ]);
+
+
+        $productoReprogramacion = new ProductoReprogramaciones();
+        $productoReprogramacion->producto_id = $id;
+        $productoReprogramacion->user_id        = auth()->user()->id;
+        //$productoReprogramacion->profesional_id = $updateProducto->profesional_id;
+        $productoReprogramacion->comentario     = $request->post('comentario_cancelacion');
+        /*$productoReprogramacion->inicio         = $updateProducto->fecha_inicio;
             $productoReprogramacion->end            = $updateProducto->fecha_fin;*/
-            $productoReprogramacion->estado_id      = $request->post('estado_programacion');
-            $productoReprogramacion->save();                              
-            
-            $response = array(
-                'status' => 'ok',
-                'code' => 200,
-                'data'   => array('producto' => $this->getProductoData($id)), 
-                'msg'    => ' Cancelado '
-            );   
-            return response()->json($response);                     
+        $productoReprogramacion->estado_id      = $request->post('estado_programacion');
+        $productoReprogramacion->save();
+
+        $response = array(
+            'status' => 'ok',
+            'code' => 200,
+            'data'   => array('producto' => $this->getProductoData($id)),
+            'msg'    => ' Cancelado '
+        );
+        return response()->json($response);
     }
+
+    public function productoReasignarPersona(Request $request, $id)
+    {
+        $persona = $request->post('persona');
+        $origenOds = $request->post('origen');
+        $destinoOds = $request->post('destino');
+
+        $response = [
+            'status' => 'error',
+            'msg' => "Se ha presentado un error al reasignar la persona",
+            'data' => [],
+        ];
+
+        if (
+            isset($persona['id']) && !empty($persona['id']) &&
+            isset($origenOds['id']) && !empty($origenOds['id']) &&
+            isset($destinoOds['id']) && !empty($destinoOds['id'])
+        ) {
+            $updateProducto = Producto::find($persona['id']);
+            if ($updateProducto) {
+
+                $updateProducto->productoReasignado = $updateProducto->producto_repso_id;
+                $updateProducto->producto_repso_id = $destinoOds['id'];
+                $updateProducto->fechaReasignado =  DB::raw('NOW()');
+                $updateProducto->save();
+
+                $response = array(
+                    'status' => 'ok',
+                    'code' => 200,
+                    'data'   => array('producto' => $this->getProductoData($updateProducto->id),  'productoinfo' => $updateProducto, 'data' => $request->post()),
+                    'msg'    => 'Actualizado',
+                );
+            }
+        }
+
+        return response()->json($response);
+    }
+
 
     public function productoUpdateGestion(Request $request, $id)
     {
@@ -220,15 +261,15 @@ class ProductoController extends Controller
                 }
 
                 $updateProducto->comentarios      = $request->post('comentarios');
-                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');   
-                $updateProducto->estado_id = $request->post('estado_programacion');             
+                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');
+                $updateProducto->estado_id = $request->post('estado_programacion');
 
                 $updateProducto->save();
-            }else{
+            } else {
 
                 $updateProducto->comentarios      = $request->post('comentarios');
-                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');                 
-                
+                $updateProducto->estadoseguimiento_id      = $request->post('estado_seguimiento');
+
                 $updateProducto->estado_id = $request->post('estado_programacion');
                 $updateProducto->save();
             }
@@ -236,7 +277,7 @@ class ProductoController extends Controller
             $response = array(
                 'status' => 'ok',
                 'code' => 200,
-                'data'   => array('producto' => $this->getProductoData($updateProducto->id),  'productoinfo' => $updateProducto, 'data' => $request->post()), 
+                'data'   => array('producto' => $this->getProductoData($updateProducto->id),  'productoinfo' => $updateProducto, 'data' => $request->post()),
                 'msg'    => 'Actualizado',
             );
         } else {
@@ -405,11 +446,10 @@ class ProductoController extends Controller
         return response()->json($response);
     }
 
-    public function validarErrores()
-    {
-    }
+    public function validarErrores() {}
 
-    public function insertProduct($item, $id, $user_id, $callbackValue=false){
+    public function insertProduct($item, $id, $user_id, $callbackValue = false)
+    {
         $producto = new Producto();
         $producto->producto_repso_id = $id;
         $producto->estado_id = 12;
@@ -418,7 +458,7 @@ class ProductoController extends Controller
         $producto->user_id = $user_id;
         $producto->modalidad = $item['modalidad'];
         $producto->save();
-        if($callbackValue){
+        if ($callbackValue) {
             return $producto;
         }
     }
@@ -427,14 +467,14 @@ class ProductoController extends Controller
     * Exportar Excel de productos
      */
 
-     public function exportExcelProducto(Request $request){
+    public function exportExcelProducto(Request $request)
+    {
         $params = $request->all();
         return Excel::download(new ProductosExport($params), 'productos.xlsx', \Maatwebsite\Excel\Excel::XLSX, [
             'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'Content-Disposition' => 'attachment; filename="productos.xlsx"'
         ]);
-
-     }
+    }
 
 
 
@@ -451,7 +491,7 @@ class ProductoController extends Controller
             ->where("id", "=", $id)
             ->select('productos_repso.*')
             ->addSelect(DB::raw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos"))
-            ->first();*/          
+            ->first();*/
 
         $clientesOtrasSolicitud = array();
         $user_id = auth()->user()->id;
@@ -460,7 +500,7 @@ class ProductoController extends Controller
             ->selectRaw("( select count(id) total_productos from productos where producto_repso_id ='" . $id . "') as total_productos")
             ->find($id);
         $validacion = 0;
-        
+
         if (!empty($find)) {
             if (file_exists(public_path() . '/' . $request->get('nombrearchivo'))) {
 
@@ -500,37 +540,38 @@ class ProductoController extends Controller
                             ->first();
                         /*
                         * Consultar si la persona existe en otra solicitud de mismo tipoproducto
-                         */   
+                         */
                         $getClientHistories = DB::table('productos')
-                        ->join('productos_repso','productos_repso.id','productos.producto_repso_id')
-                        ->join('clientes', 'productos.cedula', '=', 'clientes.cedula')
-                        ->select('productos_repso.id as solicitud',
-                                 'productos.cedula as cedula',
-                                 'productos.created_at as creado',
-                                 'clientes.nombre')                               
-                        ->where('productos.cedula', '=', $item['cedula'])
-                        ->where('productos_repso.tipoproducto_id', '=', $find->tipoproducto_id)
-                        ->whereNotIn('productos_repso.id', [$find->id])
-                        ->whereNull('productos.deleted_at')
-                        ->get();                                                   
+                            ->join('productos_repso', 'productos_repso.id', 'productos.producto_repso_id')
+                            ->join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+                            ->select(
+                                'productos_repso.id as solicitud',
+                                'productos.cedula as cedula',
+                                'productos.created_at as creado',
+                                'clientes.nombre'
+                            )
+                            ->where('productos.cedula', '=', $item['cedula'])
+                            ->where('productos_repso.tipoproducto_id', '=', $find->tipoproducto_id)
+                            ->whereNotIn('productos_repso.id', [$find->id])
+                            ->whereNull('productos.deleted_at')
+                            ->get();
 
 
-                        if (!$getClient && count($getClientHistories)==0) {
+                        if (!$getClient && count($getClientHistories) == 0) {
                             if ($item['cedula'] > 100000) {
                                 $this->insertProduct($item, $id, $user_id);
                             }
-                        }elseif(count($getClientHistories) >0 && !$getClient){
-                            $getClientHistories[0]->modalidad =$item['modalidad'];
-                            $getClientHistories[0]->dependencia_id =$item['dependencia_id'];
-                            $getClientHistories[0]->producto_repso_id =$id;
-                            $getClientHistories[0]->user_id =$user_id;
+                        } elseif (count($getClientHistories) > 0 && !$getClient) {
+                            $getClientHistories[0]->modalidad = $item['modalidad'];
+                            $getClientHistories[0]->dependencia_id = $item['dependencia_id'];
+                            $getClientHistories[0]->producto_repso_id = $id;
+                            $getClientHistories[0]->user_id = $user_id;
                             array_push($clientesOtrasSolicitud, $getClientHistories);
-                            if($request->get('forzarCargue') == 'Si'){
+                            if ($request->get('forzarCargue') == 'Si') {
                                 $this->insertProduct($item, $id, $user_id);
                             }
                         }
                     }
-                   
                 } else {
                     //return response()->json($importClientes->clientesImportar);
                     //return response()->json($response);
@@ -539,7 +580,7 @@ class ProductoController extends Controller
                 $response = array(
                     'status' => 'success',
                     'code' => 200,
-                    'data' => array("find" => $find, "clientesOtrasSolicitudes" =>$clientesOtrasSolicitud),
+                    'data' => array("find" => $find, "clientesOtrasSolicitudes" => $clientesOtrasSolicitud),
                     'msg'  => 'Registro Procesado correctamente'
                 );
 
