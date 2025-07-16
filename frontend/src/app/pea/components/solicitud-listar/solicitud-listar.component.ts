@@ -21,6 +21,7 @@ import { UtilService } from "../../../shared/services/util.service";
 import { ProductosrepsoService } from "../../services/productosrepso.service";
 import { User } from "src/app/auth/models/user";
 import { AuthenticationService } from "src/app/auth/services/authentication.service";
+import { ExcelMultiSolicitudPersonaComponent } from './excel-multi-solicitud-persona/excel-multi-solicitud-persona.component';
 
 @Component({
   selector: "app-solicitud-listar",
@@ -230,5 +231,28 @@ export class SolicitudListarComponent implements OnInit {
     this.router.navigate(["/pea/solicitudproductos"], {
       queryParams: { id: ev.id },
     });
+  }
+
+  cargaExcelMultiSolicitud() {
+    console.log("cargar excel")
+    const modalRef = this.modalService.open(ExcelMultiSolicitudPersonaComponent, {
+      backdrop: "static",
+      size: "lg",
+      keyboard: false,
+    });
+    
+    // modalRef.componentInstance.data = {
+    //   detallesPersona: data,
+    //   detallesOds: this.odsDetalles
+    // };
+
+    modalRef.result
+      .then((result) => {
+      
+        if (result.status == "ok") {
+        
+        }
+      })
+      .catch((error) => {});
   }
 }

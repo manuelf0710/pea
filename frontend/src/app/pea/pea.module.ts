@@ -36,6 +36,7 @@ import { MAT_DATE_LOCALE } from "@angular/material/core";
 import { ComentariosComponent } from "./components/comentarios/comentarios.component";
 import { PersonaSolicitudComponent } from "./components/productorepsodetallesprod/personasolicitud/personasolicitud.component";
 import { ReasignarPersonaComponent } from './components/productorepsodetallesprod/reasignarPersona/reasignar-persona/reasignar-persona.component';
+import { ExcelMultiSolicitudPersonaComponent } from './components/solicitud-listar/excel-multi-solicitud-persona/excel-multi-solicitud-persona.component';
 
 @NgModule({
   declarations: [
@@ -52,6 +53,7 @@ import { ReasignarPersonaComponent } from './components/productorepsodetallespro
     ComentariosComponent,
     PersonaSolicitudComponent,
     ReasignarPersonaComponent,
+    ExcelMultiSolicitudPersonaComponent,
   ],
   imports: [
     CommonModule,
