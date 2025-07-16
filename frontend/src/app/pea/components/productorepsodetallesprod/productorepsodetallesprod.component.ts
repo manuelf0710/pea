@@ -455,16 +455,18 @@ export class ProductorepsodetallesprodComponent
   reasignarPersona(data) {
     const modalRef = this.modalService.open(ReasignarPersonaComponent, {
       backdrop: "static",
-      size: "xs",
+      size: "lg",
       keyboard: false,
     });
-    const newInfoPersonas = {}
+    
     modalRef.componentInstance.data = {
-      info: newInfoPersonas,
+      detallesPersona: data,
+      detallesOds: this.odsDetalles
     };
 
     modalRef.result
       .then((result) => {
+        this.productosLista = this.productosLista.filter((item)=> item.id != result.id )
         if (result.status == "ok") {
           this.initLoadData();
         }

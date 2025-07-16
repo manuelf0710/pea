@@ -66,6 +66,13 @@ export class ProductosrepsoService {
     );
   }
 
+  public postReasignarPersona(data) {
+    return this._http.post<any>(
+      environment.apiUrl + environment.solicitud.postReasignarPersona + data.persona.id,
+      data
+    );
+  }
+
   eliminar(id) {
     return this._http.delete(`${environment.apiUrl}/pos/categorias/` + id);
   }
