@@ -48,6 +48,9 @@ export const environment = {
     uploadExcelToProductRepso: "files/uploads/",
     importExcelToProductRepso: "imports/importclientesproducto/",
   },
+  uploadFile: {
+    excelMultiPersona: "files/uploads/",
+  },
   exports: {
     generarExcelProductos: "exports/productos/",
   },
