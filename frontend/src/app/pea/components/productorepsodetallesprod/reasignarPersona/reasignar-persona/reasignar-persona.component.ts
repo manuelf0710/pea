@@ -86,7 +86,8 @@ export class ReasignarPersonaComponent implements OnInit {
     }
   }
 
-  buscar() {
+  buscar(event: Event) {
+    event.preventDefault();
     const idDestino = this.formulario.get("fSolicitudOrigenId").value;
     console.log("typeof",typeof idDestino)
     if(idDestino === this.data.detallesOds.id ) return this._ToastService.danger("No se puede reasignar al mismo producto");
