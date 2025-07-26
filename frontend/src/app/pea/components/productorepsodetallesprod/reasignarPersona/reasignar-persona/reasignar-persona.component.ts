@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from "@angular/common/http";
 import { Component, Input, OnInit } from "@angular/core";
-import { FormGroup } from "@angular/forms";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { ProductoService } from "src/app/pea/services/producto.service";
 import { ProductosrepsoService } from "src/app/pea/services/productosrepso.service";
@@ -14,6 +14,7 @@ import { UtilService } from "src/app/shared/services/util.service";
 })
 export class ReasignarPersonaComponent implements OnInit {
   public loading: boolean = false;
+  public loadingMessage = "Cargando información de solicitud"
   public destino = {
     tipo_producto: { name: "" },
     contrato: { nombre: "" },
@@ -28,6 +29,7 @@ export class ReasignarPersonaComponent implements OnInit {
   constructor(
     private _ProductosrepsoService: ProductosrepsoService,
     private _ToastService: ToastService,
+    private FormBuilder: FormBuilder,
     public _activeModal: NgbActiveModal
   ) {}
 
@@ -40,6 +42,12 @@ export class ReasignarPersonaComponent implements OnInit {
 
   ngOnInit(): void {
     console.log("reasigar --", this.data.detallesPersona);
+    this.buildForm();
+  }
+  buildForm() {
+    this.formulario = this.FormBuilder.group({
+      fSolicitudOrigenId: [""],
+    });
   }
 
   closeModal() {
@@ -51,6 +59,7 @@ export class ReasignarPersonaComponent implements OnInit {
 
   reasignar() {
     if (this.destino.tipo_producto.name !== "") {
+      this.loadingMessage = "Reasignando persona"
       this.loading = true;
       this._ProductosrepsoService
         .postReasignarPersona({
@@ -77,13 +86,15 @@ export class ReasignarPersonaComponent implements OnInit {
     }
   }
 
-  buscar(event: Event) {
-    event.preventDefault();
-    if(event.target[0].value === this.data.detallesOds.id.toString() ) return this._ToastService.danger("No se puede reasignar al mismo producto");
-    if(event.target[0].value){ 
+  buscar() {
+    const idDestino = this.formulario.get("fSolicitudOrigenId").value;
+    console.log("typeof",typeof idDestino)
+    if(idDestino === this.data.detallesOds.id ) return this._ToastService.danger("No se puede reasignar al mismo producto");
+    if(idDestino){ 
     this.loading = true;
+    this.loadingMessage = 'Buscando datos solicitud'
     this._ProductosrepsoService
-      .getSolicitudById(event.target[0].value)
+      .getSolicitudById(idDestino)
       .subscribe(
         (res: any) => {
           this.destino = res;

@@ -7,7 +7,7 @@
   </button>
 </div>
 <div class="container">
-  <app-loading *ngIf="loading"></app-loading>
+  <app-loading *ngIf="loading" [message]="loadingMessage"></app-loading>
   <div class="row">
     <div class="col-md-12">
       <div class="card bg-light mb-3">
@@ -27,18 +27,19 @@
       </div>
     </div>
   </div>
-  <form class="form-group form-search" (ngSubmit)="buscar($event)">
+  <form [formGroup]="formulario" class="form-group form-search" (ngSubmit)="buscar($event)">
     <div>
-      <label for="regional">Buscar codigo solicitud</label>
+      <label for="regional">Buscar codigo solicitud destino</label>
       <div class="input-group">
         <div class="input-group-prepend">
           <span class="input-group-text"><i class="fa fa-map"></i></span>
         </div>
         <input
           type="number"
-          name="fdependencia_id"
-          id="fdependencia_id"
+          name="fSolicitudOrigenId"
+          id="fSolicitudOrigenId"
           class="form-control form-control-sm"
+          formControlName="fSolicitudOrigenId"
         />
       </div>
     </div>
@@ -52,9 +53,12 @@
   <div class="row">
     <div class="col-md-6">
       <div class="card bg-light mb-3">
-        <div class="card bg-light text-center">Origen</div>
+        <div class="card bg-light text-center p-1">Origen</div>
         <div class="card-header">
           <div class="row">
+            <div class="col-md-12">
+              Código Solicitud: {{ data.detallesOds.id}}
+            </div>            
             <div class="col-md-12">
               Tipo producto: {{ data.detallesOds.tipo_producto.name }}
             </div>
@@ -73,9 +77,12 @@
     </div>
     <div class="col-md-6">
       <div class="card bg-light mb-3">
-        <div class="card bg-light text-center">Destino</div>
+        <div class="card bg-light text-center p-1">Destino</div>
         <div class="card-header" *ngIf="destino.tipo_producto?.name">
           <div class="row" >
+            <div class="col-md-12">
+              Tipo producto: {{ destino.id}}
+            </div>             
             <div class="col-md-12">
               Tipo producto: {{ destino.tipo_producto.name }}
             </div>  
