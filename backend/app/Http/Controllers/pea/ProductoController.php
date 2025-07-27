@@ -13,6 +13,7 @@ use App\Models\pea\ProductoReprogramaciones;
 use App\Models\pea\ProductoRepso;
 use App\Models\Cliente;
 use App\Imports\ClientesImport;
+use App\Imports\ClientesImportMultiProducto;
 use App\Exports\ProductosExport;
 use Auth;
 use Illuminate\Support\Facades\Storage;
@@ -69,7 +70,9 @@ class ProductoController extends Controller
      */
     public function store(Request $request)
     {
-        $product = $this->insertProduct($request, $request->post('producto_repso_id'), $request->post('user_id'), true);
+        $userId = auth()->user()->id;
+        //$product = $this->insertProduct($request, $request->post('producto_repso_id'), $request->post('user_id'), true);
+        $product = $this->insertProduct($request, $request->post('producto_repso_id'), $userId, true);
         if ($product) {
             $response = array(
                 'status' => 'ok',
@@ -431,7 +434,7 @@ class ProductoController extends Controller
                 ->selectRaw("concat(date_format(productos.fecha_inicio, '%d/%m/%Y'), ' ', date_format(productos.fecha_inicio, '%H:%i:%s  %p'), ' - ', date_format(productos.fecha_fin, '%H:%i:%s  %p')) as fecha_programacion")
                 ->selectRaw("case clientes.otrosi when 1 then 'Si' else 'No' End otrosi")
                 ->withoutTrashed()->orderBy('productos.id', 'desc')
-                ->where('producto_repso_id', '=', $id)
+                ->where('productos.producto_repso_id', '=', $id)
                 ->productId($product_id)
                 ->profesionalAsignado(auth()->user()->perfil_id, auth()->user()->id)
                 ->cedula($cedula)
@@ -476,10 +479,211 @@ class ProductoController extends Controller
         ]);
     }
 
+    /*
+    * return array [1,2,3,4]
+     */
+    private function unicosIdsFromArray($arreglo, $campo = "producto_repso_id")
+    {
+        $idsUnicos = array_unique(
+            array_map(function ($item) use ($campo) {
+                return $item[$campo] ?? null;
+            }, $arreglo)
+        );
+
+        $idsUnicos = array_filter($idsUnicos, fn($id) => $id !== null && $id !== '');
+        $idsUnicos = array_values($idsUnicos);
+
+        return $idsUnicos;
+    }
+
+    private function getClientHistory($cedula, $productoRepsoId, $solicitud)
+    {
+        if (is_array($solicitud)  && count($solicitud) > 0) {
+
+            $getClientHistories = DB::table('productos')
+                ->join('productos_repso', 'productos_repso.id', 'productos.producto_repso_id')
+                ->join('clientes', 'productos.cedula', '=', 'clientes.cedula')
+                ->select(
+                    'productos_repso.id as solicitud',
+                    'productos.cedula as cedula',
+                    'productos.created_at as creado',
+                    'clientes.nombre'
+                )
+                ->where('productos.cedula', '=', $cedula)
+                ->where('productos_repso.tipoproducto_id', '=', $solicitud['tipoproducto_id'])
+                ->whereNotIn('productos_repso.id', [$productoRepsoId])
+                ->whereNull('productos.deleted_at')
+                ->get();
+            return $getClientHistories;
+        }
+        return [];
+    }
+
+    public function getDataSolicitudDestino($solicitudes, $idSolicitud)
+    {
+        $response = [];
+        foreach ($solicitudes as $item) {
+            if ($item['id'] == $idSolicitud) {
+                $response = $item;
+                break;
+            }
+        }
+        return $response;
+    }
+
+
+    public function ImportClientesMultiProductoRepsoBK(Request $request)
+    {
+        $requestData = $request->all();
+        $user_id = auth()->user()->id;
+        $nombreArchivo =  $request->get('nombrearchivo');
+        if ($nombreArchivo && file_exists(public_path() . '/' . $nombreArchivo)) {
+            $importClientes = new ClientesImportMultiProducto;
+            $nmombreArchivo = "uploads/clientes/2025/07/26/20250726_124326_clientes_620438.xlsx";
+            Excel::import($importClientes, public_path() . '/' . $nmombreArchivo);
+            $productosRepsoLista = $this->unicosIdsFromArray($importClientes->clientesImportar);
+
+            $response = array(
+                'status' => 'success',
+                'code' => 200,
+                'data' => array("records" => $importClientes),
+                'msg'  => 'Excel leido correctamente'
+            );
+            /*
+            * Validate codigo solicitud destino tenga datos.
+             */
+            if (count($productosRepsoLista) === 0) {
+                return response()->json([
+                    'status' => 'error',
+                    'code' => 422,
+                    'data' => array("records" => $importClientes->clientesImportar),
+                    'msg' => 'No hay ningun dato en la columna de solicitud destino'
+                ], 422);
+
+                //return response()->json($response);
+            }
+
+            $getSolicitudesInfoLista = DB::table('productos_repso')
+                ->whereIn('productos_repso.id', $productosRepsoLista)
+                ->whereNull('productos_repso.deleted_at')
+                ->get()
+                ->map(function ($item) {
+                    return (array) $item;
+                })
+                ->toArray();
+            $unicosIdsSolicitudesExistentes = $this->unicosIdsFromArray($getSolicitudesInfoLista, 'id');
+
+            //$camposPermitidos = (new Cliente)->getFillable();
+            $infoData = [];
+            foreach ($importClientes->clientesImportar as $item) {
+                $itemArray = $item->getAttributes();
+                $itemArray['existeSolicitudDestinoId'] = in_array($itemArray['producto_repso_id'], $unicosIdsSolicitudesExistentes);
+                $solicitudInfo = $this->getDataSolicitudDestino($getSolicitudesInfoLista, $itemArray['producto_repso_id']);
+                $itemArray['solicitudInfo'] = $solicitudInfo;
+                $history = $this->getClientHistory($itemArray['cedula'], $itemArray['producto_repso_id'], $solicitudInfo);
+                $itemArray['historia'] = $history;
+                $infoData[] = $itemArray;
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'code' => 200,
+                'data' => [
+                    'records' => $infoData,
+                    'dataExcel' => $importClientes->clientesImportar,
+                    'productosRepsoIdDestino' => $unicosIdsSolicitudesExistentes,
+                    'dataSolicitudDestino' => $getSolicitudesInfoLista
+                ],
+                'msg' => 'Datos de excel procesados correctamente'
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'code' => 422,
+                'data' => [],
+                'msg' => 'no hay archivo excel para leer'
+            ], 422);
+        }
+    }
+
+    public function ImportClientesMultiProductoRepso(Request $request)
+    {
+        $nombreArchivo = $request->get('nombrearchivo');
+        //$nombreArchivo = "uploads/clientes/2025/07/26/20250726_124326_clientes_620438.xlsx";
+        $rutaArchivo = public_path($nombreArchivo);
+
+        if (!$nombreArchivo || !file_exists($rutaArchivo)) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 422,
+                'data' => [],
+                'msg' => 'No hay archivo Excel para leer'
+            ], 422);
+        }
+
+        $importClientes = new ClientesImportMultiProducto;
+        Excel::import($importClientes, $rutaArchivo);
+
+        $clientesImportados = $importClientes->clientesImportar;
+        $productosRepsoLista = $this->unicosIdsFromArray($clientesImportados);
+
+        // Validar que existan datos en la columna producto_repso_id
+        if (empty($productosRepsoLista)) {
+            return response()->json([
+                'status' => 'error',
+                'code' => 422,
+                'data' => ['records' => $clientesImportados],
+                'msg' => 'No hay ningún dato en la columna de solicitud destino'
+            ], 422);
+        }
+
+        // Obtener datos de solicitudes existentes
+        $getSolicitudesInfoLista = DB::table('productos_repso')
+            ->whereIn('productos_repso.id', $productosRepsoLista)
+            ->whereNull('productos_repso.deleted_at')
+            ->get()
+            ->map(function ($item) {
+                return (array) $item;
+            })
+            ->toArray();
+        $unicosIdsSolicitudesExistentes = $this->unicosIdsFromArray($getSolicitudesInfoLista, 'id');
+
+        // Procesar cada cliente importado
+        $infoData = [];
+        foreach ($clientesImportados as $item) {
+            $itemArray = $item->getAttributes();
+
+            $productoRepsoId = $itemArray['producto_repso_id'] ?? null;
+            $cedula = $itemArray['cedula'] ?? null;
+
+            $itemArray['existeSolicitudDestinoId'] = in_array($productoRepsoId, $unicosIdsSolicitudesExistentes);
+
+            $solicitudInfo = $this->getDataSolicitudDestino($getSolicitudesInfoLista, $productoRepsoId);
+            $itemArray['solicitudInfo'] = $solicitudInfo;
+
+            $historia = $this->getClientHistory($cedula, $productoRepsoId, $solicitudInfo);
+            $itemArray['historia'] = $historia;
+
+            $infoData[] = $itemArray;
+        }
+
+        // Retornar respuesta final
+        return response()->json([
+            'status' => 'success',
+            'code' => 200,
+            'data' => [
+                'records' => $infoData,
+                'dataExcel' => $clientesImportados,
+                'productosRepsoIdDestino' => $unicosIdsSolicitudesExistentes,
+                'dataSolicitudDestino' => $getSolicitudesInfoLista
+            ],
+            'msg' => 'Datos del Excel procesados correctamente'
+        ]);
+    }
 
 
     /*
-    * importa el excel de clientes
+    * importa el excel de clientes por producto Repso id
      */
     public function ImportClientesByProductoRepso($id, Request $request)
     {

@@ -1,8 +1,8 @@
 <app-loading *ngIf="loading"></app-loading>
 <ng-container *ngIf="tableConfig">
-  <button class="btn btn-success btn-sm pull-right carga-excel"
+  <button class="btn btn-info btn-sm pull-right carga-excel"
   (click)="cargaExcelMultiSolicitud()">
-    <i class="fa fa-file-excel-o"></i> Cargar Excel
+    <i class="fa fa-file-excel-o"></i> Cargar Excel Multiples Solicitudes
   </button>
   <app-bgtable
     [tableConfig]="tableConfig"

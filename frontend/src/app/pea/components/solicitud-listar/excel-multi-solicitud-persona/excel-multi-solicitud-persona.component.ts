@@ -1,6 +1,8 @@
 import { Component, Input, OnInit } from "@angular/core";
+import { FormGroup, FormBuilder, Validators } from "@angular/forms";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { ToastService } from "src/app/shared/services/toast.service";
+import { ProductoService } from "../../../services/producto.service";
 
 @Component({
   selector: "app-excel-multi-solicitud-persona",
@@ -9,10 +11,14 @@ import { ToastService } from "src/app/shared/services/toast.service";
 })
 export class ExcelMultiSolicitudPersonaComponent implements OnInit {
   public loading: boolean = false;
-  
+  public archivoscargados: any[] = [];
+  formularioArchivo: FormGroup;
+
   constructor(
+    private FormBuilder: FormBuilder,
     private _ToastService: ToastService,
-    public _activeModal: NgbActiveModal
+    public _activeModal: NgbActiveModal,
+    private _ProductoService: ProductoService
   ) {}
 
   @Input() data: any;
@@ -22,9 +28,56 @@ export class ExcelMultiSolicitudPersonaComponent implements OnInit {
     data: [],
   };
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.buildForm()
+  }
 
   closeModal() {
     this._activeModal.close(this.respuesta);
+  }
+  private buildForm() {
+    this.formularioArchivo = this.FormBuilder.group({
+      id: [""],
+      archivo: ["", [Validators.required]],
+      forzarCargue: ["No"],
+    });
+  }
+
+  getArchivos(archivos_upload) {
+    /*archivos subidos, desde fileuploadcomponent */
+    this.archivoscargados = archivos_upload;
+    this.formularioArchivo
+      .get("archivo")
+      .setValue(this.archivoscargados[0]["path"]);
+
+    if (this.archivoscargados.length > 0) {
+      this._ToastService.info("archivo cargado y procesando datos...");
+      this.procesarDatosExcel();
+    }
+  }
+  procesarDatosExcel() {
+    this._ProductoService
+      .procesarExcelMultiSolicitud({
+        nombrearchivo: this.formularioArchivo.value.archivo
+      })
+      .subscribe((res: any) => {
+        if (res.status == "error") {
+          this._ToastService.danger(res.msg);
+        }
+        if (res.code == 200) {
+          /*this.mostrarCargaExcel = false;
+          if (res.data.clientesOtrasSolicitudes.length > 0) {
+            this.simpleModal(res.data.clientesOtrasSolicitudes);
+          } else {
+            this._ToastService.success(res.msg);
+          }
+
+          this._ProductoService
+            .getProductosBySolicitud(this.id, {})
+            .subscribe((data) => {
+              this.productosLista = data.data;
+            }); */
+        }
+      });
   }
 }

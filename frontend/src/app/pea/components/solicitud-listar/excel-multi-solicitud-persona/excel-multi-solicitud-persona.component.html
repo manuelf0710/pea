@@ -1,6 +1,6 @@
 <div class="modal-header">
   <h3 class="modal-title" id="modal-basic-title">
-    <span> Reasignar persona </span>
+    <span> Carga de datos de Excel a múltiples solicitudes </span>
   </h3>
   <button type="button" class="close" aria-label="Close" (click)="closeModal()">
     <i class="fa fa-close"></i>
@@ -9,18 +9,24 @@
 <div class="m-3">
   <app-loading *ngIf="loading"></app-loading>
   <div class="card bg-light mb-1 w-100">
-    <div class="card-header">
-      Carga un archivo de excel
-    </div>
+    <div class="card-header">Carga un archivo de excel</div>
     <div class="card-body">
       <file-upload
         [multiple]="false"
         [autoupload]="true"
         (ArchivosCargados)="getArchivos($event)"
-        [title]="'Agregar Excel con personas'"
+        [title]="'Agregar Excel con personas a multiples solicitudes'"
         [document_type]="'clientes'"
         [accept_files_extension]="['xlsx', 'csv']"
       ></file-upload>
+      <!--<button
+        type="button"
+        class="close"
+        aria-label="Close"
+        (click)="procesarDatosExcel()"
+      >
+        <i class="fa fa-search"></i>Procesa Excel
+      </button>-->
     </div>
   </div>
 </div>

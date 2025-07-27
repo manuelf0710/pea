@@ -29,7 +29,8 @@ class Cliente extends Model
         'ciudad_id',
         'barrio',
         'otrosi',
-        'modalidad'
+        'modalidad',
+        'producto_repso_id'
     ];	
 
     protected $dates = ['deleted_at'];

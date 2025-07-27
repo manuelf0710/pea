@@ -15,6 +15,7 @@ export const environment = {
     posByIdProductoRepso: "pea/productobyrepsoid/",
     posProduct: "pea/createproducto/",
     getProcesarCargue: "pea/productosprocesarcargue/",
+    getProcesarCargueMultiSolicitud: "pea/productosProcesarCargueMultiSolicitud/",
     putProductoGestionById: "pea/productoupdategestion/",
     putProductoCancelStateById: "pea/productocancelstate/",
     deleteProductoBYId: "pea/productodelete/",

@@ -16,6 +16,7 @@ export class ReasignarPersonaComponent implements OnInit {
   public loading: boolean = false;
   public loadingMessage = "Cargando información de solicitud"
   public destino = {
+    id: '',
     tipo_producto: { name: "" },
     contrato: { nombre: "" },
     regional: { nombre: "" },
