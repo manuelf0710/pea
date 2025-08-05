@@ -609,7 +609,7 @@ class ProductoController extends Controller
     public function ImportClientesMultiProductoRepso(Request $request)
     {
         $nombreArchivo = $request->get('nombrearchivo');
-        //$nombreArchivo = "uploads/clientes/2025/07/26/20250726_124326_clientes_620438.xlsx";
+        $nombreArchivo = "uploads/clientes/2025/07/26/20250726_124326_clientes_620438.xlsx";
         $rutaArchivo = public_path($nombreArchivo);
 
         if (!$nombreArchivo || !file_exists($rutaArchivo)) {
