@@ -14,6 +14,7 @@ export const environment = {
     getByIdProductoRepso: "pea/productobyrepsoid/",
     posByIdProductoRepso: "pea/productobyrepsoid/",
     posProduct: "pea/createproducto/",
+    postCreateProductoMulti: "pea/createProductoMulti/",
     getProcesarCargue: "pea/productosprocesarcargue/",
     getProcesarCargueMultiSolicitud: "pea/productosProcesarCargueMultiSolicitud/",
     putProductoGestionById: "pea/productoupdategestion/",
