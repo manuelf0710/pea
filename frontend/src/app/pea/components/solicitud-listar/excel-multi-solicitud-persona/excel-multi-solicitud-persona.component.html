@@ -8,7 +8,7 @@
 </div>
 <div class="m-3">
   <app-loading *ngIf="loading"></app-loading>
-  <div class="card bg-light mb-1 w-100">
+  <div class="card bg-light mb-1 w-100" *ngIf="!procesadoReady">
     <div class="card-header">Carga un archivo de excel</div>
     <div class="card-body">
       <file-upload
@@ -28,5 +28,53 @@
         <i class="fa fa-search"></i>Procesa Excel
       </button>
     </div>
+  </div>
+  <div class="card bg-light mb-1 w-100 table-h" *ngIf="procesadoReady">
+    <table class="table table-sm table-hover table-bordered table-striped">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Nombre</th>
+          <th>Cedula</th>
+          <th>Solicitud Id</th>
+        </tr>
+      </thead>
+      <tbody
+        *ngFor="let item of datosProcesados; let i = index"
+        [ngClass]="item.existeSolicitudDestinoId ? '' : 'fondo-rojo'"
+        [title]="item.existeSolicitudDestinoId ? '' : 'No existe solicitud de destino'"
+      >
+        <tr class="cursor-po" (click)="getExpandirData(item.cedula)">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.nombre }}</td>
+          <td>{{ item.cedula }}</td>
+          <td >{{ item.solicitudInfo.id }} 
+            <span *ngIf="item.historia.length" class="badge badge-light ml-2">{{item.historia.length}}</span>
+          </td>
+        </tr>
+        <tr *ngIf="dataExpandida.cedula === item.cedula && dataExpandida.historia.length">
+          <td colspan="4">
+            <table class="table table-sm table-bordered">
+              <thead>
+                <tr>
+                  <th>Solicitud</th>
+                  <th>Nombre</th>
+                  <th>Cedula</th>
+                  <th>Creado</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>{{ dataExpandida.historia[0].solicitud }}</td>
+                  <td>{{ dataExpandida.historia[0].nombre }}</td>
+                  <td>{{ dataExpandida.historia[0].cedula }}</td>
+                  <td>{{ dataExpandida.historia[0].creado }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </div>

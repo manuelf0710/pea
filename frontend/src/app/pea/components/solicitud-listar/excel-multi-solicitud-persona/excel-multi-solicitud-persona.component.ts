@@ -12,6 +12,9 @@ import { ProductoService } from "../../../services/producto.service";
 export class ExcelMultiSolicitudPersonaComponent implements OnInit {
   public loading: boolean = false;
   public archivoscargados: any[] = [];
+  public datosProcesados: any[] = [];
+  public procesadoReady: boolean = false
+  public dataExpandida: any = {};
   formularioArchivo: FormGroup;
 
   constructor(
@@ -65,6 +68,13 @@ export class ExcelMultiSolicitudPersonaComponent implements OnInit {
           this._ToastService.danger(res.msg);
         }
         if (res.code == 200) {
+          
+          if (res.data.records.length) {
+            this.procesadoReady = true;
+            this.datosProcesados =  res.data.records;
+          } else {
+            this._ToastService.success(res.msg);
+          }
           /*this.mostrarCargaExcel = false;
           if (res.data.clientesOtrasSolicitudes.length > 0) {
             this.simpleModal(res.data.clientesOtrasSolicitudes);
@@ -79,5 +89,10 @@ export class ExcelMultiSolicitudPersonaComponent implements OnInit {
             }); */
         }
       });
+  }
+
+  getExpandirData(cedula) {
+    this.dataExpandida = this.datosProcesados.find((item)=> cedula === item.cedula)  
+    console.log(this.dataExpandida)
   }
 }
