@@ -19,14 +19,14 @@
         [document_type]="'clientes'"
         [accept_files_extension]="['xlsx', 'csv']"
       ></file-upload>
-      <button
+      <!--<button
         type="button"
         class="close"
         aria-label="Close"
         (click)="procesarDatosExcel()"
       >
         <i class="fa fa-search"></i>Procesa Excel
-      </button>
+      </button>-->
     </div>
   </div>
   <div class="card bg-light mb-1 w-100" *ngIf="procesadoReady">
@@ -51,13 +51,13 @@
       </thead>
       <tbody
         *ngFor="let item of datosProcesados; let i = index"
-        [ngClass]="item.existeSolicitudDestinoId ? '' : 'fondo-rojo'"
-        [title]="item.existeSolicitudDestinoId ? '' : 'No existe solicitud de destino'"
+        [ngClass]="item.validRecord ? '' : 'fondo-rojo'"
+        [title]="getTooltipMensaje(item)"
       >
         <tr class="cursor-po" (click)="getExpandirData(item.cedula)">
           <td>
             <input
-              *ngIf="item.existeSolicitudDestinoId && !item.nuevoProducto" 
+              *ngIf="item.validRecord && !item.nuevoProducto" 
               type="checkbox"   
               [checked]="item.agregar" 
               (change)="seleccionarAgregar($event.target.checked, item.cedula)"

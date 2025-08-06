@@ -237,7 +237,7 @@ export class SolicitudListarComponent implements OnInit {
     console.log("cargar excel")
     const modalRef = this.modalService.open(ExcelMultiSolicitudPersonaComponent, {
       backdrop: "static",
-      size: "lg",
+      size: "xl",
       keyboard: false,
     });
     

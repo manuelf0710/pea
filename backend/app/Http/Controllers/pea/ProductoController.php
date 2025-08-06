@@ -642,10 +642,28 @@ class ProductoController extends Controller
         }
     }
 
+    public function getCliente($productoRepsoId, $cedula)
+    {
+        return DB::table('productos')
+            ->where('producto_repso_id', '=', $productoRepsoId)
+            ->where('cedula', '=', $cedula)
+            ->first();
+    }
+
+    public function buscarProductoPorCedulaYRepso($productos, $cedula, $productoRepsoId)
+    {
+        foreach ($productos as $producto) {
+            if ($producto['cedula'] == $cedula && $producto['producto_repso_id'] == $productoRepsoId) {
+                return $producto;
+            }
+        }
+        return null;
+    }
+
     public function ImportClientesMultiProductoRepso(Request $request)
     {
         $nombreArchivo = $request->get('nombrearchivo');
-        $nombreArchivo = "uploads/clientes/2025/07/26/20250726_124326_clientes_620438.xlsx";
+        //$nombreArchivo = "uploads/clientes/2025/07/26/20250726_124326_clientes_620438.xlsx";
         $rutaArchivo = public_path($nombreArchivo);
 
         if (!$nombreArchivo || !file_exists($rutaArchivo)) {
@@ -684,6 +702,16 @@ class ProductoController extends Controller
             ->toArray();
         $unicosIdsSolicitudesExistentes = $this->unicosIdsFromArray($getSolicitudesInfoLista, 'id');
 
+
+        $getProductosBySolicitud = DB::table('productos')
+            ->whereIn('productos.producto_repso_id', $productosRepsoLista)
+            ->whereNull('productos.deleted_at')
+            ->get()
+            ->map(function ($item) {
+                return (array) $item;
+            })
+            ->toArray();
+
         // Procesar cada cliente importado
         $infoData = [];
         foreach ($clientesImportados as $item) {
@@ -693,6 +721,22 @@ class ProductoController extends Controller
             $cedula = $itemArray['cedula'] ?? null;
 
             $itemArray['existeSolicitudDestinoId'] = in_array($productoRepsoId, $unicosIdsSolicitudesExistentes);
+            $errores = [];
+
+            if (!$itemArray['existeSolicitudDestinoId']) {
+                $errores[] = ["id" => 1, "msg" => "No existe solicitud destino"];
+            }
+
+            $buscarTieneEnActual = $this->buscarProductoPorCedulaYRepso($getProductosBySolicitud, $cedula, $productoRepsoId);
+
+            if ($buscarTieneEnActual) {
+                $errores[] = ["id" => 2, "msg" => "Ya tiene un registro creado en la solicitud destino"];
+            }
+
+            $itemArray['errors'] = $errores;
+
+            $itemArray['validRecord'] =  count($errores) === 0;
+            $errores = [];
 
             $solicitudInfo = $this->getDataSolicitudDestino($getSolicitudesInfoLista, $productoRepsoId);
             $itemArray['solicitudInfo'] = $solicitudInfo;
@@ -711,7 +755,8 @@ class ProductoController extends Controller
                 'records' => $infoData,
                 'dataExcel' => $clientesImportados,
                 'productosRepsoIdDestino' => $unicosIdsSolicitudesExistentes,
-                'dataSolicitudDestino' => $getSolicitudesInfoLista
+                'dataSolicitudDestino' => $getSolicitudesInfoLista,
+                'temporal' => $getProductosBySolicitud
             ],
             'msg' => 'Datos del Excel procesados correctamente'
         ]);

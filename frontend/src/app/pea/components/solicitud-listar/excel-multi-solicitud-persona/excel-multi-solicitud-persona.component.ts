@@ -47,6 +47,22 @@ export class ExcelMultiSolicitudPersonaComponent implements OnInit {
     });
   }
 
+  getTooltipMensaje(item: any): string {
+  if (item.validRecord) {
+    return '';
+  }
+
+  if (!item.errors || item.errors.length === 0) {
+    return 'Error desconocido'; // o ''
+  }
+
+  return item.errors
+    .slice(0, 3) // opcional: máximo 3 errores
+    .map(error => error.msg)
+    .join(' | ');
+}
+
+
   getArchivos(archivos_upload) {
     /*archivos subidos, desde fileuploadcomponent */
     this.archivoscargados = archivos_upload;
