@@ -70,8 +70,10 @@ class ProductoController extends Controller
             foreach ($dataToInsert as $item) {
                 $datoSave = $this->insertProduct($item, $item['producto_repso_id'], $userId, true);
                 if ($datoSave) {
+                    $currenItem = $item;
                     $datoSave->creado = true;
-                    $dataRecords[] = $datoSave;
+                    $currenItem['registroInsertado'] = $datoSave;
+                    $dataRecords[] = $currenItem;
                 }
             }
 
