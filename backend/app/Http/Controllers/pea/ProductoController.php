@@ -72,7 +72,7 @@ class ProductoController extends Controller
                 if ($datoSave) {
                     $currenItem = $item;
                     $datoSave->creado = true;
-                    $currenItem['registroInsertado'] = $datoSave;
+                    $currenItem['nuevoProducto'] = $datoSave;
                     $dataRecords[] = $currenItem;
                 }
             }
