@@ -57,9 +57,43 @@ class ProductoController extends Controller
 
         return response()->json($response);
     }
-    public function create()
+
+    public function createProductoMulti(Request $request)
     {
-        //
+        $userId = auth()->user()->id;
+        $dataToInsert = $request->all();
+        $dataRecords = [];
+        if (count($dataToInsert) > 0) {
+
+            //echo json_encode($request->all());
+
+            foreach ($dataToInsert as $item) {
+                $datoSave = $this->insertProduct($item, $item['producto_repso_id'], $userId, true);
+                if ($datoSave) {
+                    $datoSave->creado = true;
+                    $dataRecords[] = $datoSave;
+                }
+            }
+
+            return response()->json([
+                'status' => 'success',
+                'code' => 200,
+                'data' => [
+                    'records' => $dataRecords,
+                    'dataExcel' => $dataToInsert,
+                ],
+                'msg' => 'Datos de excel procesados correctamente'
+            ]);
+        }
+        return response()->json([
+            'status' => 'error',
+            'code' => 422,
+            'data' => [
+                'records' => $dataRecords,
+                'dataExcel' => $dataToInsert,
+            ],
+            'msg' => 'No hay ningun dato para procesar'
+        ], 422);
     }
 
     /**

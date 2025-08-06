@@ -100,6 +100,7 @@ Route::group(['middleware' => ['jwt.auth']], function () {
 		// Rutas de Productos
 		Route::put('updateproducto/{id}', 'pea\ProductoController@update')->name('productos.update');
 		Route::post('createproducto', 'pea\ProductoController@store')->name('productos.create');
+		Route::post('createProductoMulti', 'pea\ProductoController@createProductoMulti')->name('productos.createProductoMulti');
 		Route::post('productobyrepsoid/{id}', 'pea\ProductoController@productsByProductRepso')->name('productosbyidrepso');
 		Route::post('productosprocesarcargue/{id}', 'pea\ProductoController@ImportClientesByProductoRepso')->name('import.clientesbyproductorepso');
 		Route::post('productosProcesarCargueMultiSolicitud', 'pea\ProductoController@ImportClientesMultiProductoRepso')->name('import.clientesbyproductorepso');
