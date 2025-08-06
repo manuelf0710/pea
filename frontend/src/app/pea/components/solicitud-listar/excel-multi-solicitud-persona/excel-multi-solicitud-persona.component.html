@@ -29,11 +29,21 @@
       </button>
     </div>
   </div>
-  <div class="card bg-light mb-1 w-100 table-h" *ngIf="procesadoReady">
+  <div class="card bg-light mb-1 w-100" *ngIf="procesadoReady">
     <table class="table table-sm table-hover table-bordered table-striped">
       <thead>
         <tr>
+          <td>
+            <input
+              *ngIf="!confirmacionNuevoProducto"
+              type="checkbox" 
+              id="todos" 
+              name="todos"               
+              (change)="seleccionarTodos($event.target.checked)"
+            >
+          </td>
           <th>#</th>
+          <th *ngIf="confirmacionNuevoProducto" >Creado</th>
           <th>Nombre</th>
           <th>Cedula</th>
           <th>Solicitud Id</th>
@@ -45,7 +55,16 @@
         [title]="item.existeSolicitudDestinoId ? '' : 'No existe solicitud de destino'"
       >
         <tr class="cursor-po" (click)="getExpandirData(item.cedula)">
+          <td>
+            <input
+              *ngIf="item.existeSolicitudDestinoId && !item.nuevoProducto" 
+              type="checkbox"   
+              [checked]="item.agregar" 
+              (change)="seleccionarAgregar($event.target.checked, item.cedula)"
+            >
+          </td>
           <td>{{ i + 1 }}</td>
+          <th *ngIf="item.nuevoProducto" >{{item.nuevoProducto.creado? 's':'n'}}</th>
           <td>{{ item.nombre }}</td>
           <td>{{ item.cedula }}</td>
           <td >{{ item.solicitudInfo.id }} 
@@ -53,7 +72,7 @@
           </td>
         </tr>
         <tr *ngIf="dataExpandida.cedula === item.cedula && dataExpandida.historia.length">
-          <td colspan="4">
+          <td colspan="6">
             <table class="table table-sm table-bordered">
               <thead>
                 <tr>
@@ -76,5 +95,8 @@
         </tr>
       </tbody>
     </table>
+    <button *ngIf="!confirmacionNuevoProducto" (click)="enviarDatosAgregar()" type="submit" class="btn btn-secondary btn-lg">
+      <i class="fa fa-save mr-1"></i>Guardar
+    </button>
   </div>
 </div>

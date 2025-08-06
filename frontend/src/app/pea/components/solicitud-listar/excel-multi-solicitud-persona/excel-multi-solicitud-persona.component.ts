@@ -13,8 +13,9 @@ export class ExcelMultiSolicitudPersonaComponent implements OnInit {
   public loading: boolean = false;
   public archivoscargados: any[] = [];
   public datosProcesados: any[] = [];
-  public procesadoReady: boolean = false
+  public procesadoReady: boolean = false;
   public dataExpandida: any = {};
+  public confirmacionNuevoProducto: boolean = false;
   formularioArchivo: FormGroup;
 
   constructor(
@@ -32,7 +33,7 @@ export class ExcelMultiSolicitudPersonaComponent implements OnInit {
   };
 
   ngOnInit(): void {
-    this.buildForm()
+    this.buildForm();
   }
 
   closeModal() {
@@ -61,38 +62,63 @@ export class ExcelMultiSolicitudPersonaComponent implements OnInit {
   procesarDatosExcel() {
     this._ProductoService
       .procesarExcelMultiSolicitud({
-        nombrearchivo: this.formularioArchivo.value.archivo
+        nombrearchivo: this.formularioArchivo.value.archivo,
       })
       .subscribe((res: any) => {
         if (res.status == "error") {
           this._ToastService.danger(res.msg);
         }
         if (res.code == 200) {
-          
           if (res.data.records.length) {
             this.procesadoReady = true;
-            this.datosProcesados =  res.data.records;
+            res.data.records.forEach((item) => {
+              item.agregar = false;
+            });
+            this.datosProcesados = res.data.records;
           } else {
             this._ToastService.success(res.msg);
           }
-          /*this.mostrarCargaExcel = false;
-          if (res.data.clientesOtrasSolicitudes.length > 0) {
-            this.simpleModal(res.data.clientesOtrasSolicitudes);
-          } else {
-            this._ToastService.success(res.msg);
-          }
-
-          this._ProductoService
-            .getProductosBySolicitud(this.id, {})
-            .subscribe((data) => {
-              this.productosLista = data.data;
-            }); */
         }
       });
   }
 
   getExpandirData(cedula) {
-    this.dataExpandida = this.datosProcesados.find((item)=> cedula === item.cedula)  
-    console.log(this.dataExpandida)
+    this.dataExpandida = this.datosProcesados.find(
+      (item) => cedula === item.cedula
+    );
+    console.log(this.dataExpandida);
+  }
+
+  seleccionarAgregar(ev, cedula) {
+    this.datosProcesados.forEach((item) => {
+      if (cedula === item.cedula) item.agregar = ev;
+    });
+  }
+
+  seleccionarTodos(ev) {
+    this.datosProcesados.forEach((item) => {
+      if (item.existeSolicitudDestinoId) item.agregar = ev;
+    });
+  }
+  enviarDatosAgregar() {
+    let data = this.datosProcesados.filter((item) => item.agregar === true);
+    data.forEach((item) => {
+      delete item.agregar;
+    });
+    if (data.length) {
+      this._ProductoService.saveMultiProduct(data).subscribe((res: any) => {
+        if (res.status == "error") {
+          this._ToastService.danger(res.msg);
+        }
+        if (res.code == 200) {
+          this.confirmacionNuevoProducto = true;
+          this.datosProcesados = res.data.records
+          console.log("------ res", res);
+          this._ToastService.success('Productos agregados');
+        }
+      });
+    } else {
+      this._ToastService.danger('No hay nunguno seleccionado');
+    }
   }
 }

@@ -90,4 +90,15 @@ export class ProductoService {
       environment.apiUrl + environment.productos.deleteProductoBYId + id
     );
   }
+
+  public saveMultiProduct(data) {
+    return this._http
+      .post<any>(environment.apiUrl + environment.productos.postCreateProductoMulti, data)
+      .pipe(
+        map((lista) => {
+          const retorno = lista;
+          return retorno;
+        })
+      );
+  }
 }
